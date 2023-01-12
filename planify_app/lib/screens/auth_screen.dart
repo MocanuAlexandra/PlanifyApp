@@ -94,7 +94,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: Text(
                       'Planify App',
                       style: TextStyle(
-                        color: Color.fromARGB(153, 99, 14, 135),
+                        color: Color.fromARGB(255, 255, 255, 255),
                         fontSize: 40,
                         fontFamily: 'Anton',
                         fontWeight: FontWeight.normal,
