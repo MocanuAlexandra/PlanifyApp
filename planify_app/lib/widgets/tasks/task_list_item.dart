@@ -3,14 +3,14 @@ import 'package:intl/intl.dart';
 
 import '../../models/task.dart';
 
-class TaskItem extends StatelessWidget {
+class TaskListItem extends StatelessWidget {
   final String? id;
   final String? title;
   final DateTime? dueDate;
   final bool isDone;
   final Priority? priority;
 
-  const TaskItem(
+  const TaskListItem(
       {super.key,
       required this.id,
       this.title,
@@ -39,9 +39,9 @@ class TaskItem extends StatelessWidget {
         color: Theme.of(context).errorColor,
         alignment: Alignment.centerRight,
         margin: const EdgeInsets.symmetric(
-            horizontal: 15.0,
-            vertical: 4.0,
-          ),
+          horizontal: 15.0,
+          vertical: 4.0,
+        ),
         child: const Icon(
           Icons.delete,
           color: Colors.white,
@@ -69,7 +69,7 @@ class TaskItem extends StatelessWidget {
                   ],
                 ));
       },
-      // TODO remove item 
+      // TODO remove item
       onDismissed: ((direction) => {}),
       child: InkWell(
         onTap: () {},
@@ -89,6 +89,10 @@ class TaskItem extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                subtitle: Row(children: const [
+                  Icon(Icons.location_pin),
+                  Text('Strada Avram Iancu, Brasov'),
+                ]),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -102,15 +106,6 @@ class TaskItem extends StatelessWidget {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.edit,
-                        color: Colors.brown,
-                      ),
-                      onPressed: () {
-                        // Edit task
-                      },
-                    ),
-                    IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () {
                         // Delete task
@@ -119,7 +114,7 @@ class TaskItem extends StatelessWidget {
                   ],
                 ),
               ),
-    
+
               // more infos
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -146,7 +141,7 @@ class TaskItem extends StatelessWidget {
                         DateFormat('hh:mm').format(dueDate!),
                       ),
                     ]),
-    
+
                     // prority
                     Row(children: [
                       Icon(

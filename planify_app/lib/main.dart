@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'firebase_options.dart';
+import 'package:planify_app/screens/add_new_task.dart';
 
 import '../screens/auth_screen.dart';
-import '../screens/overall_agenda.dart';
+import '../screens/overall_agenda_screen.dart';
 import '../helpers/custom_page_transitions.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +25,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: const Color.fromARGB(255, 199, 82, 246),
-          secondary:const Color.fromARGB(255, 251, 157, 56),
+          primary: Color.fromARGB(255, 7, 185, 120),
+          secondary: Color.fromARGB(255, 228, 120, 207),
         ),
         pageTransitionsTheme: PageTransitionsTheme(
           builders: {
@@ -51,7 +52,8 @@ class MyApp extends StatelessWidget {
         },
       ),
       routes: {
-        OverallAgendaScreen.routeName: (context) => const OverallAgendaScreen(),
+        OverallAgendaScreen.routeName: (context) => const OverallAgendaScreen(),  
+        AddNewTaskScreen.routeName: (context) => const AddNewTaskScreen(),
       },
     );
   }
