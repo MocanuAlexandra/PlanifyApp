@@ -92,6 +92,8 @@ class OverallAgendaScreen extends StatelessWidget {
                               title: tasks.tasksList[index].title,
                               dueDate: tasks.tasksList[index].dueDate,
                               address: tasks.tasksList[index].address,
+                            time: tasks.tasksList[index].time,
+                            priority: tasks.tasksList[index].priority,
                             ),
                           ),
                   ),

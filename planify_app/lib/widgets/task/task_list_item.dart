@@ -7,6 +7,8 @@ class TaskListItem extends StatelessWidget {
   final String? title;
   final DateTime? dueDate;
   final TaskAdress? address;
+  final String? time;
+  final String? priority;
 
   const TaskListItem({
     super.key,
@@ -14,6 +16,8 @@ class TaskListItem extends StatelessWidget {
     this.title,
     this.dueDate,
     this.address,
+    this.time,
+    this.priority,
   });
 
   @override
@@ -120,6 +124,36 @@ class TaskListItem extends StatelessWidget {
                       Text(
                         DateFormat('dd/MM/yyyy').format(dueDate!),
                       ),
+                    ]),
+                    // time
+                    Row(children: [
+                      const Icon(Icons.access_time),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Text(time!)
+                    ]),
+                    // priority
+                    Row(children: [
+                      Icon(
+                          priority == "Important"
+                              ? Icons.priority_high
+                              : priority == "Necessary"
+                                  ? Icons.warning
+                                  : priority == "Casual"
+                                      ? Icons.low_priority_sharp
+                                      : Icons.question_mark,
+                          color: priority == "Important"
+                              ? Colors.red
+                              : priority == "Necessary"
+                                  ? Colors.orange
+                                  : priority == "Casual"
+                                      ? Colors.green
+                                      : Colors.black),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Text(priority!)
                     ]),
                   ],
                 ),

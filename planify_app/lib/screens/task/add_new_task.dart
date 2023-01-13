@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
+import '../../models/task.dart';
 import '../../models/task_adress.dart';
 import '../../providers/tasks.dart';
 import '../../widgets/location/location_input.dart';
@@ -18,7 +19,9 @@ class AddNewTaskScreen extends StatefulWidget {
 class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   String _taskTitle = '';
   DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   TaskAdress? _pickedAdress;
+  Priority? _priority;
 
   void _presentDatePicker() {
     showDatePicker(
@@ -34,6 +37,18 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         });
   }
 
+  void _presentTimePicker() {
+    showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    ).then((pickedTime) => {
+          if (pickedTime != null)
+            {
+              setState(() => _selectedTime = pickedTime),
+            }
+        });
+  }
+
   void _selectPlace(double lat, double lng) {
     _pickedAdress = TaskAdress(latitude: lat, longitude: lng);
   }
@@ -42,13 +57,16 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     FocusScope.of(context).unfocus();
 
     //add the task in the database
-    DBHelper.addTask(_taskTitle, _selectedDate, _pickedAdress);
+    DBHelper.addTask(
+        _taskTitle, _selectedDate, _selectedTime, _pickedAdress, _priority!);
 
     //add the task in the UI
     Provider.of<Tasks>(context, listen: false).addTask(
       _taskTitle,
       _selectedDate,
+      _selectedTime,
       _pickedAdress,
+      _priority,
     );
 
     // close the screen
@@ -100,11 +118,68 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                           ),
                         ],
                       ),
+                      //due time
+                      Row(
+                        // ignore: prefer_const_literals_to_create_immutables
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _selectedTime == null
+                                  ? 'No due time chosen'
+                                  : _selectedTime!.hour < 10 &&
+                                          _selectedTime!.minute < 10
+                                      ? 'Due time: 0${_selectedTime!.hour}:0${_selectedTime!.minute} ${_selectedTime!.period == DayPeriod.am ? 'AM' : 'PM'}'
+                                      : _selectedTime!.hour < 10 &&
+                                              _selectedTime!.minute >= 10
+                                          ? 'Due time: 0${_selectedTime!.hour}:${_selectedTime!.minute} ${_selectedTime!.period == DayPeriod.am ? 'AM' : 'PM'}'
+                                          : _selectedTime!.minute < 10 &&
+                                                  _selectedTime!.hour >= 10
+                                              ? 'Due time: ${_selectedTime!.hour}:0${_selectedTime!.minute} ${_selectedTime!.period == DayPeriod.am ? 'AM' : 'PM'}'
+                                              : 'Due time: ${_selectedTime!.hour}:${_selectedTime!.minute} ${_selectedTime!.period == DayPeriod.am ? 'AM' : 'PM'}',
+                            ),
+                          ),
+                          const Icon(Icons.access_time),
+                          TextButton(
+                            onPressed: _presentTimePicker,
+                            child: const Text(
+                              'Choose time',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                       //adress
                       const SizedBox(height: 10),
                       LocationInput(
                         onSelectPlace: _selectPlace,
                       ),
+                      const SizedBox(height: 10),
+                      //priority
+                      DropdownButtonFormField<Priority>(
+                        icon: const Icon(Icons.arrow_drop_down),
+                        value: _priority,
+                        items: const [
+                          DropdownMenuItem(
+                            value: Priority.casual,
+                            child: Text('Casual'),
+                          ),
+                          DropdownMenuItem(
+                            value: Priority.necessary,
+                            child: Text('Neccessary'),
+                          ),
+                          DropdownMenuItem(
+                            value: Priority.important,
+                            child: Text('Important'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _priority = value;
+                          });
+                        },
+                        hint: const Text('Select priority'),
+                      ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),

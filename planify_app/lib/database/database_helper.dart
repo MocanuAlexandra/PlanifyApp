@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import '../helpers/location_helper.dart';
+import '../models/task.dart';
 import '../models/task_adress.dart';
 
 class DBHelper {
@@ -30,6 +32,9 @@ class DBHelper {
         'address': task['address'],
         'latitude': task['latitude'],
         'longitude': task['longitude'],
+        'time': task['time'],
+        'priority': task['priority'],
+        'isDone': task['isDone'],
       };
     }).toList();
 
@@ -38,8 +43,12 @@ class DBHelper {
 
   // function for adding tasks to the database
   static void addTask(String? taskTitle, DateTime? selectedDate,
-      TaskAdress? pickedAdress) async {
-    if (taskTitle == null || selectedDate == null || pickedAdress == null) {
+      TimeOfDay? selectedTime, TaskAdress? pickedAdress, Priority? priority ) async {
+    if (taskTitle == null ||
+        selectedDate == null ||
+        pickedAdress == null ||
+        selectedTime == null ||
+        priority == null) {
       return;
     }
 
@@ -53,6 +62,28 @@ class DBHelper {
         longitude: pickedAdress.longitude,
         address: address);
 
+    //create a new time with the selected time
+    String time = selectedTime.hour < 10
+        ? '0${selectedTime.hour}:${selectedTime.minute}'
+        : selectedTime.minute < 10
+            ? '${selectedTime.hour}:0${selectedTime.minute}'
+            : '${selectedTime.hour}:${selectedTime.minute}';
+
+    // transform the priority to a string
+    String priorityString = '';
+    switch (priority) {
+      case Priority.casual:
+        priorityString = 'Casual';
+        break;
+      case Priority.necessary:
+        priorityString = 'Necessary';
+        break;
+      case Priority.important:
+        priorityString = 'Important';
+        break;
+
+  }
+
     //add the task in the tasks collection of the connected user
     await FirebaseFirestore.instance
         .collection('users')
@@ -61,9 +92,12 @@ class DBHelper {
         .add({
       'title': taskTitle,
       'dueDate': selectedDate.toIso8601String(),
+      'time': time,
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,
       'address': updatedLocation.address,
+      'priority': priorityString,
+      'isDone': false,
     });
   }
 }
