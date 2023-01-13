@@ -13,7 +13,7 @@ class Tasks with ChangeNotifier {
     return [..._tasks];
   }
 
-  Future<void> fetchAndSetTasks() async {
+  Future<void> fetchAndSetAllTasks() async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -29,9 +29,36 @@ class Tasks with ChangeNotifier {
           ),
           time: task['time'],
           priority: task['priority'],
+          isDone: task['isDone'],
         );
       },
     ).toList();
+    notifyListeners();
+  }
+
+  Future<void> fetchAndSetTasksInProgress() async {
+    final tasksData = await DBHelper.fetchTasks();
+
+    _tasks = tasksData.map(
+      (task) {
+        return Task(
+          id: task['id'],
+          title: task['title'],
+          dueDate: task['dueDate'],
+          address: TaskAdress(
+            latitude: task['latitude'],
+            longitude: task['longitude'],
+            address: task['address'],
+          ),
+          time: task['time'],
+          priority: task['priority'],
+          isDone: task['isDone'],
+        );
+      },
+    ).toList();
+
+    //filter just task that are not done
+    _tasks = _tasks.where((task) => task.isDone == false).toList();
     notifyListeners();
   }
 

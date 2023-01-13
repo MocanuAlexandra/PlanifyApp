@@ -34,8 +34,7 @@ class MyApp extends StatelessWidget {
             ),
             pageTransitionsTheme: PageTransitionsTheme(
               builders: {
-                TargetPlatform.android: CustomPageTransitionBuilder(),
-                TargetPlatform.iOS: CustomPageTransitionBuilder()
+                TargetPlatform.android: CustomPageTransitionBuilder(),               
               },
             ),
           ),

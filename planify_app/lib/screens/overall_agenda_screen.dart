@@ -75,13 +75,13 @@ class OverallAgendaScreen extends StatelessWidget {
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(
-        future: Provider.of<Tasks>(context, listen: false).fetchAndSetTasks(),
+        future: Provider.of<Tasks>(context, listen: false).fetchAndSetTasksInProgress(),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(child: CircularProgressIndicator())
                 : Consumer<Tasks>(
                     child: const Center(
-                      child: Text('Got no tasks yet, start adding some!'),
+                      child: Text('Wow, you have no tasks :o'),
                     ),
                     builder: (context, tasks, ch) => tasks.tasksList.isEmpty
                         ? ch!
