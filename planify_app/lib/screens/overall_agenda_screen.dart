@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/widgets/drawer.dart';
+import 'package:provider/provider.dart';
 
-import '../models/task.dart';
-import '../widgets/tasks/task_list_item.dart';
+import '../providers/tasks.dart';
+import '../widgets/drawer.dart';
+import '../widgets/task/task_list_item.dart';
+import '../screens/task/add_new_task.dart';
 
 enum FilterOptions {
   All,
@@ -17,27 +19,6 @@ class OverallAgendaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Task> tasks = [
-      Task(
-          id: '1',
-          title: 'Task 1',
-          dueDate: DateTime.now(),
-          isDone: false,
-          priority: Priority.Important),
-      Task(
-          id: '2',
-          title: 'Task 2',
-          dueDate: DateTime.now(),
-          isDone: false,
-          priority: Priority.Low),
-      Task(
-          id: '3',
-          title: 'Task 3',
-          dueDate: DateTime.now(),
-          isDone: false,
-          priority: Priority.Medium),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Overall Agenda'),
@@ -93,20 +74,31 @@ class OverallAgendaScreen extends StatelessWidget {
         ],
       ),
       drawer: const MainDrawer(),
-      body: ListView.builder(
-          itemCount: tasks.length,
-          itemBuilder: (context, index) {
-            return TaskListItem(
-              id: tasks[index].id,
-              title: tasks[index].title,
-              dueDate: tasks[index].dueDate,
-              isDone: tasks[index].isDone,
-              priority: tasks[index].priority,
-            );
-          }),
+      body: FutureBuilder(
+        future: Provider.of<Tasks>(context, listen: false).fetchAndSetTasks(),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? const Center(child: CircularProgressIndicator())
+                : Consumer<Tasks>(
+                    child: const Center(
+                      child: Text('Got no tasks yet, start adding some!'),
+                    ),
+                    builder: (context, tasks, ch) => tasks.tasksList.isEmpty
+                        ? ch!
+                        : ListView.builder(
+                            itemCount: tasks.tasksList.length,
+                            itemBuilder: (context, index) => TaskListItem(
+                              id: tasks.tasksList[index].id,
+                              title: tasks.tasksList[index].title,
+                              dueDate: tasks.tasksList[index].dueDate,
+                              address: tasks.tasksList[index].address,
+                            ),
+                          ),
+                  ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed('/add-task');
+          Navigator.of(context).pushNamed(AddNewTaskScreen.routeName);
         },
         child: const Icon(Icons.add),
       ),

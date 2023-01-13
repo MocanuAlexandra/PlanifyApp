@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/auth/auth_form.dart';
+import '../../widgets/auth/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -75,8 +75,8 @@ class _AuthScreenState extends State<AuthScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromARGB(255, 161, 82, 246).withOpacity(0.5),
-                  Color.fromARGB(255, 56, 251, 137).withOpacity(0.9),
+                  const Color.fromARGB(255, 161, 82, 246).withOpacity(0.5),
+                  const Color.fromARGB(255, 56, 251, 137).withOpacity(0.9),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

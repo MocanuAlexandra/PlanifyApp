@@ -1,11 +1,15 @@
-enum Priority { Important, Medium, Low }
+import 'package:planify_app/models/task_adress.dart';
 
 class Task {
   final String? id;
   final String? title;
   final DateTime? dueDate;
-  final bool isDone;
-  final Priority? priority;
+  final TaskAdress? address;
 
-  Task({this.id,this.title, this.dueDate, this.isDone = false, this.priority});
+  Task({
+    this.id,
+    this.title,
+    this.dueDate,
+    this.address,
+  });
 }

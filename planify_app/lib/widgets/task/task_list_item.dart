@@ -1,35 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../models/task.dart';
+import 'package:planify_app/models/task_adress.dart';
 
 class TaskListItem extends StatelessWidget {
   final String? id;
   final String? title;
   final DateTime? dueDate;
-  final bool isDone;
-  final Priority? priority;
+  final TaskAdress? address;
 
-  const TaskListItem(
-      {super.key,
-      required this.id,
-      this.title,
-      this.dueDate,
-      required this.isDone,
-      this.priority});
-
-  String get priorityText {
-    switch (priority) {
-      case Priority.Important:
-        return 'Important';
-      case Priority.Medium:
-        return 'Necessary';
-      case Priority.Low:
-        return 'Casual';
-      default:
-        return 'Unknown';
-    }
-  }
+  const TaskListItem({
+    super.key,
+    required this.id,
+    this.title,
+    this.dueDate,
+    this.address,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +54,6 @@ class TaskListItem extends StatelessWidget {
                   ],
                 ));
       },
-      // TODO remove item
       onDismissed: ((direction) => {}),
       child: InkWell(
         onTap: () {},
@@ -89,9 +73,16 @@ class TaskListItem extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                subtitle: Row(children: const [
-                  Icon(Icons.location_pin),
-                  Text('Strada Avram Iancu, Brasov'),
+                //address
+                subtitle: Row(children: [
+                  const Icon(Icons.location_pin),
+                  Expanded(
+                    child: Text(
+                      address!.address!,
+                      softWrap: true,
+                      maxLines: 3,
+                    ),
+                  ),
                 ]),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -114,7 +105,6 @@ class TaskListItem extends StatelessWidget {
                   ],
                 ),
               ),
-
               // more infos
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -130,39 +120,6 @@ class TaskListItem extends StatelessWidget {
                       Text(
                         DateFormat('dd/MM/yyyy').format(dueDate!),
                       ),
-                    ]),
-                    //due time
-                    Row(children: [
-                      const Icon(Icons.schedule),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        DateFormat('hh:mm').format(dueDate!),
-                      ),
-                    ]),
-
-                    // prority
-                    Row(children: [
-                      Icon(
-                          priorityText == "Important"
-                              ? Icons.priority_high
-                              : priorityText == "Necessary"
-                                  ? Icons.warning
-                                  : priorityText == "Casual"
-                                      ? Icons.low_priority_sharp
-                                      : Icons.question_mark,
-                          color: priorityText == "Important"
-                              ? Colors.red
-                              : priorityText == "Necessary"
-                                  ? Colors.orange
-                                  : priorityText == "Casual"
-                                      ? Colors.green
-                                      : Colors.black),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(priorityText)
                     ]),
                   ],
                 ),

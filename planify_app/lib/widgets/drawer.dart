@@ -45,7 +45,7 @@ class MainDrawer extends StatelessWidget {
         const SizedBox(height: 10),
         buildListTile('Overall', Icons.calendar_month, () {
           Navigator.of(context).pushReplacementNamed('/overall-agenda');
-        }),    
+        }),
         const Divider(),
         Expanded(
           child: Align(
