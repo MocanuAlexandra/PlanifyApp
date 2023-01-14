@@ -42,32 +42,42 @@ class DBHelper {
   }
 
   // function for adding tasks to the database
-  static void addTask(String? taskTitle, DateTime? selectedDate,
-      TimeOfDay? selectedTime, TaskAdress? pickedAdress, Priority? priority ) async {
-    if (taskTitle == null ||
-        selectedDate == null ||
-        pickedAdress == null ||
-        selectedTime == null ||
-        priority == null) {
+  static void addTask(
+      String? taskTitle,
+      DateTime? selectedDate,
+      TimeOfDay? selectedTime,
+      TaskAdress? pickedAdress,
+      Priority? priority) async {
+    if (taskTitle == null || selectedDate == null) {
       return;
     }
 
+    //get the connected user
     final user = FirebaseAuth.instance.currentUser;
-    // get the address of the picked location
-    final address = await LocationHelper.getPlaceAddress(
-        pickedAdress.latitude!, pickedAdress.longitude!);
-    // create a new task adress with the address
-    final updatedLocation = TaskAdress(
-        latitude: pickedAdress.latitude,
-        longitude: pickedAdress.longitude,
-        address: address);
 
-    //create a new time with the selected time
-    String time = selectedTime.hour < 10
-        ? '0${selectedTime.hour}:${selectedTime.minute}'
-        : selectedTime.minute < 10
-            ? '${selectedTime.hour}:0${selectedTime.minute}'
-            : '${selectedTime.hour}:${selectedTime.minute}';
+    var updatedLocation =
+        const TaskAdress(latitude: 0, longitude: 0, address: 'No address');
+    //check if the user picked an adress
+    if (pickedAdress != null) {
+      // get the address of the picked location
+      final address = await LocationHelper.getPlaceAddress(
+          pickedAdress.latitude!, pickedAdress.longitude!);
+      // create a new task adress with the address
+      updatedLocation = TaskAdress(
+          latitude: pickedAdress.latitude,
+          longitude: pickedAdress.longitude,
+          address: address);
+    }
+
+    String time = "--:--";
+    if (selectedTime != null) {
+      //create a new time with the selected time
+      time = selectedTime.hour < 10
+          ? '0${selectedTime.hour}:${selectedTime.minute}'
+          : selectedTime.minute < 10
+              ? '${selectedTime.hour}:0${selectedTime.minute}'
+              : '${selectedTime.hour}:${selectedTime.minute}';
+    }
 
     // transform the priority to a string
     String priorityString = '';
@@ -81,8 +91,9 @@ class DBHelper {
       case Priority.important:
         priorityString = 'Important';
         break;
-
-  }
+      case null:
+        priorityString = 'Uknown';
+    }
 
     //add the task in the tasks collection of the connected user
     await FirebaseFirestore.instance

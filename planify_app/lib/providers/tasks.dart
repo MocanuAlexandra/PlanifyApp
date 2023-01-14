@@ -68,23 +68,33 @@ class Tasks with ChangeNotifier {
       TimeOfDay? selectedTime,
       TaskAdress? pickedAdress,
       Priority? priority) async {
-    final address = await LocationHelper.getPlaceAddress(
-        pickedAdress!.latitude!, pickedAdress.longitude!);
+        
+    var updatedLocation =
+        const TaskAdress(latitude: 0, longitude: 0, address: 'No address');
+    //check if the user picked an adress
+    if (pickedAdress != null) {
+      // get the address of the picked location
+      final address = await LocationHelper.getPlaceAddress(
+          pickedAdress.latitude!, pickedAdress.longitude!);
+      // create a new task adress with the address
+      updatedLocation = TaskAdress(
+          latitude: pickedAdress.latitude,
+          longitude: pickedAdress.longitude,
+          address: address);
+    }
 
-    final updatedAdress = TaskAdress(
-        latitude: pickedAdress.latitude,
-        longitude: pickedAdress.longitude,
-        address: address);
-
-    String time = selectedTime!.hour < 10
-        ? '0${selectedTime.hour}:${selectedTime.minute}'
-        : selectedTime.minute < 10
-            ? '${selectedTime.hour}:0${selectedTime.minute}'
-            : '${selectedTime.hour}:${selectedTime.minute}';
+    String time = '--:--';
+    if (selectedTime != null) {
+      time = selectedTime.hour < 10
+          ? '0${selectedTime.hour}:${selectedTime.minute}'
+          : selectedTime.minute < 10
+              ? '${selectedTime.hour}:0${selectedTime.minute}'
+              : '${selectedTime.hour}:${selectedTime.minute}';
+    }
 
     // transform the priority to a string
     String priorityString = '';
-    switch (priority!) {
+    switch (priority) {
       case Priority.casual:
         priorityString = 'Casual';
         break;
@@ -94,12 +104,14 @@ class Tasks with ChangeNotifier {
       case Priority.important:
         priorityString = 'Important';
         break;
+      case null:
+        priorityString = 'Unknown';
     }
 
     final newTask = Task(
       title: taskTitle,
       dueDate: selectedDate,
-      address: updatedAdress,
+      address: updatedLocation,
       time: time,
       priority: priorityString,
       isDone: false,
