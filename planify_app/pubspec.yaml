@@ -32,22 +32,29 @@ dependencies:
   flutter:
     sdk: flutter
 
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2 # For iOS style icons
+  # Firebase dependencies
   firebase_core: ^2.4.1 # For Firebase Core
   cloud_firestore: ^4.3.1 # For Cloud Firestore
   firebase_auth: ^4.2.5 # For authentication
+
+  # Validation dependencies
   flutter_form_builder: ^7.7.0 # For form creation
   form_builder_validators: ^8.4.0 # For form validation
+
+  # UI dependencies
   intl: ^0.17.0 # For date formatting
   provider: ^6.0.5 # For state management
+
+  # Maps dependencies
   location: ^4.4.0 # For location services
   google_maps_flutter: ^2.2.3 # For Google Maps
   google_maps_flutter_web: ^0.4.0+4 # For Google Maps Web
+  google_maps_webservice_ex: ^0.0.1+2 # For Google Maps API
+
+  # Other dependencies
+  flutter_typeahead: ^4.1.1 # For typeahead search
   http: ^0.13.5 # For HTTP requests
-  google_maps_webservice_ex:  00.0.1+2 # For Google Maps API
+
 
 dev_dependencies:
   flutter_test:
@@ -58,7 +65,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^2.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -15,4 +15,7 @@ class LocationHelper {
     return json.decode(response.body)['results'][0]['formatted_address'];
   }
 
+  static getApiKey() {
+    return GOOGLE_API_KEY;
+  }
 }
