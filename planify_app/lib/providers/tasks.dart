@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -70,7 +69,7 @@ class Tasks with ChangeNotifier {
       Priority? priority) async {
         
     var updatedLocation =
-        const TaskAdress(latitude: 0, longitude: 0, address: 'No address');
+        const TaskAdress(latitude: 0, longitude: 0, address: 'No address chosen');
     //check if the user picked an adress
     if (pickedAdress != null) {
       // get the address of the picked location

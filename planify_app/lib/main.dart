@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 import 'screens/auth/auth_screen.dart';
 import '../screens/overall_agenda_screen.dart';
-import '../helpers/custom_page_transitions.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -31,11 +30,6 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSwatch().copyWith(
               primary: const Color.fromARGB(255, 7, 185, 120),
               secondary: const Color.fromARGB(255, 228, 120, 207),
-            ),
-            pageTransitionsTheme: PageTransitionsTheme(
-              builders: {
-                TargetPlatform.android: CustomPageTransitionBuilder(),               
-              },
             ),
           ),
           home: StreamBuilder(

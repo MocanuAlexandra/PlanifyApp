@@ -56,7 +56,7 @@ class DBHelper {
     final user = FirebaseAuth.instance.currentUser;
 
     var updatedLocation =
-        const TaskAdress(latitude: 0, longitude: 0, address: 'No address');
+        const TaskAdress(latitude: 0, longitude: 0, address: 'No address chsosen');
     //check if the user picked an adress
     if (pickedAdress != null) {
       // get the address of the picked location
@@ -92,7 +92,7 @@ class DBHelper {
         priorityString = 'Important';
         break;
       case null:
-        priorityString = 'Uknown';
+        priorityString = 'Unknown';
     }
 
     //add the task in the tasks collection of the connected user
