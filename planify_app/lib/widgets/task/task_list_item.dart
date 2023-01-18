@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:planify_app/models/task_adress.dart';
+import 'package:provider/provider.dart';
+
+import '../../database/database_helper.dart';
+import '../../providers/tasks.dart';
 
 class TaskListItem extends StatelessWidget {
   final String? id;
@@ -19,6 +23,14 @@ class TaskListItem extends StatelessWidget {
     this.time,
     this.priority,
   });
+
+  void _deleteTask(BuildContext context, String id) {
+    // delete task from database
+    DBHelper.deleteTask(id);
+
+    // delete task from UI
+    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +70,9 @@ class TaskListItem extends StatelessWidget {
                   ],
                 ));
       },
-      onDismissed: ((direction) => {}),
+      onDismissed: ((direction) => {
+            _deleteTask(context, id!),
+          }),
       child: InkWell(
         onTap: () {},
         child: Card(
@@ -103,7 +117,7 @@ class TaskListItem extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () {
-                        // Delete task
+                        _deleteTask(context, id!);
                       },
                     ),
                   ],
@@ -117,7 +131,7 @@ class TaskListItem extends StatelessWidget {
                   children: <Widget>[
                     //due date
                     Row(children: [
-                      const Icon(Icons.calendar_today),
+                      const Icon(Icons.calendar_month),
                       const SizedBox(
                         width: 6,
                       ),

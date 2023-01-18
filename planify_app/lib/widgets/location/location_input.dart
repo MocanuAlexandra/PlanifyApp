@@ -94,7 +94,7 @@ class _LocationInputState extends State<LocationInput> {
             TextButton.icon(
               onPressed: _selectOnMap,
               icon: const Icon(Icons.map),
-              label: const Text('Select on Map'),
+              label: const Text('Search on Map'),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),

@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:planify_app/providers/tasks.dart';
-import 'package:planify_app/screens/task/add_new_task.dart';
+import 'package:planify_app/widgets/task/add_new_task_form.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/auth/auth_screen.dart';
-import '../screens/overall_agenda_screen.dart';
+import 'screens/agenda/overall_agenda_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.purple,
             colorScheme: ColorScheme.fromSwatch().copyWith(
-              primary: const Color.fromARGB(255, 7, 185, 120),
+              primary: const Color.fromARGB(255, 19, 208, 164),
               secondary: const Color.fromARGB(255, 228, 120, 207),
             ),
           ),
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           routes: {
             OverallAgendaScreen.routeName: (context) =>
                 const OverallAgendaScreen(),
-            AddNewTaskScreen.routeName: (context) => const AddNewTaskScreen(),
+            AddNewTaskForm.routeName: (context) => const AddNewTaskForm(),
           },
         ));
   }

@@ -55,8 +55,8 @@ class DBHelper {
     //get the connected user
     final user = FirebaseAuth.instance.currentUser;
 
-    var updatedLocation =
-        const TaskAdress(latitude: 0, longitude: 0, address: 'No address chsosen');
+    var updatedLocation = const TaskAdress(
+        latitude: 0, longitude: 0, address: 'No address chosen');
     //check if the user picked an adress
     if (pickedAdress != null) {
       // get the address of the picked location
@@ -110,5 +110,16 @@ class DBHelper {
       'priority': priorityString,
       'isDone': false,
     });
+  }
+
+  // function for deleting tasks in the database
+  static void deleteTask(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .delete();
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/tasks.dart';
-import '../widgets/drawer.dart';
-import '../widgets/task/task_list_item.dart';
-import '../screens/task/add_new_task.dart';
+import '../../providers/tasks.dart';
+import '../../widgets/drawer.dart';
+import '../../widgets/task/task_list_item.dart';
+import '../../widgets/task/add_new_task_form.dart';
 
 enum FilterOptions {
   All,
@@ -75,7 +75,8 @@ class OverallAgendaScreen extends StatelessWidget {
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(
-        future: Provider.of<Tasks>(context, listen: false).fetchAndSetTasksInProgress(),
+        future: Provider.of<Tasks>(context, listen: false)
+            .fetchAndSetTasksInProgress(),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(child: CircularProgressIndicator())
@@ -92,15 +93,15 @@ class OverallAgendaScreen extends StatelessWidget {
                               title: tasks.tasksList[index].title,
                               dueDate: tasks.tasksList[index].dueDate,
                               address: tasks.tasksList[index].address,
-                            time: tasks.tasksList[index].time,
-                            priority: tasks.tasksList[index].priority,
+                              time: tasks.tasksList[index].time,
+                              priority: tasks.tasksList[index].priority,
                             ),
                           ),
                   ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(AddNewTaskScreen.routeName);
+          Navigator.of(context).pushNamed(AddNewTaskForm.routeName);
         },
         child: const Icon(Icons.add),
       ),

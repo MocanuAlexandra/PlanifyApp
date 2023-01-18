@@ -119,4 +119,9 @@ class Tasks with ChangeNotifier {
     _tasks.add(newTask);
     notifyListeners();
   }
+
+  deleteTask(String id) {
+    _tasks.removeWhere((task) => task.id == id);
+    notifyListeners();
+  }
 }

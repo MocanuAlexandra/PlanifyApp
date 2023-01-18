@@ -7,18 +7,18 @@ import '../../database/database_helper.dart';
 import '../../models/task.dart';
 import '../../models/task_adress.dart';
 import '../../providers/tasks.dart';
-import '../../widgets/location/location_input.dart';
+import '../location/location_input.dart';
 
-class AddNewTaskScreen extends StatefulWidget {
-  const AddNewTaskScreen({super.key});
+class AddNewTaskForm extends StatefulWidget {
+  const AddNewTaskForm({super.key});
 
   static const routeName = '/add-task';
 
   @override
-  State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
+  State<AddNewTaskForm> createState() => _AddNewTaskFormState();
 }
 
-class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
+class _AddNewTaskFormState extends State<AddNewTaskForm> {
   final _formKey = GlobalKey<FormState>();
   String? _taskTitle;
   DateTime? _selectedDate;
@@ -234,18 +234,17 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                 ),
               ),
             ),
-            ElevatedButton.icon(
+            ElevatedButton(
                 onPressed: _addTask,
-                icon: const Icon(Icons.add_circle_outline),
-                label: const Text('Add Task'),
                 style: ElevatedButton.styleFrom(
-                  elevation: 0,
+                  elevation: 5,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(0),
                   ),
                   backgroundColor: Theme.of(context).colorScheme.secondary,
-                )),
+                ),
+                child: const Text('Submit')),
           ],
         ));
   }
