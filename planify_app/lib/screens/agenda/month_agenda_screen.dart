@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:month_year_picker/month_year_picker.dart';
+import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 
 import '../../providers/tasks.dart';
 import '../../widgets/drawer.dart';
@@ -17,23 +17,23 @@ class MonthAgendaScreen extends StatefulWidget {
 }
 
 class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
-  DateTime? _selectedMonth;
+  DateTime? _selectedDate;
 
   Future<void> _refreshTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)
-        .fetchTasksDueMonth(_selectedMonth!);
+        .fetchTasksDueMonth(_selectedDate!);
   }
 
   void _presentMonthPicker() async {
-    final DateTime? picked = await showMonthYearPicker(
+    final DateTime? picked = await showMonthPicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (picked != null && picked != _selectedMonth) {
+    if (picked != null && picked != _selectedDate) {
       setState(() {
-        _selectedMonth = picked;
+        _selectedDate = picked;
       });
     }
   }

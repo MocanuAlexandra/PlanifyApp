@@ -89,7 +89,7 @@ class Tasks with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void>fetchTasksDueMonth(DateTime selectedMonth) async{
+  Future<void>fetchTasksDueMonth(DateTime selectedDate) async{
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -113,7 +113,7 @@ class Tasks with ChangeNotifier {
     //filter task that are due the selected month
     _tasks = _tasks
         .where((task) =>
-            task.isDone == false && task.dueDate!.month == selectedMonth.month)
+            task.isDone == false && task.dueDate!.month == selectedDate.month && task.dueDate!.year == selectedDate.year)
         .toList();
     notifyListeners();
   }

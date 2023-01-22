@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:month_year_picker/month_year_picker.dart';
 import 'firebase_options.dart';
 
 import './providers/tasks.dart';
@@ -27,10 +26,6 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider.value(
         value: Tasks(),
         child: MaterialApp(
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            MonthYearPickerLocalizations.delegate,
-          ],
           debugShowCheckedModeBanner: false,
           title: 'Planify App',
           theme: ThemeData(
