@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
 import '../../models/task.dart';
 import '../../models/task_adress.dart';
-import '../../providers/tasks.dart';
 import '../location/location_input.dart';
 
 class AddNewTaskForm extends StatefulWidget {
@@ -120,15 +118,6 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
         //add the task in the database
         DBHelper.addTask(
             _taskTitle, _selectedDate, _selectedTime, _pickedAdress, _priority);
-
-        //add the task in the UI
-        Provider.of<Tasks>(context, listen: false).addTask(
-          _taskTitle,
-          _selectedDate,
-          _selectedTime,
-          _pickedAdress,
-          _priority,
-        );
 
         // close the screen
         Navigator.of(context).pop();

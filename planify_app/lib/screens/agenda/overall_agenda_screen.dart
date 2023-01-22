@@ -17,6 +17,11 @@ class OverallAgendaScreen extends StatelessWidget {
 
   const OverallAgendaScreen({super.key});
 
+  Future<void> _refreshTasks(BuildContext context) async {
+    await Provider.of<Tasks>(context, listen: false)
+        .fetchAndSetTasksInProgress();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,28 +80,28 @@ class OverallAgendaScreen extends StatelessWidget {
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(
-        future: Provider.of<Tasks>(context, listen: false)
-            .fetchAndSetTasksInProgress(),
+        future: _refreshTasks(context),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
-                ? const Center(child: CircularProgressIndicator())
-                : Consumer<Tasks>(
-                    child: const Center(
-                      child: Text('Wow, you have no tasks :o'),
-                    ),
-                    builder: (context, tasks, ch) => tasks.tasksList.isEmpty
-                        ? ch!
-                        : ListView.builder(
-                            itemCount: tasks.tasksList.length,
-                            itemBuilder: (context, index) => TaskListItem(
-                              id: tasks.tasksList[index].id,
-                              title: tasks.tasksList[index].title,
-                              dueDate: tasks.tasksList[index].dueDate,
-                              address: tasks.tasksList[index].address,
-                              time: tasks.tasksList[index].time,
-                              priority: tasks.tasksList[index].priority,
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => _refreshTasks(context),
+                    child: Consumer<Tasks>(
+                      builder: (context, tasks, ch) =>
+                           ListView.builder(
+                              itemCount: tasks.tasksList.length,
+                              itemBuilder: (context, index) => TaskListItem(
+                                id: tasks.tasksList[index].id,
+                                title: tasks.tasksList[index].title,
+                                dueDate: tasks.tasksList[index].dueDate,
+                                address: tasks.tasksList[index].address,
+                                time: tasks.tasksList[index].time,
+                                priority: tasks.tasksList[index].priority,
+                              ),
                             ),
-                          ),
+                    ),
                   ),
       ),
       floatingActionButton: FloatingActionButton(

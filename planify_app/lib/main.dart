@@ -28,8 +28,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.purple,
             colorScheme: ColorScheme.fromSwatch().copyWith(
-              primary: const Color.fromARGB(255, 19, 208, 164),
-              secondary: const Color.fromARGB(255, 228, 120, 207),
+              primary: const Color.fromARGB(255, 156, 39, 176),
+              secondary: const Color.fromARGB(255, 19, 208, 164),
             ),
           ),
           home: StreamBuilder(
