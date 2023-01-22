@@ -31,6 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # Firebase dependencies
   firebase_core: ^2.4.1 # For Firebase Core
@@ -54,6 +56,7 @@ dependencies:
   # Other dependencies
   flutter_typeahead: ^4.1.1 # For typeahead search
   http: ^0.13.5 # For HTTP requests
+  month_year_picker: ^0.2.0+2 # For month/year picker
 
 
 dev_dependencies:

@@ -1,13 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/providers/tasks.dart';
-import 'package:planify_app/widgets/task/add_new_task_form.dart';
 import 'package:provider/provider.dart';
-
-import 'screens/auth/auth_screen.dart';
-import 'screens/agenda/overall_agenda_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'firebase_options.dart';
+
+import './providers/tasks.dart';
+import './screens/agenda/month_agenda_screen.dart';
+import './screens/agenda/today_agenda_screen.dart';
+import './screens/auth/auth_screen.dart';
+import './screens/agenda/overall_agenda_screen.dart';
+import './widgets/task/add_new_task_form.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +27,10 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider.value(
         value: Tasks(),
         child: MaterialApp(
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            MonthYearPickerLocalizations.delegate,
+          ],
           debugShowCheckedModeBanner: false,
           title: 'Planify App',
           theme: ThemeData(
@@ -51,6 +59,8 @@ class MyApp extends StatelessWidget {
           routes: {
             OverallAgendaScreen.routeName: (context) =>
                 const OverallAgendaScreen(),
+            TodayAgendaScreen.routeName: (context) => const TodayAgendaScreen(),
+            MonthAgendaScreen.routeName: (context) => const MonthAgendaScreen(),
             AddNewTaskForm.routeName: (context) => const AddNewTaskForm(),
           },
         ));

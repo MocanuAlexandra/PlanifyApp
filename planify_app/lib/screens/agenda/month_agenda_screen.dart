@@ -1,32 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 
 import '../../providers/tasks.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../../widgets/task/add_new_task_form.dart';
 
-enum FilterOptions {
-  All,
-  In_progress,
-  Done,
+class MonthAgendaScreen extends StatefulWidget {
+  static const routeName = '/month-agenda';
+
+  const MonthAgendaScreen({super.key});
+
+  @override
+  State<MonthAgendaScreen> createState() => _MonthAgendaScreenState();
 }
 
-class OverallAgendaScreen extends StatelessWidget {
-  static const routeName = '/overall-agenda';
-
-  const OverallAgendaScreen({super.key});
+class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
+  DateTime? _selectedMonth;
 
   Future<void> _refreshTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)
-        .fetchAndSetTasksInProgress();
+        .fetchTasksDueMonth(_selectedMonth!);
+  }
+
+  void _presentMonthPicker() async {
+    final DateTime? picked = await showMonthYearPicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != _selectedMonth) {
+      setState(() {
+        _selectedMonth = picked;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Overall'),
+        title: const Text('Month'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: _presentMonthPicker,
+          ),
+        ],
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(

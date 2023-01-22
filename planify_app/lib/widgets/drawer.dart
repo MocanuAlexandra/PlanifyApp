@@ -43,8 +43,16 @@ class MainDrawer extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        buildListTile('Overall', Icons.calendar_month, () {
+        buildListTile('Overall', Icons.calendar_view_week, () {
           Navigator.of(context).pushReplacementNamed('/overall-agenda');
+        }),
+        const Divider(),
+        buildListTile('Today', Icons.calendar_today, () {
+          Navigator.of(context).pushReplacementNamed('/today-agenda');
+        }),
+         const Divider(),
+        buildListTile('Month', Icons.calendar_month, () {
+          Navigator.of(context).pushReplacementNamed('/month-agenda');
         }),
         const Divider(),
         Expanded(
@@ -56,7 +64,6 @@ class MainDrawer extends StatelessWidget {
               visualDensity: const VisualDensity(vertical: -4),
               leading: const Icon(
                 Icons.logout,
-                color: Colors.black,
               ),
               title: const Text('Logout',
                   style: TextStyle(

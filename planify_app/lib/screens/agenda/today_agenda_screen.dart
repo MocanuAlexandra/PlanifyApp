@@ -6,27 +6,20 @@ import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../../widgets/task/add_new_task_form.dart';
 
-enum FilterOptions {
-  All,
-  In_progress,
-  Done,
-}
+class TodayAgendaScreen extends StatelessWidget {
+  static const routeName = '/today-agenda';
 
-class OverallAgendaScreen extends StatelessWidget {
-  static const routeName = '/overall-agenda';
-
-  const OverallAgendaScreen({super.key});
+  const TodayAgendaScreen({super.key});
 
   Future<void> _refreshTasks(BuildContext context) async {
-    await Provider.of<Tasks>(context, listen: false)
-        .fetchAndSetTasksInProgress();
+    await Provider.of<Tasks>(context, listen: false).fetchTasksDueToday();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Overall'),
+        title: const Text('Today'),
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(

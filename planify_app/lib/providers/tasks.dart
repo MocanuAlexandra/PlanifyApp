@@ -60,7 +60,65 @@ class Tasks with ChangeNotifier {
     notifyListeners();
   }
 
-   void deleteTask(String id) {
+  Future<void> fetchTasksDueToday() async {
+    final tasksData = await DBHelper.fetchTasks();
+
+    _tasks = tasksData.map(
+      (task) {
+        return Task(
+          id: task['id'],
+          title: task['title'],
+          dueDate: task['dueDate'],
+          address: TaskAdress(
+            latitude: task['latitude'],
+            longitude: task['longitude'],
+            address: task['address'],
+          ),
+          time: task['time'],
+          priority: task['priority'],
+          isDone: task['isDone'],
+        );
+      },
+    ).toList();
+
+    //filter task that are due today
+    _tasks = _tasks
+        .where((task) =>
+            task.isDone == false && task.dueDate!.day == DateTime.now().day)
+        .toList();
+    notifyListeners();
+  }
+
+  Future<void>fetchTasksDueMonth(DateTime selectedMonth) async{
+    final tasksData = await DBHelper.fetchTasks();
+
+    _tasks = tasksData.map(
+      (task) {
+        return Task(
+          id: task['id'],
+          title: task['title'],
+          dueDate: task['dueDate'],
+          address: TaskAdress(
+            latitude: task['latitude'],
+            longitude: task['longitude'],
+            address: task['address'],
+          ),
+          time: task['time'],
+          priority: task['priority'],
+          isDone: task['isDone'],
+        );
+      },
+    ).toList();
+
+    //filter task that are due the selected month
+    _tasks = _tasks
+        .where((task) =>
+            task.isDone == false && task.dueDate!.month == selectedMonth.month)
+        .toList();
+    notifyListeners();
+  }
+
+  void deleteTask(String id) {
     _tasks.removeWhere((task) => task.id == id);
     notifyListeners();
   }
