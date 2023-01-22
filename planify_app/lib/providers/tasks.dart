@@ -122,4 +122,9 @@ class Tasks with ChangeNotifier {
     _tasks.removeWhere((task) => task.id == id);
     notifyListeners();
   }
+
+  //find task by id
+  Task findById(String id) {
+    return _tasks.firstWhere((task) => task.id == id);
+  }
 }

@@ -17,7 +17,7 @@ class MonthAgendaScreen extends StatefulWidget {
 }
 
 class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
-  DateTime? _selectedDate;
+  DateTime? _selectedDate=DateTime.now();
 
   Future<void> _refreshTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
 import '../../providers/tasks.dart';
+import '../../screens/task_detail_screen.dart';
 
 class TaskListItem extends StatelessWidget {
   final String? id;
@@ -74,7 +75,11 @@ class TaskListItem extends StatelessWidget {
             _deleteTask(context, id!),
           }),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          // Navigate to task details screen
+           Navigator.of(context).pushNamed(TaskDetailScreen.routeName,
+                  arguments:id);
+        },
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
