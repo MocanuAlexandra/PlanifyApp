@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planify_app/helpers/utility.dart';
 
 import '../database/database_helper.dart';
 import '../models/task.dart';
@@ -19,7 +20,7 @@ class Tasks with ChangeNotifier {
         return Task(
           id: task['id'],
           title: task['title'],
-          dueDate: task['dueDate'],
+          dueDate: DateTime.parse(task['dueDate']),
           address: TaskAdress(
             latitude: task['latitude'],
             longitude: task['longitude'],
@@ -42,7 +43,7 @@ class Tasks with ChangeNotifier {
         return Task(
           id: task['id'],
           title: task['title'],
-          dueDate: task['dueDate'],
+          dueDate: DateTime.parse(task['dueDate']),
           address: TaskAdress(
             latitude: task['latitude'],
             longitude: task['longitude'],
@@ -68,7 +69,7 @@ class Tasks with ChangeNotifier {
         return Task(
           id: task['id'],
           title: task['title'],
-          dueDate: task['dueDate'],
+          dueDate: DateTime.parse(task['dueDate']),
           address: TaskAdress(
             latitude: task['latitude'],
             longitude: task['longitude'],
@@ -89,7 +90,7 @@ class Tasks with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void>fetchTasksDueMonth(DateTime selectedDate) async{
+  Future<void> fetchTasksDueMonth(DateTime selectedDate) async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -97,7 +98,7 @@ class Tasks with ChangeNotifier {
         return Task(
           id: task['id'],
           title: task['title'],
-          dueDate: task['dueDate'],
+          dueDate: DateTime.parse(task['dueDate']),
           address: TaskAdress(
             latitude: task['latitude'],
             longitude: task['longitude'],
@@ -113,7 +114,9 @@ class Tasks with ChangeNotifier {
     //filter task that are due the selected month
     _tasks = _tasks
         .where((task) =>
-            task.isDone == false && task.dueDate!.month == selectedDate.month && task.dueDate!.year == selectedDate.year)
+            task.isDone == false &&
+            task.dueDate!.month == selectedDate.month &&
+            task.dueDate!.year == selectedDate.year)
         .toList();
     notifyListeners();
   }

@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../database/database_helper.dart';
+import '../helpers/utility.dart';
 import '../providers/tasks.dart';
+import '../widgets/task/add_new_task_form.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   const TaskDetailScreen({super.key});
@@ -26,9 +28,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final productId = ModalRoute.of(context)!.settings.arguments as String;
+    final taskId = ModalRoute.of(context)!.settings.arguments as String;
     final loadedTask =
-        Provider.of<Tasks>(context, listen: false).findById(productId);
+        Provider.of<Tasks>(context, listen: false).findById(taskId);
 
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +56,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   //title field
                   Text(
                     loadedTask.title!,
-                    style: const TextStyle(fontSize: 25),
+                    style: const TextStyle(fontSize: 20),
                     softWrap: true,
                     maxLines: 3,
                   ),
@@ -65,7 +67,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       const Icon(Icons.calendar_month),
                       const SizedBox(width: 10),
                       Text(DateFormat('dd/MM/yyyy').format(loadedTask.dueDate!),
-                          style: const TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -74,8 +76,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     children: [
                       const Icon(Icons.access_time),
                       const SizedBox(width: 10),
-                      Text(loadedTask.time!,
-                          style: const TextStyle(fontSize: 18)),
+                      Text(Utility.timeOfDayToString(loadedTask.time),
+                          style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                   //priority field
@@ -83,23 +85,34 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   Row(
                     children: [
                       Icon(
-                          loadedTask.priority! == "Important"
+                          Utility.priorityEnumToString(loadedTask.priority) ==
+                                  "Important"
                               ? Icons.priority_high
-                              : loadedTask.priority! == "Necessary"
+                              : Utility.priorityEnumToString(
+                                          loadedTask.priority) ==
+                                      "Necessary"
                                   ? Icons.warning
-                                  : loadedTask.priority! == "Casual"
+                                  : Utility.priorityEnumToString(
+                                              loadedTask.priority) ==
+                                          "Casual"
                                       ? Icons.low_priority_sharp
                                       : Icons.question_mark,
-                          color: loadedTask.priority! == "Important"
+                          color: Utility.priorityEnumToString(
+                                      loadedTask.priority) ==
+                                  "Important"
                               ? Colors.red
-                              : loadedTask.priority! == "Necessary"
+                              : Utility.priorityEnumToString(
+                                          loadedTask.priority) ==
+                                      "Necessary"
                                   ? Colors.orange
-                                  : loadedTask.priority! == "Casual"
+                                  : Utility.priorityEnumToString(
+                                              loadedTask.priority) ==
+                                          "Casual"
                                       ? Colors.green
                                       : Colors.black),
                       const SizedBox(width: 10),
-                      Text(loadedTask.priority!,
-                          style: const TextStyle(fontSize: 18)),
+                      Text(Utility.priorityEnumToString(loadedTask.priority),
+                          style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                   //adress field
@@ -111,7 +124,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         loadedTask.address!.address!,
                         softWrap: true,
                         maxLines: 3,
-                        style: const TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
                   ]),
@@ -150,7 +163,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       ),
       //edit button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // Navigator.of(context)
+          //     .pushNamed(AddNewTaskForm.routeName, arguments: taskId);
+        },
         child: const Icon(Icons.edit),
       ),
     );

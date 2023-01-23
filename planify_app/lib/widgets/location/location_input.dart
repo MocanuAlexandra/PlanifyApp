@@ -75,6 +75,7 @@ class _LocationInputState extends State<LocationInput> {
           child: _previewImageUrl == null
               ? const Text(
                   'No location chosen',
+                  style: TextStyle(fontSize: 15),
                   textAlign: TextAlign.center,
                 )
               : Image.network(_previewImageUrl!,
@@ -86,7 +87,10 @@ class _LocationInputState extends State<LocationInput> {
             TextButton.icon(
               onPressed: _getCurrentUserLocation,
               icon: const Icon(Icons.location_on),
-              label: const Text('Current Location'),
+              label: const Text(
+                'Current Location',
+                style: TextStyle(fontSize: 15),
+              ),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
@@ -94,7 +98,10 @@ class _LocationInputState extends State<LocationInput> {
             TextButton.icon(
               onPressed: _selectOnMap,
               icon: const Icon(Icons.map),
-              label: const Text('Search on Map'),
+              label: const Text(
+                'Search on Map',
+                style: TextStyle(fontSize: 15),
+              ),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),

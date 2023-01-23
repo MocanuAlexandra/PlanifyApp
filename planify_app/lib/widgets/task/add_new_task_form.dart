@@ -145,7 +145,11 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                         //title field
                         FormBuilderTextField(
                           name: 'title',
-                          decoration: const InputDecoration(labelText: 'Title'),
+                          decoration: const InputDecoration(
+                              labelText: 'Title',
+                              labelStyle: TextStyle(
+                                fontSize: 16,
+                              )),
                           validator: FormBuilderValidators.required(
                               errorText: 'Required'),
                           onSaved: (value) {
@@ -157,14 +161,20 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(_displayDate(_selectedDate)),
+                              child: Text(
+                                _displayDate(_selectedDate),
+                                style: const TextStyle(fontSize: 16),
+                              ),
                             ),
                             const Icon(Icons.calendar_month),
                             TextButton(
                               onPressed: _presentDatePicker,
                               child: const Text(
                                 'Choose date',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
                           ],
@@ -173,14 +183,20 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(_displayTime(_selectedTime)),
+                              child: Text(
+                                _displayTime(_selectedTime),
+                                style: const TextStyle(fontSize: 16),
+                              ),
                             ),
                             const Icon(Icons.access_time),
                             TextButton(
                               onPressed: _presentTimePicker,
                               child: const Text(
                                 'Choose time',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
                           ],
@@ -198,15 +214,24 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                           items: const [
                             DropdownMenuItem(
                               value: Priority.casual,
-                              child: Text('Casual'),
+                              child: Text(
+                                'Casual',
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
                             DropdownMenuItem(
                               value: Priority.necessary,
-                              child: Text('Neccessary'),
+                              child: Text(
+                                'Neccessary',
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
                             DropdownMenuItem(
                               value: Priority.important,
-                              child: Text('Important'),
+                              child: Text(
+                                'Important',
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
                           ],
                           onChanged: (value) {
@@ -214,7 +239,10 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                               _priority = value;
                             });
                           },
-                          hint: const Text('Select priority'),
+                          hint: const Text(
+                            'Select priority',
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                         const SizedBox(height: 10),
                       ],
@@ -233,7 +261,10 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                   ),
                   backgroundColor: Theme.of(context).colorScheme.secondary,
                 ),
-                child: const Text('Submit')),
+                child: const Text(
+                  'Submit',
+                  style: TextStyle(fontSize: 18),
+                )),
           ],
         ));
   }

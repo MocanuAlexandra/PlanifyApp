@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 
+import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
@@ -17,7 +18,7 @@ class MonthAgendaScreen extends StatefulWidget {
 }
 
 class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
-  DateTime? _selectedDate=DateTime.now();
+  DateTime? _selectedDate = DateTime.now();
 
   Future<void> _refreshTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)
@@ -68,8 +69,10 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
                           title: tasks.tasksList[index].title,
                           dueDate: tasks.tasksList[index].dueDate,
                           address: tasks.tasksList[index].address,
-                          time: tasks.tasksList[index].time,
-                          priority: tasks.tasksList[index].priority,
+                          time: Utility.timeOfDayToString(
+                              tasks.tasksList[index].time),
+                          priority: Utility.priorityEnumToString(
+                              tasks.tasksList[index].priority),
                         ),
                       ),
                     ),

@@ -13,7 +13,6 @@ class MainDrawer extends StatelessWidget {
       title: Text(
         title,
         style: const TextStyle(
-          fontFamily: 'Anton',
           fontSize: 20,
         ),
       ),
@@ -36,7 +35,6 @@ class MainDrawer extends StatelessWidget {
           child: const Text(
             'Planify App',
             style: TextStyle(
-              fontFamily: 'Anton',
               fontSize: 30,
               color: Colors.white,
             ),
@@ -50,7 +48,7 @@ class MainDrawer extends StatelessWidget {
         buildListTile('Today', Icons.calendar_today, () {
           Navigator.of(context).pushReplacementNamed('/today-agenda');
         }),
-         const Divider(),
+        const Divider(),
         buildListTile('Month', Icons.calendar_month, () {
           Navigator.of(context).pushReplacementNamed('/month-agenda');
         }),
@@ -67,7 +65,6 @@ class MainDrawer extends StatelessWidget {
               ),
               title: const Text('Logout',
                   style: TextStyle(
-                    fontFamily: 'Anton',
                     fontSize: 20,
                     color: Colors.black,
                   )),

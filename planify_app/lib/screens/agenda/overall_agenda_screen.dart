@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
@@ -46,8 +47,10 @@ class OverallAgendaScreen extends StatelessWidget {
                           title: tasks.tasksList[index].title,
                           dueDate: tasks.tasksList[index].dueDate,
                           address: tasks.tasksList[index].address,
-                          time: tasks.tasksList[index].time,
-                          priority: tasks.tasksList[index].priority,
+                          time: Utility.timeOfDayToString(
+                              tasks.tasksList[index].time),
+                          priority: Utility.priorityEnumToString(
+                              tasks.tasksList[index].priority),
                         ),
                       ),
                     ),

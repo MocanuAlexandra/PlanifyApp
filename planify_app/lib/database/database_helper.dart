@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../helpers/location_helper.dart';
+import '../helpers/utility.dart';
 import '../models/task.dart';
 import '../models/task_adress.dart';
 
@@ -28,12 +29,12 @@ class DBHelper {
       return {
         'id': task.id,
         'title': task['title'],
-        'dueDate': DateTime.parse(task['dueDate']),
+        'dueDate': task['dueDate'],
         'address': task['address'],
         'latitude': task['latitude'],
         'longitude': task['longitude'],
-        'time': task['time'],
-        'priority': task['priority'],
+        'time': Utility.stringToTimeOfDay(task['time']),
+        'priority': Utility.stringToPriorityEnum(task['priority']),
         'isDone': task['isDone'],
       };
     }).toList();
@@ -69,32 +70,6 @@ class DBHelper {
           address: address);
     }
 
-    String time = "--:--";
-    if (selectedTime != null) {
-      //create a new time with the selected time
-      time = selectedTime.hour < 10
-          ? '0${selectedTime.hour}:${selectedTime.minute}'
-          : selectedTime.minute < 10
-              ? '${selectedTime.hour}:0${selectedTime.minute}'
-              : '${selectedTime.hour}:${selectedTime.minute}';
-    }
-
-    // transform the priority to a string
-    String priorityString = '';
-    switch (priority) {
-      case Priority.casual:
-        priorityString = 'Casual';
-        break;
-      case Priority.necessary:
-        priorityString = 'Necessary';
-        break;
-      case Priority.important:
-        priorityString = 'Important';
-        break;
-      case null:
-        priorityString = 'Unknown';
-    }
-
     //add the task in the tasks collection of the connected user
     await FirebaseFirestore.instance
         .collection('users')
@@ -103,11 +78,11 @@ class DBHelper {
         .add({
       'title': taskTitle,
       'dueDate': selectedDate.toIso8601String(),
-      'time': time,
+      'time': Utility.timeOfDayToString(selectedTime),
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,
       'address': updatedLocation.address,
-      'priority': priorityString,
+      'priority': Utility.priorityEnumToString(priority),
       'isDone': false,
     });
   }
@@ -121,5 +96,24 @@ class DBHelper {
         .collection('tasks')
         .doc(id)
         .delete();
+  }
+
+  static void updateTask(String s, String? taskTitle, DateTime selectedDate,
+      TimeOfDay? selectedTime, TaskAdress? pickedAdress, Priority? priority) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(s)
+        .update({
+      'title': taskTitle,
+      'dueDate': selectedDate.toIso8601String(),
+      'time':Utility.timeOfDayToString(selectedTime),
+      'latitude': pickedAdress!.latitude,
+      'longitude': pickedAdress.longitude,
+      'address': pickedAdress.address,
+      'priority': Utility.priorityEnumToString(priority),
+    });
   }
 }
