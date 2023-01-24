@@ -14,7 +14,7 @@ class OverallAgendaScreen extends StatelessWidget {
 
   Future<void> _refreshTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)
-        .fetchAndSetTasksInProgress();
+        .fetchAndSetAllTasks();
   }
 
   @override
@@ -45,6 +45,7 @@ class OverallAgendaScreen extends StatelessWidget {
                               tasks.tasksList[index].time),
                           priority: Utility.priorityEnumToString(
                               tasks.tasksList[index].priority),
+                          isDone: tasks.tasksList[index].isDone,
                         ),
                       ),
                     ),

@@ -14,6 +14,7 @@ class TaskListItem extends StatelessWidget {
   final TaskAdress? address;
   final String? time;
   final String? priority;
+  final bool? isDone;
 
   const TaskListItem({
     super.key,
@@ -23,6 +24,7 @@ class TaskListItem extends StatelessWidget {
     this.address,
     this.time,
     this.priority,
+    this.isDone,
   });
 
   void _deleteTask(BuildContext context, String id) {
@@ -30,6 +32,14 @@ class TaskListItem extends StatelessWidget {
     DBHelper.deleteTask(id);
 
     // delete task from UI
+    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+  }
+
+  void _markTaskAsDone(BuildContext context, String id) {
+    // mark task as done in database
+    DBHelper.markTaskAsDone(id);
+
+    // mark task as done in UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
@@ -65,7 +75,7 @@ class TaskListItem extends StatelessWidget {
     ]);
   }
 
-  ListTile displayTitle(BuildContext context) {
+  ListTile displayTitleAndDoneDeleteIconButtons(BuildContext context) {
     return ListTile(
       title: Text(
         title!,
@@ -87,15 +97,17 @@ class TaskListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.check,
-              color: Colors.green,
-            ),
-            onPressed: () {
-              // Mark task as done
-            },
-          ),
+          !isDone!
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.check,
+                    color: Colors.green,
+                  ),
+                  onPressed: () {
+                    _markTaskAsDone(context, id!);
+                  },
+                )
+              : const SizedBox(width: 0),
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: () {
@@ -162,11 +174,14 @@ class TaskListItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
+          color: isDone!
+              ? const Color.fromARGB(255, 231, 254, 225)
+              : const Color.fromARGB(255, 255, 252, 219),
           elevation: 4,
           margin: const EdgeInsets.all(10),
           child: Column(
             children: <Widget>[
-              displayTitle(context),
+              displayTitleAndDoneDeleteIconButtons(context),
               // more infos
               Padding(
                 padding: const EdgeInsets.all(20),

@@ -128,4 +128,15 @@ class DBHelper {
       'isDone': editedTask.isDone,
     });
   }
+
+  // function for marking a task as done in the database
+  static void markTaskAsDone(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDone': true});
+  }
 }

@@ -13,7 +13,8 @@ class TodayAgendaScreen extends StatelessWidget {
   const TodayAgendaScreen({super.key});
 
   Future<void> _refreshTasks(BuildContext context) async {
-    await Provider.of<Tasks>(context, listen: false).fetchTasksDueToday();
+    await Provider.of<Tasks>(context, listen: false)
+        .fetchAndSetAllTasksDueToday();
   }
 
   @override
@@ -44,6 +45,7 @@ class TodayAgendaScreen extends StatelessWidget {
                               tasks.tasksList[index].time),
                           priority: Utility.priorityEnumToString(
                               tasks.tasksList[index].priority),
+                          isDone: tasks.tasksList[index].isDone,
                         ),
                       ),
                     ),

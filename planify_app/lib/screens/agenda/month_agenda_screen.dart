@@ -22,7 +22,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
 
   Future<void> _refreshTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)
-        .fetchTasksDueMonth(_selectedDate!);
+        .fetchAndSetAllTasksDueMonth(_selectedDate!);
   }
 
   void _presentMonthPicker() async {
@@ -73,6 +73,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
                               tasks.tasksList[index].time),
                           priority: Utility.priorityEnumToString(
                               tasks.tasksList[index].priority),
+                          isDone: tasks.tasksList[index].isDone,
                         ),
                       ),
                     ),

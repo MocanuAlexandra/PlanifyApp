@@ -209,11 +209,18 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
 
       // if we got an id, it means that we are editing a task
       if (_editedTask.id != null) {
-        //update the task in the database
-        DBHelper.updateTask(_editedTask.id!, _editedTask);
+        if (_editedTask.isDone == true) {
+          //show an alert dialog to the user if the task is done
+          //we ask the user if he wants to move the tasks to 'in progress' tasks
+          //and we update the task in the database accordingly
+          _displayDialogForDoneTask();
+        } else {
+          //update the task in the database
+          DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-        // go back to overall agenda screen
-        Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
+          // go back to overall agenda screen
+          Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
+        }
       }
       // if we didn't get an id, it means that we are adding a new task
       else {
@@ -356,6 +363,64 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                 child: const Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _displayDialogForDoneTask() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Notification"),
+            content: const Text(
+                'This task is done. Do you want to move it to "In progress" tasks?'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("No"),
+                onPressed: () {
+                  // change the task to done
+                  _editedTask = Task(
+                    id: _editedTask.id,
+                    title: _editedTask.title,
+                    dueDate: _editedTask.dueDate,
+                    address: _editedTask.address,
+                    time: _editedTask.time,
+                    priority: _editedTask.priority,
+                    isDone: true,
+                  );
+
+                  //update the task in the database
+                  DBHelper.updateTask(_editedTask.id!, _editedTask);
+
+                  // go back to overall agenda screen
+                  Navigator.of(context)
+                      .popAndPushNamed(OverallAgendaScreen.routeName);
+                },
+              ),
+              TextButton(
+                child: const Text("Yes"),
+                onPressed: () {
+                  // change the task to not done
+                  _editedTask = Task(
+                    id: _editedTask.id,
+                    title: _editedTask.title,
+                    dueDate: _editedTask.dueDate,
+                    address: _editedTask.address,
+                    time: _editedTask.time,
+                    priority: _editedTask.priority,
+                    isDone: false,
+                  );
+
+                  //update the task in the database
+                  DBHelper.updateTask(_editedTask.id!, _editedTask);
+
+                  // go back to overall agenda screen
+                  Navigator.of(context)
+                      .popAndPushNamed(OverallAgendaScreen.routeName);
                 },
               ),
             ],

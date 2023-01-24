@@ -59,7 +59,35 @@ class Tasks with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchTasksDueToday() async {
+  Future<void> fetchAndSetAllTasksDueToday() async {
+    final tasksData = await DBHelper.fetchTasks();
+
+    _tasks = tasksData.map(
+      (task) {
+        return Task(
+          id: task['id'],
+          title: task['title'],
+          dueDate: DateTime.parse(task['dueDate']),
+          address: TaskAdress(
+            latitude: task['latitude'],
+            longitude: task['longitude'],
+            address: task['address'],
+          ),
+          time: task['time'],
+          priority: task['priority'],
+          isDone: task['isDone'],
+        );
+      },
+    ).toList();
+
+    //filter task that are due today
+    _tasks = _tasks
+        .where((task) => task.dueDate!.day == DateTime.now().day)
+        .toList();
+    notifyListeners();
+  }
+
+  Future<void> fetchAndSetInProgressTasksDueToday() async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -88,7 +116,37 @@ class Tasks with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchTasksDueMonth(DateTime selectedDate) async {
+  Future<void> fetchAndSetAllTasksDueMonth(DateTime selectedDate) async {
+    final tasksData = await DBHelper.fetchTasks();
+
+    _tasks = tasksData.map(
+      (task) {
+        return Task(
+          id: task['id'],
+          title: task['title'],
+          dueDate: DateTime.parse(task['dueDate']),
+          address: TaskAdress(
+            latitude: task['latitude'],
+            longitude: task['longitude'],
+            address: task['address'],
+          ),
+          time: task['time'],
+          priority: task['priority'],
+          isDone: task['isDone'],
+        );
+      },
+    ).toList();
+
+    //filter task that are due the selected month
+    _tasks = _tasks
+        .where((task) =>
+            task.dueDate!.month == selectedDate.month &&
+            task.dueDate!.year == selectedDate.year)
+        .toList();
+    notifyListeners();
+  }
+
+  Future<void> fetchAndSetInProgressTasksDueMonth(DateTime selectedDate) async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
