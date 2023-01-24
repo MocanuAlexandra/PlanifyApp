@@ -99,7 +99,9 @@ class DBHelper {
     var updatedLocation = const TaskAdress(
         latitude: 0, longitude: 0, address: 'No address chosen');
     //check if the user picked an adress
-    if (editedTask.address != null) {
+    if (editedTask.address != null &&
+        editedTask.address!.latitude != null &&
+        editedTask.address!.longitude != null) {
       // get the address of the picked location
       final address = await LocationHelper.getPlaceAddress(
           editedTask.address!.latitude!, editedTask.address!.longitude!);

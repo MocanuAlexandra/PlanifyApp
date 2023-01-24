@@ -22,7 +22,7 @@ class _LocationInputState extends State<LocationInput> {
 
   @override
   void initState() {
-    if (widget.previousAdress != null) {
+    if (widget.previousAdress != null && widget.previousAdress!.latitude != 0 && widget.previousAdress!.longitude != 0) {
       _previewImageUrl = LocationHelper.generateLocPreviewImg(
           latitude: widget.previousAdress!.latitude,
           longitude: widget.previousAdress!.longitude);
@@ -73,12 +73,19 @@ class _LocationInputState extends State<LocationInput> {
     widget.onSelectPlace(selectedLocation.latitude, selectedLocation.longitude);
   }
 
+void _deleteLocation() {
+    setState(() {
+      _previewImageUrl = null;
+    });
+    widget.onSelectPlace(null, null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          height: 200,
+          height: 170,
           width: double.infinity,
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -91,16 +98,16 @@ class _LocationInputState extends State<LocationInput> {
                   textAlign: TextAlign.center,
                 )
               : Image.network(_previewImageUrl!,
-                  fit: BoxFit.cover, width: double.infinity),
+                  fit: BoxFit.fitHeight, width: double.infinity),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton.icon(
               onPressed: _getCurrentUserLocation,
               icon: const Icon(Icons.location_on),
               label: const Text(
-                'Current Location',
+                'Your location',
                 style: TextStyle(fontSize: 15),
               ),
               style: TextButton.styleFrom(
@@ -111,7 +118,18 @@ class _LocationInputState extends State<LocationInput> {
               onPressed: _selectOnMap,
               icon: const Icon(Icons.map),
               label: const Text(
-                'Search on Map',
+                'Search',
+                style: TextStyle(fontSize: 15),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+              ),
+            ),
+             TextButton.icon(
+              onPressed: _deleteLocation,
+              icon: const Icon(Icons.delete),
+              label: const Text(
+                'Delete',
                 style: TextStyle(fontSize: 15),
               ),
               style: TextButton.styleFrom(

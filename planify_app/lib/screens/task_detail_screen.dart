@@ -52,9 +52,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         height: 200,
         width: double.infinity,
         alignment: Alignment.center,
-        decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Colors.grey),
-        ),
         child: loadedTask.address!.latitude == 0 &&
                 loadedTask.address!.longitude == 0
             ? const SizedBox(height: 10)

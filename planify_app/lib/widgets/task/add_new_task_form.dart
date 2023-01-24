@@ -111,7 +111,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
         });
   }
 
-  void _selectPlace(double lat, double lng) {
+  void _selectPlace(double? lat, double? lng) {
     _editedTask = Task(
       id: _editedTask.id,
       title: _editedTask.title,
@@ -318,6 +318,13 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                               value: Priority.important,
                               child: Text(
                                 'Important',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                             DropdownMenuItem(
+                              value: Priority.unknown,
+                              child: Text(
+                                'Unknown',
                                 style: TextStyle(fontSize: 16),
                               ),
                             ),
