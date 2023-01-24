@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
@@ -43,13 +42,8 @@ class DBHelper {
   }
 
   // function for adding tasks to the database
-  static void addTask(
-      String? taskTitle,
-      DateTime? selectedDate,
-      TimeOfDay? selectedTime,
-      TaskAdress? pickedAdress,
-      Priority? priority) async {
-    if (taskTitle == null || selectedDate == null) {
+  static void addTask(Task newTask) async {
+    if (newTask.title == null || newTask.dueDate == null) {
       return;
     }
 
@@ -59,14 +53,14 @@ class DBHelper {
     var updatedLocation = const TaskAdress(
         latitude: 0, longitude: 0, address: 'No address chosen');
     //check if the user picked an adress
-    if (pickedAdress != null) {
+    if (newTask.address != null) {
       // get the address of the picked location
       final address = await LocationHelper.getPlaceAddress(
-          pickedAdress.latitude!, pickedAdress.longitude!);
+          newTask.address!.latitude!, newTask.address!.longitude!);
       // create a new task adress with the address
       updatedLocation = TaskAdress(
-          latitude: pickedAdress.latitude,
-          longitude: pickedAdress.longitude,
+          latitude: newTask.address!.latitude,
+          longitude: newTask.address!.longitude,
           address: address);
     }
 
@@ -76,13 +70,13 @@ class DBHelper {
         .doc(user!.uid)
         .collection('tasks')
         .add({
-      'title': taskTitle,
-      'dueDate': selectedDate.toIso8601String(),
-      'time': Utility.timeOfDayToString(selectedTime),
+      'title': newTask.title,
+      'dueDate': newTask.dueDate!.toIso8601String(),
+      'time': Utility.timeOfDayToString(newTask.time),
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,
       'address': updatedLocation.address,
-      'priority': Utility.priorityEnumToString(priority),
+      'priority': Utility.priorityEnumToString(newTask.priority),
       'isDone': false,
     });
   }
@@ -98,22 +92,38 @@ class DBHelper {
         .delete();
   }
 
-  static void updateTask(String s, String? taskTitle, DateTime selectedDate,
-      TimeOfDay? selectedTime, TaskAdress? pickedAdress, Priority? priority) {
+  // function for updating tasks in the database
+  static void updateTask(String editedTaskId, Task editedTask) async {
     final user = FirebaseAuth.instance.currentUser;
+
+    var updatedLocation = const TaskAdress(
+        latitude: 0, longitude: 0, address: 'No address chosen');
+    //check if the user picked an adress
+    if (editedTask.address != null) {
+      // get the address of the picked location
+      final address = await LocationHelper.getPlaceAddress(
+          editedTask.address!.latitude!, editedTask.address!.longitude!);
+      // create a new task adress with the address
+      updatedLocation = TaskAdress(
+          latitude: editedTask.address!.latitude,
+          longitude: editedTask.address!.longitude,
+          address: address);
+    }
+
     FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
-        .doc(s)
+        .doc(editedTaskId)
         .update({
-      'title': taskTitle,
-      'dueDate': selectedDate.toIso8601String(),
-      'time':Utility.timeOfDayToString(selectedTime),
-      'latitude': pickedAdress!.latitude,
-      'longitude': pickedAdress.longitude,
-      'address': pickedAdress.address,
-      'priority': Utility.priorityEnumToString(priority),
+      'title': editedTask.title,
+      'dueDate': editedTask.dueDate!.toIso8601String(),
+      'time': Utility.timeOfDayToString(editedTask.time),
+      'latitude': updatedLocation.latitude,
+      'longitude': updatedLocation.longitude,
+      'address': updatedLocation.address,
+      'priority': Utility.priorityEnumToString(editedTask.priority),
+      'isDone': editedTask.isDone,
     });
   }
 }

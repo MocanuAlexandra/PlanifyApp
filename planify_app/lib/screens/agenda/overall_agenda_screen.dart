@@ -7,12 +7,6 @@ import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../../widgets/task/add_new_task_form.dart';
 
-enum FilterOptions {
-  All,
-  In_progress,
-  Done,
-}
-
 class OverallAgendaScreen extends StatelessWidget {
   static const routeName = '/overall-agenda';
 
@@ -58,7 +52,7 @@ class OverallAgendaScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(AddNewTaskForm.routeName);
+          Navigator.of(context).pushNamed(AddEditTaskForm.routeName);
         },
         child: const Icon(Icons.add),
       ),

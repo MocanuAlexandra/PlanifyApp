@@ -8,7 +8,9 @@ import '../../screens/location/map_screen.dart';
 
 class LocationInput extends StatefulWidget {
   final Function onSelectPlace;
-  const LocationInput({super.key, required this.onSelectPlace});
+  final TaskAdress? previousAdress;
+  const LocationInput(
+      {super.key, required this.onSelectPlace, this.previousAdress});
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -17,6 +19,16 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   String? _previewImageUrl;
   TaskAdress? _initialAdress;
+
+  @override
+  void initState() {
+    if (widget.previousAdress != null) {
+      _previewImageUrl = LocationHelper.generateLocPreviewImg(
+          latitude: widget.previousAdress!.latitude,
+          longitude: widget.previousAdress!.longitude);
+    }
+    super.initState();
+  }
 
   // add the map in preview
   void _showPreview(double lat, double long) {
@@ -66,7 +78,7 @@ class _LocationInputState extends State<LocationInput> {
     return Column(
       children: [
         Container(
-          height: 170,
+          height: 200,
           width: double.infinity,
           alignment: Alignment.center,
           decoration: BoxDecoration(

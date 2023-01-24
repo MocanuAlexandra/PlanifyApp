@@ -8,7 +8,7 @@ class Task {
   final String? title;
   final DateTime? dueDate;
   final TimeOfDay? time;
-  late final TaskAdress? address;
+  final TaskAdress? address;
   final Priority? priority;
   bool isDone;
 

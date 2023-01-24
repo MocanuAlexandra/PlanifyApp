@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:planify_app/screens/agenda/month_agenda_screen.dart';
+import 'package:planify_app/screens/agenda/overall_agenda_screen.dart';
+import 'package:planify_app/screens/agenda/today_agenda_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -42,17 +45,21 @@ class MainDrawer extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         buildListTile('Overall', Icons.calendar_view_week, () {
-          Navigator.of(context).pushReplacementNamed('/overall-agenda');
+          Navigator.of(context)
+              .pushReplacementNamed(OverallAgendaScreen.routeName);
         }),
         const Divider(),
         buildListTile('Today', Icons.calendar_today, () {
-          Navigator.of(context).pushReplacementNamed('/today-agenda');
+          Navigator.of(context)
+              .pushReplacementNamed(TodayAgendaScreen.routeName);
         }),
         const Divider(),
         buildListTile('Month', Icons.calendar_month, () {
-          Navigator.of(context).pushReplacementNamed('/month-agenda');
+          Navigator.of(context)
+              .pushReplacementNamed(MonthAgendaScreen.routeName);
         }),
         const Divider(),
+        //logout 
         Expanded(
           child: Align(
             alignment: FractionalOffset.bottomCenter,

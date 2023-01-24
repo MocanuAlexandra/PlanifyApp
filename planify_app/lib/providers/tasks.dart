@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/helpers/utility.dart';
-
 import '../database/database_helper.dart';
 import '../models/task.dart';
 import '../models/task_adress.dart';
@@ -126,7 +124,6 @@ class Tasks with ChangeNotifier {
     notifyListeners();
   }
 
-  //find task by id
   Task findById(String id) {
     return _tasks.firstWhere((task) => task.id == id);
   }

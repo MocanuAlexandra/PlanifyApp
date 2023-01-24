@@ -1,28 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:planify_app/screens/agenda/overall_agenda_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
 import '../../models/task.dart';
 import '../../models/task_adress.dart';
+import '../../providers/tasks.dart';
 import '../location/location_input.dart';
 
-class AddNewTaskForm extends StatefulWidget {
-  const AddNewTaskForm({super.key});
+class AddEditTaskForm extends StatefulWidget {
+  const AddEditTaskForm({super.key});
 
   static const routeName = '/add-task';
 
   @override
-  State<AddNewTaskForm> createState() => _AddNewTaskFormState();
+  State<AddEditTaskForm> createState() => _AddEditTaskFormState();
 }
 
-class _AddNewTaskFormState extends State<AddNewTaskForm> {
+class _AddEditTaskFormState extends State<AddEditTaskForm> {
   final _formKey = GlobalKey<FormState>();
-  String? _taskTitle;
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedTime;
-  TaskAdress? _pickedAdress;
-  Priority? _priority;
+  var _editedTask = Task(
+    id: null,
+    title: '',
+    dueDate: null,
+    address: null,
+    time: null,
+    priority: null,
+    isDone: false,
+  );
+  var _initValues = {
+    'title': '',
+    'dueDate': null,
+    'address': null,
+    'time': null,
+    'priority': null,
+    'isDone': false,
+  };
+
+  var _isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final taskId = ModalRoute.of(context)!.settings.arguments as String?;
+
+      if (taskId != null) {
+        _editedTask =
+            Provider.of<Tasks>(context, listen: false).findById(taskId);
+        _initValues = {
+          'title': _editedTask.title,
+          'dueDate': _editedTask.dueDate,
+          'address': _editedTask.address,
+          'time': _editedTask.time,
+          'priority': _editedTask.priority,
+          'isDone': _editedTask.isDone,
+        };
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   void _presentDatePicker() {
     showDatePicker(
@@ -35,7 +74,17 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
     ).then((pickedDate) => {
           if (pickedDate != null)
             {
-              setState(() => _selectedDate = pickedDate),
+              setState(() {
+                _editedTask = Task(
+                  id: _editedTask.id,
+                  title: _editedTask.title,
+                  dueDate: pickedDate,
+                  address: _editedTask.address,
+                  time: _editedTask.time,
+                  priority: _editedTask.priority,
+                  isDone: _editedTask.isDone,
+                );
+              }),
             }
         });
   }
@@ -47,13 +96,31 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
     ).then((pickedTime) => {
           if (pickedTime != null)
             {
-              setState(() => _selectedTime = pickedTime),
+              setState(() {
+                _editedTask = Task(
+                  id: _editedTask.id,
+                  title: _editedTask.title,
+                  dueDate: _editedTask.dueDate,
+                  address: _editedTask.address,
+                  time: pickedTime,
+                  priority: _editedTask.priority,
+                  isDone: _editedTask.isDone,
+                );
+              }),
             }
         });
   }
 
   void _selectPlace(double lat, double lng) {
-    _pickedAdress = TaskAdress(latitude: lat, longitude: lng);
+    _editedTask = Task(
+      id: _editedTask.id,
+      title: _editedTask.title,
+      dueDate: _editedTask.dueDate,
+      address: TaskAdress(latitude: lat, longitude: lng),
+      time: _editedTask.time,
+      priority: _editedTask.priority,
+      isDone: _editedTask.isDone,
+    );
   }
 
   void _displayDialogForNotPickDate() {
@@ -76,51 +143,61 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
   }
 
   String _displayTime(TimeOfDay? selectedTime) {
-    if (_selectedTime == null) {
+    if (_editedTask.time == null) {
       return 'No due time chosen';
     }
-    String hour = _selectedTime!.hour < 10
-        ? '0${_selectedTime!.hour}'
-        : '${_selectedTime!.hour}';
-    String minute = _selectedTime!.minute < 10
-        ? '0${_selectedTime!.minute}'
-        : '${_selectedTime!.minute}';
-    String period = _selectedTime!.period == DayPeriod.am ? 'AM' : 'PM';
+    String hour = _editedTask.time!.hour < 10
+        ? '0${_editedTask.time!.hour}'
+        : '${_editedTask.time!.hour}';
+    String minute = _editedTask.time!.minute < 10
+        ? '0${_editedTask.time!.minute}'
+        : '${_editedTask.time!.minute}';
+    String period = _editedTask.time!.period == DayPeriod.am ? 'AM' : 'PM';
     return 'Due time: $hour:$minute $period';
   }
 
   String _displayDate(DateTime? selectedDate) {
-    if (_selectedDate == null) {
+    if (_editedTask.dueDate == null) {
       return 'No due date chosen';
     }
-    String day = _selectedDate!.day < 10
-        ? '0${_selectedDate!.day}'
-        : '${_selectedDate!.day}';
-    String month = _selectedDate!.month < 10
-        ? '0${_selectedDate!.month}'
-        : '${_selectedDate!.month}';
-    String year = '${_selectedDate!.year}';
+    String day = _editedTask.dueDate!.day < 10
+        ? '0${_editedTask.dueDate!.day}'
+        : '${_editedTask.dueDate!.day}';
+    String month = _editedTask.dueDate!.month < 10
+        ? '0${_editedTask.dueDate!.month}'
+        : '${_editedTask.dueDate!.month}';
+    String year = '${_editedTask.dueDate!.year}';
     return 'Due date: $day/$month/$year';
   }
 
-  void _addTask() {
+  void _addEditTask() {
+    //check for validation of the form
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
 
     if (isValid) {
       _formKey.currentState!.save();
 
-      //check if the user picked a due date
-      if (_selectedDate == null) {
-        //show an alert dialog to the user if the due date is not selected
-        _displayDialogForNotPickDate();
-      } else {
-        //add the task in the database
-        DBHelper.addTask(
-            _taskTitle, _selectedDate, _selectedTime, _pickedAdress, _priority);
+      // if we got an id, it means that we are editing a task
+      if (_editedTask.id != null) {
+        //update the task in the database
+        DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-        // close the screen
-        Navigator.of(context).pop();
+        // go back to overall agenda screen
+        Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
+      }
+      // if we didn't get an id, it means that we are adding a new task
+      else {
+        if (_editedTask.dueDate == null) {
+          //show an alert dialog to the user if the due date is not selected
+          _displayDialogForNotPickDate();
+        } else {
+          //add the task in the database
+          DBHelper.addTask(_editedTask);
+
+          // close the screen
+          Navigator.of(context).pop();
+        }
       }
     }
   }
@@ -129,7 +206,9 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Add a new task'),
+          title: _editedTask.id == null
+              ? const Text('Add new task')
+              : const Text('Edit task'),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -145,6 +224,7 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                         //title field
                         FormBuilderTextField(
                           name: 'title',
+                          initialValue: _initValues['title'].toString(),
                           decoration: const InputDecoration(
                               labelText: 'Title',
                               labelStyle: TextStyle(
@@ -153,7 +233,15 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                           validator: FormBuilderValidators.required(
                               errorText: 'Required'),
                           onSaved: (value) {
-                            _taskTitle = value;
+                            _editedTask = Task(
+                              id: _editedTask.id,
+                              title: value.toString(),
+                              dueDate: _editedTask.dueDate,
+                              address: _editedTask.address,
+                              time: _editedTask.time,
+                              priority: _editedTask.priority,
+                              isDone: _editedTask.isDone,
+                            );
                           },
                         ),
                         const SizedBox(height: 10),
@@ -162,7 +250,7 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                           children: [
                             Expanded(
                               child: Text(
-                                _displayDate(_selectedDate),
+                                _displayDate(_editedTask.dueDate),
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
@@ -184,7 +272,7 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                           children: [
                             Expanded(
                               child: Text(
-                                _displayTime(_selectedTime),
+                                _displayTime(_editedTask.time),
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
@@ -202,15 +290,15 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                           ],
                         ),
                         //adress field
-                        const SizedBox(height: 10),
                         LocationInput(
+                          previousAdress: _editedTask.address,
                           onSelectPlace: _selectPlace,
                         ),
                         const SizedBox(height: 10),
                         //priority field
                         DropdownButtonFormField<Priority>(
                           icon: const Icon(Icons.arrow_drop_down),
-                          value: _priority,
+                          value: _editedTask.priority,
                           items: const [
                             DropdownMenuItem(
                               value: Priority.casual,
@@ -236,7 +324,15 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                           ],
                           onChanged: (value) {
                             setState(() {
-                              _priority = value;
+                              _editedTask = Task(
+                                id: _editedTask.id,
+                                title: _editedTask.title,
+                                dueDate: _editedTask.dueDate,
+                                address: _editedTask.address,
+                                time: _editedTask.time,
+                                priority: value,
+                                isDone: _editedTask.isDone,
+                              );
                             });
                           },
                           hint: const Text(
@@ -251,8 +347,9 @@ class _AddNewTaskFormState extends State<AddNewTaskForm> {
                 ),
               ),
             ),
+            //submit button
             ElevatedButton(
-                onPressed: _addTask,
+                onPressed: _addEditTask,
                 style: ElevatedButton.styleFrom(
                   elevation: 5,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,

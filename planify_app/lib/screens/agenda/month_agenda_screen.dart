@@ -80,7 +80,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(AddNewTaskForm.routeName);
+          Navigator.of(context).pushNamed(AddEditTaskForm.routeName);
         },
         child: const Icon(Icons.add),
       ),

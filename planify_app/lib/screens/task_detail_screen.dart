@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:planify_app/models/task.dart';
 import 'package:provider/provider.dart';
 
 import '../database/database_helper.dart';
@@ -24,6 +25,55 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     // delete task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
+  }
+
+  IconData _priorityIcon(Priority? priority) {
+    return Utility.priorityEnumToString(priority) == "Important"
+        ? Icons.priority_high
+        : Utility.priorityEnumToString(priority) == "Necessary"
+            ? Icons.warning
+            : Utility.priorityEnumToString(priority) == "Casual"
+                ? Icons.low_priority_sharp
+                : Icons.question_mark;
+  }
+
+  Color _priorityColor(Priority? priority) {
+    return Utility.priorityEnumToString(priority) == "Important"
+        ? Colors.red
+        : Utility.priorityEnumToString(priority) == "Necessary"
+            ? Colors.orange
+            : Utility.priorityEnumToString(priority) == "Casual"
+                ? Colors.green
+                : Colors.black;
+  }
+
+  Container _displayMap(Task loadedTask) {
+    return Container(
+        height: 200,
+        width: double.infinity,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(width: 1, color: Colors.grey),
+        ),
+        child: loadedTask.address!.latitude == 0 &&
+                loadedTask.address!.longitude == 0
+            ? const SizedBox(height: 10)
+            : GoogleMap(
+                initialCameraPosition: CameraPosition(
+                    target: LatLng(loadedTask.address!.latitude!,
+                        loadedTask.address!.longitude!),
+                    zoom: 15.0),
+                markers: {
+                  Marker(
+                    markerId: MarkerId(loadedTask.address!.address!),
+                    position: LatLng(loadedTask.address!.latitude!,
+                        loadedTask.address!.longitude!),
+                    infoWindow: InfoWindow(
+                        title: loadedTask.title!,
+                        snippet: loadedTask.address!.address!),
+                  )
+                },
+              ));
   }
 
   @override
@@ -84,32 +134,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(
-                          Utility.priorityEnumToString(loadedTask.priority) ==
-                                  "Important"
-                              ? Icons.priority_high
-                              : Utility.priorityEnumToString(
-                                          loadedTask.priority) ==
-                                      "Necessary"
-                                  ? Icons.warning
-                                  : Utility.priorityEnumToString(
-                                              loadedTask.priority) ==
-                                          "Casual"
-                                      ? Icons.low_priority_sharp
-                                      : Icons.question_mark,
-                          color: Utility.priorityEnumToString(
-                                      loadedTask.priority) ==
-                                  "Important"
-                              ? Colors.red
-                              : Utility.priorityEnumToString(
-                                          loadedTask.priority) ==
-                                      "Necessary"
-                                  ? Colors.orange
-                                  : Utility.priorityEnumToString(
-                                              loadedTask.priority) ==
-                                          "Casual"
-                                      ? Colors.green
-                                      : Colors.black),
+                      Icon(_priorityIcon(loadedTask.priority),
+                          color: _priorityColor(loadedTask.priority)),
                       const SizedBox(width: 10),
                       Text(Utility.priorityEnumToString(loadedTask.priority),
                           style: const TextStyle(fontSize: 16)),
@@ -130,30 +156,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   ]),
                   const SizedBox(height: 10),
                   //show map
-                  SizedBox(
-                    height: 200,
-                    width: double.infinity,
-                    child: loadedTask.address!.latitude == 0 &&
-                            loadedTask.address!.longitude == 0
-                        ? const SizedBox(height: 10)
-                        : GoogleMap(
-                            initialCameraPosition: CameraPosition(
-                                target: LatLng(loadedTask.address!.latitude!,
-                                    loadedTask.address!.longitude!),
-                                zoom: 15.0),
-                            markers: {
-                              Marker(
-                                markerId:
-                                    MarkerId(loadedTask.address!.address!),
-                                position: LatLng(loadedTask.address!.latitude!,
-                                    loadedTask.address!.longitude!),
-                                infoWindow: InfoWindow(
-                                    title: loadedTask.title!,
-                                    snippet: loadedTask.address!.address!),
-                              )
-                            },
-                          ),
-                  ),
+                  _displayMap(loadedTask),
                   const SizedBox(height: 10),
                 ]),
               ),
@@ -164,8 +167,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       //edit button
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigator.of(context)
-          //     .pushNamed(AddNewTaskForm.routeName, arguments: taskId);
+          Navigator.of(context)
+              .pushNamed(AddEditTaskForm.routeName, arguments: taskId);
         },
         child: const Icon(Icons.edit),
       ),
