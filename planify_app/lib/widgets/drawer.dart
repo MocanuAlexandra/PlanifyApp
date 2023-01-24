@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/screens/agenda/month_agenda_screen.dart';
-import 'package:planify_app/screens/agenda/overall_agenda_screen.dart';
-import 'package:planify_app/screens/agenda/today_agenda_screen.dart';
+
+import '../../screens/agenda/month_agenda_screen.dart';
+import '../../screens/agenda/overall_agenda_screen.dart';
+import '../../screens/agenda/today_agenda_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -22,6 +23,30 @@ class MainDrawer extends StatelessWidget {
       onTap: () {
         tapHandler();
       },
+    );
+  }
+
+  Widget buildLogoutTile() {
+    return Expanded(
+      child: Align(
+        alignment: FractionalOffset.bottomCenter,
+        child: ListTile(
+          hoverColor: Colors.blue,
+          dense: true,
+          visualDensity: const VisualDensity(vertical: -4),
+          leading: const Icon(
+            Icons.logout,
+          ),
+          title: const Text('Logout',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black,
+              )),
+          onTap: () {
+            FirebaseAuth.instance.signOut();
+          },
+        ),
+      ),
     );
   }
 
@@ -59,28 +84,8 @@ class MainDrawer extends StatelessWidget {
               .pushReplacementNamed(MonthAgendaScreen.routeName);
         }),
         const Divider(),
-        //logout 
-        Expanded(
-          child: Align(
-            alignment: FractionalOffset.bottomCenter,
-            child: ListTile(
-              hoverColor: Colors.blue,
-              dense: true,
-              visualDensity: const VisualDensity(vertical: -4),
-              leading: const Icon(
-                Icons.logout,
-              ),
-              title: const Text('Logout',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                  )),
-              onTap: () {
-                FirebaseAuth.instance.signOut();
-              },
-            ),
-          ),
-        ),
+        //logout
+        buildLogoutTile(),
       ]),
     );
   }

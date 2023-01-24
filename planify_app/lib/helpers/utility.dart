@@ -16,6 +16,9 @@ class Utility {
       case Priority.important:
         priorityString = 'Important';
         break;
+      case Priority.unknown:
+        priorityString = 'Unknown';
+        break;
       case null:
         priorityString = 'Unknown';
     }

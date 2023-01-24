@@ -27,27 +27,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
-  IconData _priorityIcon(Priority? priority) {
-    return Utility.priorityEnumToString(priority) == "Important"
-        ? Icons.priority_high
-        : Utility.priorityEnumToString(priority) == "Necessary"
-            ? Icons.warning
-            : Utility.priorityEnumToString(priority) == "Casual"
-                ? Icons.low_priority_sharp
-                : Icons.question_mark;
-  }
-
-  Color _priorityColor(Priority? priority) {
-    return Utility.priorityEnumToString(priority) == "Important"
-        ? Colors.red
-        : Utility.priorityEnumToString(priority) == "Necessary"
-            ? Colors.orange
-            : Utility.priorityEnumToString(priority) == "Casual"
-                ? Colors.green
-                : Colors.black;
-  }
-
-  Container _displayMap(Task loadedTask) {
+  //auxiliary methods
+  Container displayMap(Task loadedTask) {
     return Container(
         height: 200,
         width: double.infinity,
@@ -71,6 +52,63 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   )
                 },
               ));
+  }
+
+  Text displayTitle(Task loadedTask) {
+    return Text(
+      loadedTask.title!,
+      style: const TextStyle(fontSize: 20),
+      softWrap: true,
+      maxLines: 3,
+    );
+  }
+
+  Row displayDueDate(Task loadedTask) {
+    return Row(
+      children: [
+        const Icon(Icons.calendar_month),
+        const SizedBox(width: 10),
+        Text(DateFormat('dd/MM/yyyy').format(loadedTask.dueDate!),
+            style: const TextStyle(fontSize: 16)),
+      ],
+    );
+  }
+
+  Row displayDueTime(Task loadedTask) {
+    return Row(
+      children: [
+        const Icon(Icons.access_time),
+        const SizedBox(width: 10),
+        Text(Utility.timeOfDayToString(loadedTask.time),
+            style: const TextStyle(fontSize: 16)),
+      ],
+    );
+  }
+
+  Row displayPriority(Task loadedTask) {
+    return Row(
+      children: [
+        Icon(_priorityIcon(loadedTask.priority),
+            color: _priorityColor(loadedTask.priority)),
+        const SizedBox(width: 10),
+        Text(Utility.priorityEnumToString(loadedTask.priority),
+            style: const TextStyle(fontSize: 16)),
+      ],
+    );
+  }
+
+  Row displayAddress(Task loadedTask) {
+    return Row(children: [
+      const Icon(Icons.location_pin),
+      Expanded(
+        child: Text(
+          loadedTask.address!.address!,
+          softWrap: true,
+          maxLines: 3,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ),
+    ]);
   }
 
   @override
@@ -101,59 +139,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 padding: const EdgeInsets.all(10),
                 child: Column(children: [
                   //title field
-                  Text(
-                    loadedTask.title!,
-                    style: const TextStyle(fontSize: 20),
-                    softWrap: true,
-                    maxLines: 3,
-                  ),
+                  displayTitle(loadedTask),
                   const SizedBox(height: 20),
                   //due date field
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_month),
-                      const SizedBox(width: 10),
-                      Text(DateFormat('dd/MM/yyyy').format(loadedTask.dueDate!),
-                          style: const TextStyle(fontSize: 16)),
-                    ],
-                  ),
+                  displayDueDate(loadedTask),
                   const SizedBox(height: 10),
                   //due time field
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(width: 10),
-                      Text(Utility.timeOfDayToString(loadedTask.time),
-                          style: const TextStyle(fontSize: 16)),
-                    ],
-                  ),
+                  displayDueTime(loadedTask),
                   //priority field
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(_priorityIcon(loadedTask.priority),
-                          color: _priorityColor(loadedTask.priority)),
-                      const SizedBox(width: 10),
-                      Text(Utility.priorityEnumToString(loadedTask.priority),
-                          style: const TextStyle(fontSize: 16)),
-                    ],
-                  ),
+                  displayPriority(loadedTask),
                   //adress field
                   const SizedBox(height: 10),
-                  Row(children: [
-                    const Icon(Icons.location_pin),
-                    Expanded(
-                      child: Text(
-                        loadedTask.address!.address!,
-                        softWrap: true,
-                        maxLines: 3,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ]),
+                  displayAddress(loadedTask),
                   const SizedBox(height: 10),
                   //show map
-                  _displayMap(loadedTask),
+                  displayMap(loadedTask),
                   const SizedBox(height: 10),
                 ]),
               ),
@@ -170,5 +171,25 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         child: const Icon(Icons.edit),
       ),
     );
+  }
+
+  IconData _priorityIcon(Priority? priority) {
+    return Utility.priorityEnumToString(priority) == "Important"
+        ? Icons.priority_high
+        : Utility.priorityEnumToString(priority) == "Necessary"
+            ? Icons.warning
+            : Utility.priorityEnumToString(priority) == "Casual"
+                ? Icons.low_priority_sharp
+                : Icons.question_mark;
+  }
+
+  Color _priorityColor(Priority? priority) {
+    return Utility.priorityEnumToString(priority) == "Important"
+        ? Colors.red
+        : Utility.priorityEnumToString(priority) == "Necessary"
+            ? Colors.orange
+            : Utility.priorityEnumToString(priority) == "Casual"
+                ? Colors.green
+                : Colors.black;
   }
 }

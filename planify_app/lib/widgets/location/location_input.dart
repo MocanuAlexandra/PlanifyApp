@@ -22,7 +22,9 @@ class _LocationInputState extends State<LocationInput> {
 
   @override
   void initState() {
-    if (widget.previousAdress != null && widget.previousAdress!.latitude != 0 && widget.previousAdress!.longitude != 0) {
+    if (widget.previousAdress != null &&
+        widget.previousAdress!.latitude != 0 &&
+        widget.previousAdress!.longitude != 0) {
       _previewImageUrl = LocationHelper.generateLocPreviewImg(
           latitude: widget.previousAdress!.latitude,
           longitude: widget.previousAdress!.longitude);
@@ -73,7 +75,7 @@ class _LocationInputState extends State<LocationInput> {
     widget.onSelectPlace(selectedLocation.latitude, selectedLocation.longitude);
   }
 
-void _deleteLocation() {
+  void _deleteLocation() {
     setState(() {
       _previewImageUrl = null;
     });
@@ -125,7 +127,7 @@ void _deleteLocation() {
                 foregroundColor: Theme.of(context).primaryColor,
               ),
             ),
-             TextButton.icon(
+            TextButton.icon(
               onPressed: _deleteLocation,
               icon: const Icon(Icons.delete),
               label: const Text(

@@ -90,6 +90,75 @@ class _AuthFormState extends State<AuthForm>
     }
   }
 
+
+  //auxiliary methods
+  AnimatedContainer confirmPasswordField() {
+    return AnimatedContainer(
+      constraints: BoxConstraints(
+        minHeight: _authMode == AuthMode.Signup ? 60 : 0,
+        maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
+      ),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeIn,
+      child: FadeTransition(
+        opacity: _opacityAnimation!,
+        child: SlideTransition(
+          position: _slideAnimation!,
+          child: FormBuilderTextField(
+              name: 'confirmPassword',
+              enabled: _authMode == AuthMode.Signup,
+              decoration: const InputDecoration(labelText: 'Confirm Password'),
+              obscureText: true,
+              validator: _authMode == AuthMode.Signup
+                  ? FormBuilderValidators.compose([
+                      FormBuilderValidators.required(errorText: 'Required'),
+                      FormBuilderValidators.match(_passwordController.text,
+                          errorText: 'Passwords do not match'),
+                    ])
+                  : null),
+        ),
+      ),
+    );
+  }
+
+  FormBuilderTextField passwordField() {
+    return FormBuilderTextField(
+        name: 'password',
+        focusNode: _passwordNode,
+        controller: _passwordController,
+        decoration: const InputDecoration(labelText: 'Password'),
+        obscureText: true,
+        textInputAction: TextInputAction.next,
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(errorText: 'Required'),
+          FormBuilderValidators.match(_passwordRegexPattern, errorText: '''
+Use at least one lower case character, 
+one upper case character and one digit, 
+one special character (?=.*[@#%^&+=]), 
+least 8 characters and no space.'''),
+        ]),
+        onSaved: (newValue) => {
+              userPass = newValue,
+            });
+  }
+
+  FormBuilderTextField emailField(BuildContext context) {
+    return FormBuilderTextField(
+        name: 'email',
+        decoration: const InputDecoration(labelText: 'Email Address'),
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(errorText: 'Required'),
+          FormBuilderValidators.email(errorText: 'Invalid email address'),
+        ]),
+        onSubmitted: (value) =>
+            {FocusScope.of(context).requestFocus(_passwordNode)},
+        onSaved: (newValue) => {
+              userEmail = newValue,
+            });
+  }
+
   @override
   void dispose() {
     _passwordNode.dispose();
@@ -120,72 +189,11 @@ class _AuthFormState extends State<AuthForm>
               child: SingleChildScrollView(
                 child: Column(children: [
                   // email field
-                  FormBuilderTextField(
-                      name: 'email',
-                      decoration:
-                          const InputDecoration(labelText: 'Email Address'),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: 'Required'),
-                        FormBuilderValidators.email(
-                            errorText: 'Invalid email address'),
-                      ]),
-                      onSubmitted: (value) =>
-                          {FocusScope.of(context).requestFocus(_passwordNode)},
-                      onSaved: (newValue) => {
-                            userEmail = newValue,
-                          }),
+                  emailField(context),
                   // password field
-                  FormBuilderTextField(
-                      name: 'password',
-                      focusNode: _passwordNode,
-                      controller: _passwordController,
-                      decoration: const InputDecoration(labelText: 'Password'),
-                      obscureText: true,
-                      textInputAction: TextInputAction.next,
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(errorText: 'Required'),
-                        FormBuilderValidators.match(_passwordRegexPattern,
-                            errorText: '''
-Use at least one lower case character, 
-one upper case character and one digit, 
-one special character (?=.*[@#%^&+=]), 
-least 8 characters and no space.'''),
-                      ]),
-                      onSaved: (newValue) => {
-                            userPass = newValue,
-                          }),
+                  passwordField(),
                   // if the form is in sign up mode, display the confirm password field
-                  AnimatedContainer(
-                    constraints: BoxConstraints(
-                      minHeight: _authMode == AuthMode.Signup ? 60 : 0,
-                      maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
-                    ),
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeIn,
-                    child: FadeTransition(
-                      opacity: _opacityAnimation!,
-                      child: SlideTransition(
-                        position: _slideAnimation!,
-                        child: FormBuilderTextField(
-                            name: 'confirmPassword',
-                            enabled: _authMode == AuthMode.Signup,
-                            decoration: const InputDecoration(
-                                labelText: 'Confirm Password'),
-                            obscureText: true,
-                            validator: _authMode == AuthMode.Signup
-                                ? FormBuilderValidators.compose([
-                                    FormBuilderValidators.required(
-                                        errorText: 'Required'),
-                                    FormBuilderValidators.match(
-                                        _passwordController.text,
-                                        errorText: 'Passwords do not match'),
-                                  ])
-                                : null),
-                      ),
-                    ),
-                  ),
+                  confirmPasswordField(),
                   const SizedBox(
                     height: 20,
                   ),

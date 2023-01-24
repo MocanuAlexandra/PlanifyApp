@@ -33,6 +33,101 @@ class TaskListItem extends StatelessWidget {
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
+  Row displayPriority() {
+    return Row(children: [
+      Icon(_prorityIcon(priority!), color: _priorityIconColor(priority!)),
+      const SizedBox(
+        width: 6,
+      ),
+      Text(priority!)
+    ]);
+  }
+
+  Row displayTime() {
+    return Row(children: [
+      const Icon(Icons.access_time),
+      const SizedBox(
+        width: 6,
+      ),
+      Text(time!)
+    ]);
+  }
+
+  Row displayDueDate() {
+    return Row(children: [
+      const Icon(Icons.calendar_month),
+      const SizedBox(
+        width: 6,
+      ),
+      Text(
+        DateFormat('dd/MM/yyyy').format(dueDate!),
+      ),
+    ]);
+  }
+
+  ListTile displayTitle(BuildContext context) {
+    return ListTile(
+      title: Text(
+        title!,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      //address
+      subtitle: Row(children: [
+        const Icon(Icons.location_pin),
+        Expanded(
+          child: Text(
+            address!.address!,
+            softWrap: true,
+            maxLines: 3,
+          ),
+        ),
+      ]),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+            onPressed: () {
+              // Mark task as done
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () {
+              _deleteTask(context, id!);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool?> displayAlertDialogForDelete(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Question'),
+              content: const Text('Do you want to remove the task?'),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: const Text('No')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Yes')),
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -52,24 +147,7 @@ class TaskListItem extends StatelessWidget {
       ),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) {
-        return showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: const Text('Question'),
-                  content: const Text('Do you want to remove the task?'),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                        },
-                        child: const Text('No')),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                        child: const Text('Yes')),
-                  ],
-                ));
+        return displayAlertDialogForDelete(context);
       },
       onDismissed: ((direction) => {
             _deleteTask(context, id!),
@@ -77,8 +155,8 @@ class TaskListItem extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Navigate to task details screen
-           Navigator.of(context).pushNamed(TaskDetailScreen.routeName,
-                  arguments:id);
+          Navigator.of(context)
+              .pushNamed(TaskDetailScreen.routeName, arguments: id);
         },
         child: Card(
           shape: RoundedRectangleBorder(
@@ -88,92 +166,16 @@ class TaskListItem extends StatelessWidget {
           margin: const EdgeInsets.all(10),
           child: Column(
             children: <Widget>[
-              // title
-              ListTile(
-                title: Text(
-                  title!,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                //address
-                subtitle: Row(children: [
-                  const Icon(Icons.location_pin),
-                  Expanded(
-                    child: Text(
-                      address!.address!,
-                      softWrap: true,
-                      maxLines: 3,
-                    ),
-                  ),
-                ]),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    IconButton(
-                      icon: const Icon(
-                        Icons.check,
-                        color: Colors.green,
-                      ),
-                      onPressed: () {
-                        // Mark task as done
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        _deleteTask(context, id!);
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              displayTitle(context),
               // more infos
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    //due date
-                    Row(children: [
-                      const Icon(Icons.calendar_month),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        DateFormat('dd/MM/yyyy').format(dueDate!),
-                      ),
-                    ]),
-                    // time
-                    Row(children: [
-                      const Icon(Icons.access_time),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(time!)
-                    ]),
-                    // priority
-                    Row(children: [
-                      Icon(
-                          priority == "Important"
-                              ? Icons.priority_high
-                              : priority == "Necessary"
-                                  ? Icons.warning
-                                  : priority == "Casual"
-                                      ? Icons.low_priority_sharp
-                                      : Icons.question_mark,
-                          color: priority == "Important"
-                              ? Colors.red
-                              : priority == "Necessary"
-                                  ? Colors.orange
-                                  : priority == "Casual"
-                                      ? Colors.green
-                                      : Colors.black),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(priority!)
-                    ]),
+                    displayDueDate(),
+                    displayTime(),
+                    displayPriority(),
                   ],
                 ),
               ),
@@ -182,5 +184,25 @@ class TaskListItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData? _prorityIcon(String priority) {
+    return priority == "Important"
+        ? Icons.priority_high
+        : priority == "Necessary"
+            ? Icons.warning
+            : priority == "Casual"
+                ? Icons.low_priority_sharp
+                : Icons.question_mark;
+  }
+
+  Color? _priorityIconColor(String priority) {
+    return priority == "Important"
+        ? Colors.red
+        : priority == "Necessary"
+            ? Colors.orange
+            : priority == "Casual"
+                ? Colors.green
+                : Colors.black;
   }
 }
