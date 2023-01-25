@@ -219,7 +219,8 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
           DBHelper.updateTask(_editedTask.id!, _editedTask);
 
           // go back to overall agenda screen
-          Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
+          Navigator.of(context)
+              .pushReplacementNamed(OverallAgendaScreen.routeName);
         }
       }
       // if we didn't get an id, it means that we are adding a new task
@@ -231,8 +232,9 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
           //add the task in the database
           DBHelper.addTask(_editedTask);
 
-          // close the screen
-          Navigator.of(context).pop();
+          // go back to overall agenda screen
+          Navigator.of(context)
+              .pushReplacementNamed(OverallAgendaScreen.routeName);
         }
       }
     }

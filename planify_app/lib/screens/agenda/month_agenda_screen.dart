@@ -8,6 +8,12 @@ import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../../widgets/task/add_new_task_form.dart';
 
+enum FilterOptions {
+  All,
+  In_progress,
+  Done,
+}
+
 class MonthAgendaScreen extends StatefulWidget {
   static const routeName = '/month-agenda';
 
@@ -20,9 +26,19 @@ class MonthAgendaScreen extends StatefulWidget {
 class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
   DateTime? _selectedDate = DateTime.now();
 
-  Future<void> _refreshTasks(BuildContext context) async {
+  Future<void> _refreshAllTasks(BuildContext context) async {
     await Provider.of<Tasks>(context, listen: false)
         .fetchAndSetAllTasksDueMonth(_selectedDate!);
+  }
+
+  Future<void> _refreshInProgressTasks(BuildContext context) async {
+    await Provider.of<Tasks>(context, listen: false)
+        .fetchAndSetInProgressTasksDueMonth(_selectedDate!);
+  }
+
+  Future<void> _refreshDoneTasks(BuildContext context) async {
+    await Provider.of<Tasks>(context, listen: false)
+        .fetchAndSetDoneTasksDueMonth(_selectedDate!);
   }
 
   void _presentMonthPicker() async {
@@ -49,18 +65,74 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
             icon: const Icon(Icons.calendar_today),
             onPressed: _presentMonthPicker,
           ),
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (FilterOptions selectedValue) {
+              selectedValue == FilterOptions.Done
+                  ? _refreshDoneTasks(context)
+                  : selectedValue == FilterOptions.In_progress
+                      ? _refreshInProgressTasks(context)
+                      : _refreshAllTasks(context);
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: FilterOptions.All,
+                child: Row(
+                  // ignore: prefer_const_literals_to_create_immutables
+                  children: [
+                    const Icon(
+                      Icons.all_inbox,
+                      color: Colors.black,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('All'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: FilterOptions.In_progress,
+                child: Row(
+                  // ignore: prefer_const_literals_to_create_immutables
+                  children: [
+                    const Icon(
+                      Icons.work,
+                      color: Colors.black,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('In progress'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: FilterOptions.Done,
+                child: Row(
+                  // ignore: prefer_const_literals_to_create_immutables
+                  children: [
+                    const Icon(
+                      Icons.done,
+                      color: Colors.black,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Done'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(
-        future: _refreshTasks(context),
+        future: _refreshAllTasks(context),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : RefreshIndicator(
-                    onRefresh: () => _refreshTasks(context),
+                    onRefresh: () =>
+                        //TODO check what filter option is selected before the refresh
+                        _refreshAllTasks(context),
                     child: Consumer<Tasks>(
                       builder: (context, tasks, ch) => ListView.builder(
                         itemCount: tasks.tasksList.length,
