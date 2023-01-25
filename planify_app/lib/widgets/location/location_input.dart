@@ -23,8 +23,8 @@ class _LocationInputState extends State<LocationInput> {
   @override
   void initState() {
     if (widget.previousAdress != null &&
-        widget.previousAdress!.latitude != 0 &&
-        widget.previousAdress!.longitude != 0) {
+        widget.previousAdress!.latitude != 0.0 &&
+        widget.previousAdress!.longitude != 0.0) {
       _previewImageUrl = LocationHelper.generateLocPreviewImg(
           latitude: widget.previousAdress!.latitude,
           longitude: widget.previousAdress!.longitude);

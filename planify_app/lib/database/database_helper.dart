@@ -97,11 +97,18 @@ class DBHelper {
     final user = FirebaseAuth.instance.currentUser;
 
     var updatedLocation = const TaskAdress(
-        latitude: 0, longitude: 0, address: 'No address chosen');
+        latitude: 0.0, longitude: 0.0, address: 'No address chosen');
     //check if the user picked an adress
-    if (editedTask.address != null &&
-        editedTask.address!.latitude != null &&
-        editedTask.address!.longitude != null) {
+    if ((editedTask.address != null &&
+                editedTask.address!.latitude != null &&
+                editedTask.address!.longitude !=
+                    null) // if the user picked an address, so the values are not default ones
+            &&
+            (editedTask.address!.latitude != 0.0 &&
+                editedTask.address!.longitude != 0.0 &&
+                editedTask.address!.address !=
+                    'No address chosen') // if the user previously deleted the address, so the task has default address
+        ) {
       // get the address of the picked location
       final address = await LocationHelper.getPlaceAddress(
           editedTask.address!.latitude!, editedTask.address!.longitude!);

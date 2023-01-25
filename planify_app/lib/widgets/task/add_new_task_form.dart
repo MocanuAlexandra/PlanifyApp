@@ -375,7 +375,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Notification"),
+            title: const Text("Question"),
             content: const Text(
                 'This task is done. Do you want to move it to "In progress" tasks?'),
             actions: <Widget>[
