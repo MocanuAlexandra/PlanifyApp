@@ -19,6 +19,8 @@ class _AuthFormState extends State<AuthForm>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   AuthMode _authMode = AuthMode.Login;
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible = false;
   final _passwordNode = FocusNode();
   String? userEmail;
   String? userPass;
@@ -90,7 +92,6 @@ class _AuthFormState extends State<AuthForm>
     }
   }
 
-
   //auxiliary methods
   AnimatedContainer confirmPasswordField() {
     return AnimatedContainer(
@@ -107,8 +108,20 @@ class _AuthFormState extends State<AuthForm>
           child: FormBuilderTextField(
               name: 'confirmPassword',
               enabled: _authMode == AuthMode.Signup,
-              decoration: const InputDecoration(labelText: 'Confirm Password'),
-              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Confirm assword',
+                suffixIcon: IconButton(
+                  icon: Icon(_confirmPasswordVisible
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _confirmPasswordVisible = !_confirmPasswordVisible;
+                    });
+                  },
+                ),
+              ),
+              obscureText: !_confirmPasswordVisible,
               validator: _authMode == AuthMode.Signup
                   ? FormBuilderValidators.compose([
                       FormBuilderValidators.required(errorText: 'Required'),
@@ -126,8 +139,19 @@ class _AuthFormState extends State<AuthForm>
         name: 'password',
         focusNode: _passwordNode,
         controller: _passwordController,
-        decoration: const InputDecoration(labelText: 'Password'),
-        obscureText: true,
+        decoration: InputDecoration(
+          labelText: 'Password',
+          suffixIcon: IconButton(
+            icon: Icon(
+                _passwordVisible ? Icons.visibility_off : Icons.visibility),
+            onPressed: () {
+              setState(() {
+                _passwordVisible = !_passwordVisible;
+              });
+            },
+          ),
+        ),
+        obscureText: !_passwordVisible,
         textInputAction: TextInputAction.next,
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(errorText: 'Required'),
