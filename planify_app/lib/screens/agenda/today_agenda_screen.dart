@@ -7,30 +7,13 @@ import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../../widgets/task/add_new_task_form.dart';
 
-enum FilterOptions {
-  All,
-  In_progress,
-  Done,
-}
-
 class TodayAgendaScreen extends StatelessWidget {
   static const routeName = '/today-agenda';
 
   const TodayAgendaScreen({super.key});
 
-  Future<void> _refreshAllTasks(BuildContext context) async {
-    await Provider.of<Tasks>(context, listen: false)
-        .fetchAndSetAllTasksDueToday();
-  }
-
-  Future<void> _refreshInProgressTasks(BuildContext context) async {
-    await Provider.of<Tasks>(context, listen: false)
-        .fetchAndSetInProgressTasksDueToday();
-  }
-
-  Future<void> _refreshDoneTasks(BuildContext context) async {
-    await Provider.of<Tasks>(context, listen: false)
-        .fetchAndSetDoneTasksDueToday();
+  Future<void> _fetchTasks(BuildContext context) async {
+    await Provider.of<Tasks>(context, listen: false).fetchTasks(true);
   }
 
   @override
@@ -38,74 +21,17 @@ class TodayAgendaScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Today'),
-        actions: [
-          PopupMenuButton(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (FilterOptions selectedValue) {
-              selectedValue == FilterOptions.Done
-                  ? _refreshDoneTasks(context)
-                  : selectedValue == FilterOptions.In_progress
-                      ? _refreshInProgressTasks(context)
-                      : _refreshAllTasks(context);
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: FilterOptions.All,
-                child: Row(
-                  // ignore: prefer_const_literals_to_create_immutables
-                  children: [
-                    const Icon(
-                      Icons.all_inbox,
-                      color: Colors.black,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('All'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: FilterOptions.In_progress,
-                child: Row(
-                  // ignore: prefer_const_literals_to_create_immutables
-                  children: [
-                    const Icon(
-                      Icons.work,
-                      color: Colors.black,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('In progress'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: FilterOptions.Done,
-                child: Row(
-                  // ignore: prefer_const_literals_to_create_immutables
-                  children: [
-                    const Icon(
-                      Icons.done,
-                      color: Colors.black,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('Done'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(
-        future: _refreshAllTasks(context),
+        future: _fetchTasks(context),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : RefreshIndicator(
-                     //TODO check what filter option is selected before the refresh
-                    onRefresh: () => _refreshAllTasks(context),
+                    onRefresh: () => _fetchTasks(context),
                     child: Consumer<Tasks>(
                       builder: (context, tasks, ch) => ListView.builder(
                         itemCount: tasks.tasksList.length,
