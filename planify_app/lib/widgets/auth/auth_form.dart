@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:planify_app/widgets/auth/square_tile_buttons.dart';
 
 enum AuthMode { Signup, Login }
 
 class AuthForm extends StatefulWidget {
   final void Function(
       String email, String password, bool isLogin, BuildContext ctx) submitFn;
+  final void Function() googleSignIn;
   final bool isLoading;
 
-  const AuthForm({super.key, required this.submitFn, required this.isLoading});
+  const AuthForm(
+      {super.key,
+      required this.submitFn,
+      required this.isLoading,
+      required this.googleSignIn});
 
   @override
   State<AuthForm> createState() => _AuthFormState();
@@ -90,6 +96,10 @@ class _AuthFormState extends State<AuthForm>
       widget.submitFn(userEmail!.trim(), userPass!.trim(),
           _authMode == AuthMode.Login, context);
     }
+  }
+
+  void _trySignInWithGoogle() {
+    widget.googleSignIn();
   }
 
   //auxiliary methods
@@ -193,75 +203,88 @@ least 8 characters and no space.'''),
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
 
-    return Center(
-      child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          elevation: 8.0,
-          margin: const EdgeInsets.all(20),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeIn,
-            height: _authMode == AuthMode.Signup ? 320 : 260,
-            constraints: BoxConstraints(
-                minHeight: _authMode == AuthMode.Signup ? 320 : 260),
-            width: deviceSize.width * 0.75,
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(children: [
-                  // email field
-                  emailField(context),
-                  // password field
-                  passwordField(),
-                  // if the form is in sign up mode, display the confirm password field
-                  confirmPasswordField(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  // if the request is being handled, display circular indicator
-                  if (widget.isLoading) const CircularProgressIndicator(),
-                  // else display the sumbit button with login/sign up
-                  if (!widget.isLoading)
-                    ElevatedButton(
-                      onPressed: _trySubmit,
-                      style: TextButton.styleFrom(
-                        textStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30.0, vertical: 8.0),
-                      ),
-                      child: Text(
-                        _authMode == AuthMode.Login ? 'Login' : 'Signup',
-                      ),
-                    ),
-                  //change the form to be for sign up/login
-                  if (!widget.isLoading)
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        textStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30.0, vertical: 4),
-                      ),
-                      onPressed: _switchAuthMode,
-                      child: Text(
-                        _authMode == AuthMode.Login
-                            ? 'Create a new account'
-                            : 'I already have an account',
-                      ),
-                    )
-                ]),
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      elevation: 8.0,
+      margin: const EdgeInsets.all(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeIn,
+        height: _authMode == AuthMode.Signup ? 430 : 360,
+        constraints:
+            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 430 : 360),
+        width: deviceSize.width * 0.75,
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(children: [
+              // email field
+              emailField(context),
+              // password field
+              passwordField(),
+              // if the form is in sign up mode, display the confirm password field
+              confirmPasswordField(),
+              const SizedBox(
+                height: 20,
               ),
-            ),
-          )),
+              // if the request is being handled, display circular indicator
+              if (widget.isLoading) const CircularProgressIndicator(),
+              // else display the sumbit button with login/sign up
+              if (!widget.isLoading)
+                ElevatedButton(
+                  onPressed: _trySubmit,
+                  style: TextButton.styleFrom(
+                    textStyle: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30.0, vertical: 8.0),
+                  ),
+                  child: Text(
+                    _authMode == AuthMode.Login ? 'Login' : 'Signup',
+                  ),
+                ),
+              //change the form to be for sign up/login
+              if (!widget.isLoading)
+                TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30.0, vertical: 4),
+                  ),
+                  onPressed: _switchAuthMode,
+                  child: Text(
+                    _authMode == AuthMode.Login
+                        ? 'Create a new account'
+                        : 'I already have an account',
+                  ),
+                ),
+              if (!widget.isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Or continue with'),
+                ),
+              //sign in with google
+              if (!widget.isLoading)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SquareTile(
+                    imapgePath: 'assets/images/google.jpg',
+                    onTap: _trySignInWithGoogle,
+                  ),
+                )
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }

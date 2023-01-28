@@ -36,6 +36,7 @@ dependencies:
   firebase_core: ^2.4.1 # For Firebase Core
   cloud_firestore: ^4.3.1 # For Cloud Firestore
   firebase_auth: ^4.2.5 # For authentication
+  google_sign_in: ^5.4.4 # For Google Sign In
 
   # Validation dependencies
   flutter_form_builder: ^7.7.0 # For form creation
@@ -80,8 +81,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/google.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

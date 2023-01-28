@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../widgets/auth/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
-   static const routeName = '/auth';
+  static const routeName = '/auth';
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -16,6 +17,19 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   var _isLoading = false;
+
+  void submitGoogleSignIn() async {
+    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+
+    final userCredential = GoogleAuthProvider.credential(
+      accessToken: gAuth.accessToken,
+      idToken: gAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(userCredential);
+  }
 
   void submitAuthForm(
       String email, String password, bool isLogin, BuildContext ctx) async {
@@ -91,10 +105,10 @@ class _AuthScreenState extends State<AuthScreen> {
               height: deviceSize.height,
               width: deviceSize.width,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Flexible(
+                  const SizedBox(
                     // title of the login/sign up page
                     child: Text(
                       'Planify App',
@@ -108,12 +122,12 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   // the form
                   Flexible(
-                    flex: deviceSize.width > 600 ? 2 : 1,
                     child: AuthForm(
+                      googleSignIn: submitGoogleSignIn,
                       submitFn: submitAuthForm,
                       isLoading: _isLoading,
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
