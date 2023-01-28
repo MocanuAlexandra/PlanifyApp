@@ -23,12 +23,19 @@ class _AuthScreenState extends State<AuthScreen> {
 
     final GoogleSignInAuthentication gAuth = await gUser!.authentication;
 
-    final userCredential = GoogleAuthProvider.credential(
+    final credentials = GoogleAuthProvider.credential(
       accessToken: gAuth.accessToken,
       idToken: gAuth.idToken,
     );
 
-    await FirebaseAuth.instance.signInWithCredential(userCredential);
+    UserCredential userCredentials =
+        await FirebaseAuth.instance.signInWithCredential(credentials);
+
+    //add the username as extra field
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userCredentials.user!.uid)
+        .set({'email': userCredentials.user!.email});
   }
 
   void submitAuthForm(
