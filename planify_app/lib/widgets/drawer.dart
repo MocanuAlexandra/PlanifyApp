@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:planify_app/screens/auth/auth_screen.dart';
 
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
@@ -26,7 +27,7 @@ class MainDrawer extends StatelessWidget {
     );
   }
 
-  Widget buildLogoutTile() {
+  Widget buildLogoutTile(BuildContext context) {
     return Expanded(
       child: Align(
         alignment: FractionalOffset.bottomCenter,
@@ -44,6 +45,7 @@ class MainDrawer extends StatelessWidget {
               )),
           onTap: () {
             FirebaseAuth.instance.signOut();
+            Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
           },
         ),
       ),
@@ -85,7 +87,7 @@ class MainDrawer extends StatelessWidget {
         }),
         const Divider(),
         //logout
-        buildLogoutTile(),
+        buildLogoutTile(context),
       ]),
     );
   }

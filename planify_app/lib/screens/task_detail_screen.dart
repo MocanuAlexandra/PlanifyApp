@@ -138,18 +138,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(children: [
-                  //title field
+                  //title
                   displayTitle(loadedTask),
                   const SizedBox(height: 20),
-                  //due date field
+                  //due date 
                   displayDueDate(loadedTask),
                   const SizedBox(height: 10),
-                  //due time field
+                  //due time 
                   displayDueTime(loadedTask),
-                  //priority field
+                  //priority
                   const SizedBox(height: 10),
                   displayPriority(loadedTask),
-                  //adress field
+                  //adress
                   const SizedBox(height: 10),
                   displayAddress(loadedTask),
                   const SizedBox(height: 10),

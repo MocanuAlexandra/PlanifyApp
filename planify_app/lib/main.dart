@@ -59,6 +59,7 @@ class MyApp extends StatelessWidget {
             MonthAgendaScreen.routeName: (context) => const MonthAgendaScreen(),
             AddEditTaskForm.routeName: (context) => const AddEditTaskForm(),
             TaskDetailScreen.routeName: (context) => const TaskDetailScreen(),
+            AuthScreen.routeName:(context) => const AuthScreen(),
           },
         ));
   }
