@@ -45,7 +45,7 @@ class MainDrawer extends StatelessWidget {
               )),
           onTap: () {
             FirebaseAuth.instance.signOut();
-            Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
+            //Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
           },
         ),
       ),

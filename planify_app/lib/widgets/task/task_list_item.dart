@@ -128,14 +128,14 @@ class TaskListItem extends StatelessWidget {
               actions: [
                 TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                    child: const Text('No')),
-                TextButton(
-                    onPressed: () {
                       Navigator.of(context).pop(true);
                     },
                     child: const Text('Yes')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: const Text('No')),
               ],
             ));
   }

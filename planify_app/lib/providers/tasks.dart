@@ -3,6 +3,12 @@ import '../database/database_helper.dart';
 import '../models/task.dart';
 import '../models/task_adress.dart';
 
+enum FilterOptions {
+  All,
+  In_progress,
+  Done,
+}
+
 class Tasks with ChangeNotifier {
   List<Task> _tasks = [];
 
@@ -11,7 +17,10 @@ class Tasks with ChangeNotifier {
   }
 
   Future<void> fetchTasks(
-      [bool? today, bool? month, DateTime? selectedDate]) async {
+      [bool? today,
+      bool? month,
+      DateTime? selectedDate,
+      FilterOptions? selectedOption]) async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -46,7 +55,26 @@ class Tasks with ChangeNotifier {
           .toList();
     }
 
-    
+    //check for filters
+    switch (selectedOption) {
+      case FilterOptions.All:
+        _tasks = _tasks
+            .where((task) => task.isDone == false || task.isDone == true)
+            .toList();
+        break;
+      case FilterOptions.In_progress:
+        _tasks = _tasks.where((task) => task.isDone == false).toList();
+        break;
+      case FilterOptions.Done:
+        _tasks = _tasks.where((task) => task.isDone == true).toList();
+        break;
+      default:
+        _tasks = _tasks
+            .where((task) => task.isDone == false || task.isDone == true)
+            .toList();
+        break;
+    }
+
     //in the end notify listeners in order to update the UI
     notifyListeners();
   }
