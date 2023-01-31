@@ -149,4 +149,14 @@ class DBHelper {
         .doc(id)
         .update({'isDone': true});
   }
+
+  static void markTaskAsDeleted(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDeleted': true});
+  }
 }

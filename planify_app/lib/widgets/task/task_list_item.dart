@@ -38,6 +38,14 @@ class TaskListItem extends StatelessWidget {
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
+  void _markAsDeleted(BuildContext context, String id) {
+    // mark task as deleted in database
+    DBHelper.markTaskAsDeleted(id);
+
+    // mark task as deleted in UI
+    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+  }
+
   void _markTaskAsDone(BuildContext context, String id) {
     // mark task as done in database
     DBHelper.markTaskAsDone(id);
@@ -100,7 +108,7 @@ class TaskListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          !isDone! && !isDeleted!
+          !isDone! && !isDeleted! // if isDone is false, show the check button
               ? IconButton(
                   icon: const Icon(
                     Icons.check,
@@ -110,7 +118,7 @@ class TaskListItem extends StatelessWidget {
                     _markTaskAsDone(context, id!);
                   },
                 )
-              : isDeleted!
+              : isDeleted! // if isDeleted is true, show the undo button
                   ? IconButton(
                       icon: const Icon(
                         Icons.arrow_circle_left,
@@ -121,17 +129,18 @@ class TaskListItem extends StatelessWidget {
                       },
                     )
                   : const SizedBox(width: 0),
-          !isDeleted!
+          !isDeleted! // if isDeleted is false, show the delete button
               ? IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
-                    _deleteTask(context, id!);
+                    _markAsDeleted(context, id!);
                   },
                 )
               : IconButton(
                   icon: const Icon(Icons.delete_forever, color: Colors.red),
-                  //TODO make the delete forever function
-                  onPressed: () {},
+                  onPressed: () {
+                    _deleteTask(context, id!);
+                  },
                 ),
         ],
       ),
