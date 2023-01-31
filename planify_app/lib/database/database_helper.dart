@@ -159,4 +159,14 @@ class DBHelper {
         .doc(id)
         .update({'isDeleted': true});
   }
+
+  static void markTaskAsUndeleted(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDeleted': false});
+  }
 }

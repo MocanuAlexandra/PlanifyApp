@@ -29,12 +29,11 @@ class TaskListItem extends StatelessWidget {
     this.isDeleted,
   });
 
-//TODO change the delete function
   void _deleteTask(BuildContext context, String id) {
     // delete task from database
     DBHelper.deleteTask(id);
 
-    // delete task from UI
+    // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
@@ -42,7 +41,15 @@ class TaskListItem extends StatelessWidget {
     // mark task as deleted in database
     DBHelper.markTaskAsDeleted(id);
 
-    // mark task as deleted in UI
+    // remove task from UI
+    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+  }
+
+  void _markAsUndeleted(BuildContext context, String id) {
+    // mark task as undeleted in database
+    DBHelper.markTaskAsUndeleted(id);
+
+    // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
@@ -125,7 +132,7 @@ class TaskListItem extends StatelessWidget {
                         color: Colors.green,
                       ),
                       onPressed: () {
-                        //TODO make the undo function
+                        _markAsUndeleted(context, id!);
                       },
                     )
                   : const SizedBox(width: 0),
