@@ -29,6 +29,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
     time: null,
     priority: null,
     isDone: false,
+    isDeleted: false,
   );
   var _initValues = {
     'title': '',
@@ -37,6 +38,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
     'time': null,
     'priority': null,
     'isDone': false,
+    'isDeleted': false,
   };
 
   var _isInit = true;
@@ -56,6 +58,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
           'time': _editedTask.time,
           'priority': _editedTask.priority,
           'isDone': _editedTask.isDone,
+          'isDeleted': _editedTask.isDeleted,
         };
       }
     }
@@ -313,6 +316,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                   time: _editedTask.time,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
+                  isDeleted: _editedTask.isDeleted,
                 );
               }),
             }
@@ -335,6 +339,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                   time: pickedTime,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
+                  isDeleted: _editedTask.isDeleted,
                 );
               }),
             }
@@ -350,6 +355,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
       time: _editedTask.time,
       priority: _editedTask.priority,
       isDone: _editedTask.isDone,
+      isDeleted: _editedTask.isDeleted,
     );
   }
 
@@ -393,6 +399,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                     time: _editedTask.time,
                     priority: _editedTask.priority,
                     isDone: false,
+                    isDeleted:_editedTask.isDeleted,
                   );
 
                   //update the task in the database
@@ -415,6 +422,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                     time: _editedTask.time,
                     priority: _editedTask.priority,
                     isDone: true,
+                     isDeleted:_editedTask.isDeleted,
                   );
 
                   //update the task in the database

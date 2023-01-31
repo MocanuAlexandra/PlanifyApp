@@ -11,6 +11,7 @@ class Task {
   final TaskAdress? address;
   final Priority? priority;
   bool isDone;
+  bool isDeleted;
 
   Task({
     this.id,
@@ -20,5 +21,6 @@ class Task {
     this.address,
     this.priority,
     this.isDone = false,
+    this.isDeleted = false,
   });
 }

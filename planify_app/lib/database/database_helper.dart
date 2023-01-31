@@ -35,6 +35,7 @@ class DBHelper {
         'time': Utility.stringToTimeOfDay(task['time']),
         'priority': Utility.stringToPriorityEnum(task['priority']),
         'isDone': task['isDone'],
+        'isDeleted': task['isDeleted'],
       };
     }).toList();
 
@@ -78,6 +79,7 @@ class DBHelper {
       'address': updatedLocation.address,
       'priority': Utility.priorityEnumToString(newTask.priority),
       'isDone': false,
+      'isDeleted': false,
     });
   }
 
@@ -133,6 +135,7 @@ class DBHelper {
       'address': updatedLocation.address,
       'priority': Utility.priorityEnumToString(editedTask.priority),
       'isDone': editedTask.isDone,
+      'isDeleted': editedTask.isDeleted,
     });
   }
 

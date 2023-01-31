@@ -15,6 +15,7 @@ class TaskListItem extends StatelessWidget {
   final String? time;
   final String? priority;
   final bool? isDone;
+  final bool? isDeleted;
 
   const TaskListItem({
     super.key,
@@ -25,8 +26,10 @@ class TaskListItem extends StatelessWidget {
     this.time,
     this.priority,
     this.isDone,
+    this.isDeleted,
   });
 
+//TODO change the delete function
   void _deleteTask(BuildContext context, String id) {
     // delete task from database
     DBHelper.deleteTask(id);
@@ -97,7 +100,7 @@ class TaskListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          !isDone!
+          !isDone! && !isDeleted!
               ? IconButton(
                   icon: const Icon(
                     Icons.check,
@@ -107,13 +110,29 @@ class TaskListItem extends StatelessWidget {
                     _markTaskAsDone(context, id!);
                   },
                 )
-              : const SizedBox(width: 0),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              _deleteTask(context, id!);
-            },
-          ),
+              : isDeleted!
+                  ? IconButton(
+                      icon: const Icon(
+                        Icons.arrow_circle_left,
+                        color: Colors.green,
+                      ),
+                      onPressed: () {
+                        //TODO make the undo function
+                      },
+                    )
+                  : const SizedBox(width: 0),
+          !isDeleted!
+              ? IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    _deleteTask(context, id!);
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.delete_forever, color: Colors.red),
+                  //TODO make the delete forever function
+                  onPressed: () {},
+                ),
         ],
       ),
     );
@@ -145,7 +164,7 @@ class TaskListItem extends StatelessWidget {
     return Dismissible(
       key: ValueKey(id),
       background: Container(
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.error,
         alignment: Alignment.centerRight,
         margin: const EdgeInsets.symmetric(
           horizontal: 15.0,
@@ -174,9 +193,11 @@ class TaskListItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          color: isDone!
-              ? const Color.fromARGB(255, 231, 254, 225)
-              : const Color.fromARGB(255, 255, 252, 219),
+          color: isDeleted!
+              ? const Color.fromARGB(255, 255, 219, 219)
+              : isDone!
+                  ? const Color.fromARGB(255, 231, 254, 225)
+                  : const Color.fromARGB(255, 255, 252, 219),
           elevation: 4,
           margin: const EdgeInsets.all(10),
           child: Column(

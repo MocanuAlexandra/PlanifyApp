@@ -7,6 +7,7 @@ enum FilterOptions {
   All,
   In_progress,
   Done,
+  Deleted,
 }
 
 class Tasks with ChangeNotifier {
@@ -37,6 +38,7 @@ class Tasks with ChangeNotifier {
           time: task['time'],
           priority: task['priority'],
           isDone: task['isDone'],
+          isDeleted: task['isDeleted'],
         );
       },
     ).toList();
@@ -59,14 +61,23 @@ class Tasks with ChangeNotifier {
     switch (selectedOption) {
       case FilterOptions.All:
         _tasks = _tasks
-            .where((task) => task.isDone == false || task.isDone == true)
+            .where((task) =>
+                (task.isDone == false || task.isDone == true) &&
+                task.isDeleted == false)
             .toList();
         break;
       case FilterOptions.In_progress:
-        _tasks = _tasks.where((task) => task.isDone == false).toList();
+        _tasks = _tasks
+            .where((task) => task.isDone == false && task.isDeleted == false)
+            .toList();
         break;
       case FilterOptions.Done:
-        _tasks = _tasks.where((task) => task.isDone == true).toList();
+        _tasks = _tasks
+            .where((task) => task.isDone == true && task.isDeleted == false)
+            .toList();
+        break;
+      case FilterOptions.Deleted:
+        _tasks = _tasks.where((task) => task.isDeleted == true).toList();
         break;
       default:
         _tasks = _tasks

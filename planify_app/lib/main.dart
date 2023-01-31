@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:planify_app/screens/agenda/deleted_agenda_screen.dart';
 
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -60,6 +61,8 @@ class MyApp extends StatelessWidget {
             AddEditTaskForm.routeName: (context) => const AddEditTaskForm(),
             TaskDetailScreen.routeName: (context) => const TaskDetailScreen(),
             AuthScreen.routeName: (context) => const AuthScreen(),
+            DeletedAgendaScreen.routeName: (context) =>
+                const DeletedAgendaScreen(),
           },
         ));
   }
