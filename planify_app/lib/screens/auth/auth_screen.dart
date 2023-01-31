@@ -18,24 +18,50 @@ class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   var _isLoading = false;
 
-  void submitGoogleSignIn() async {
-    final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+  void submitGoogleSignIn(BuildContext ctx) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
 
-    final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
+      final credentials = GoogleAuthProvider.credential(
+        accessToken: gAuth.accessToken,
+        idToken: gAuth.idToken,
+      );
 
-    final credentials = GoogleAuthProvider.credential(
-      accessToken: gAuth.accessToken,
-      idToken: gAuth.idToken,
-    );
+      UserCredential userCredentials =
+          await FirebaseAuth.instance.signInWithCredential(credentials);
 
-    UserCredential userCredentials =
-        await FirebaseAuth.instance.signInWithCredential(credentials);
+      //add the username as extra field
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredentials.user!.uid)
+          .set({'email': userCredentials.user!.email});
+    } on FirebaseAuthException catch (error) {
+      var message = 'An error occured, please check your credentials';
+      if (error.message != null) {
+        message = error.message!;
+      }
 
-    //add the username as extra field
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userCredentials.user!.uid)
-        .set({'email': userCredentials.user!.email});
+      //show a snack bar with the error to the user
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ));
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+        content: Text(error.toString()),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ));
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void submitAuthForm(
@@ -70,7 +96,7 @@ class _AuthScreenState extends State<AuthScreen> {
       //show a snack bar with the error to the user
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         content: Text(message),
-        backgroundColor: Theme.of(context).errorColor,
+        backgroundColor: Theme.of(context).colorScheme.error,
       ));
       setState(() {
         _isLoading = false;
@@ -78,7 +104,7 @@ class _AuthScreenState extends State<AuthScreen> {
     } catch (error) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         content: Text(error.toString()),
-        backgroundColor: Theme.of(context).errorColor,
+        backgroundColor: Theme.of(context).colorScheme.error,
       ));
       setState(() {
         _isLoading = false;

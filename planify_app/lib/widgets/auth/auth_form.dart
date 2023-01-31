@@ -8,7 +8,7 @@ enum AuthMode { Signup, Login }
 class AuthForm extends StatefulWidget {
   final void Function(
       String email, String password, bool isLogin, BuildContext ctx) submitFn;
-  final void Function() googleSignIn;
+  final void Function(BuildContext ctx) googleSignIn;
   final bool isLoading;
 
   const AuthForm(
@@ -99,7 +99,7 @@ class _AuthFormState extends State<AuthForm>
   }
 
   void _trySignInWithGoogle() {
-    widget.googleSignIn();
+    widget.googleSignIn(context);
   }
 
   //auxiliary methods

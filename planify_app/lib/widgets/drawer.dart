@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/screens/auth/auth_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
+import '../screens/auth/auth_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -45,7 +46,8 @@ class MainDrawer extends StatelessWidget {
               )),
           onTap: () {
             FirebaseAuth.instance.signOut();
-            //Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
+            GoogleSignIn().signOut();
+            Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
           },
         ),
       ),

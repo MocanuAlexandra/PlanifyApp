@@ -49,11 +49,11 @@ dependencies:
   # Maps dependencies
   location: ^4.4.0 # For location services
   google_maps_flutter: ^2.2.3 # For Google Maps
-  google_maps_flutter_web: ^0.4.0+4 # For Google Maps Web
+  google_maps_flutter_web: ^0.4.0+5 # For Google Maps Web
   google_maps_webservice_ex: ^0.0.1+2 # For Google Maps API
 
   # Other dependencies
-  flutter_typeahead: ^4.1.1 # For typeahead search
+  flutter_typeahead: ^4.3.2 # For typeahead search
   http: ^0.13.5 # For HTTP requests 
   month_picker_dialog_2: ^0.6.1+2 # For month/year picker
 
