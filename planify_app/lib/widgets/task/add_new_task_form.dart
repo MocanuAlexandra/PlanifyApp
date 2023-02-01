@@ -101,17 +101,31 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
             style: const TextStyle(fontSize: 16),
           ),
         ),
-        const Icon(Icons.calendar_month),
-        TextButton(
+        TextButton.icon(
           onPressed: _presentDatePicker,
-          child: const Text(
-            'Choose date',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
+          icon: const Icon(Icons.calendar_month),
+          label: const Text(
+            'Choose time',
+            style: TextStyle(fontSize: 15),
+          ),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).primaryColor,
           ),
         ),
+        //delete selected date
+        IconButton(onPressed: () {
+          setState(() {
+            _editedTask = Task(
+              id: _editedTask.id,
+              title: _editedTask.title,
+              dueDate: null,
+              address: _editedTask.address,
+              time: _editedTask.time,
+              priority: _editedTask.priority,
+              isDone: _editedTask.isDone,
+            );
+          });
+        }, icon: const Icon(Icons.delete))
       ],
     );
   }
@@ -125,17 +139,31 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
             style: const TextStyle(fontSize: 16),
           ),
         ),
-        const Icon(Icons.access_time),
-        TextButton(
+        TextButton.icon(
           onPressed: _presentTimePicker,
-          child: const Text(
+          icon: const Icon(Icons.access_time),
+          label: const Text(
             'Choose time',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
+            style: TextStyle(fontSize: 15),
+          ),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).primaryColor,
           ),
         ),
+        //delete selected time
+        IconButton(onPressed: () {
+           setState(() {
+            _editedTask = Task(
+              id: _editedTask.id,
+              title: _editedTask.title,
+              dueDate: _editedTask.dueDate,
+              address: _editedTask.address,
+              time:null,
+              priority: _editedTask.priority,
+              isDone: _editedTask.isDone,
+            );
+          });
+        }, icon: const Icon(Icons.delete))
       ],
     );
   }

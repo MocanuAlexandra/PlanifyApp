@@ -82,7 +82,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       children: [
         const Icon(Icons.calendar_month),
         const SizedBox(width: 10),
-        Text(DateFormat('dd/MM/yyyy').format(loadedTask.dueDate!),
+        Text(Utility.dateTimeToString(loadedTask.dueDate),
             style: const TextStyle(fontSize: 16)),
       ],
     );

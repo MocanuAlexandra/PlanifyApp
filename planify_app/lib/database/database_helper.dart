@@ -127,6 +127,11 @@ class DBHelper {
           address: address);
     }
 
+    String updatedDueDate = '--/--/----';
+    if (editedTask.dueDate != null) {
+      updatedDueDate = editedTask.dueDate!.toIso8601String();
+    }
+
     FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
@@ -134,7 +139,7 @@ class DBHelper {
         .doc(editedTaskId)
         .update({
       'title': editedTask.title,
-      'dueDate': editedTask.dueDate!.toIso8601String(),
+      'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(editedTask.time),
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,
