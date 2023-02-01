@@ -19,6 +19,8 @@ class TaskDetailScreen extends StatefulWidget {
 }
 
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  bool _isMapLoading = true;
+
   void _deleteTask(BuildContext context, String id) {
     // delete task from database
     DBHelper.deleteTask(id);
@@ -30,17 +32,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   //auxiliary methods
   Container displayMap(Task loadedTask) {
     return Container(
-        height: 200,
-        width: double.infinity,
-        alignment: Alignment.center,
-        child: loadedTask.address!.latitude == 0 &&
-                loadedTask.address!.longitude == 0
-            ? const SizedBox(height: 10)
-            : GoogleMap(
+      height: 200,
+      width: double.infinity,
+      alignment: Alignment.center,
+      child: loadedTask.address!.latitude == 0 &&
+              loadedTask.address!.longitude == 0
+          ? const SizedBox(height: 10)
+          : Stack(children: [
+              GoogleMap(
                 initialCameraPosition: CameraPosition(
                     target: LatLng(loadedTask.address!.latitude!,
                         loadedTask.address!.longitude!),
                     zoom: 15.0),
+                onMapCreated: (GoogleMapController controller) {
+                  setState(() {
+                    _isMapLoading = false;
+                  });
+                },
                 markers: {
                   Marker(
                     markerId: MarkerId(loadedTask.address!.address!),
@@ -51,7 +59,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         snippet: loadedTask.address!.address!),
                   )
                 },
-              ));
+              ),
+              if (_isMapLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ]),
+    );
   }
 
   Text displayTitle(Task loadedTask) {
@@ -141,10 +155,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   //title
                   displayTitle(loadedTask),
                   const SizedBox(height: 20),
-                  //due date 
+                  //due date
                   displayDueDate(loadedTask),
                   const SizedBox(height: 10),
-                  //due time 
+                  //due time
                   displayDueTime(loadedTask),
                   //priority
                   const SizedBox(height: 10),

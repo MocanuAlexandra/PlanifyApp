@@ -159,7 +159,7 @@ class TaskListItem extends StatelessWidget {
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Question'),
-              content: const Text('Do you want to remove the task?'),
+              content: const Text('Do you want to move the task in Trash?'),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -197,7 +197,7 @@ class TaskListItem extends StatelessWidget {
         return displayAlertDialogForDelete(context);
       },
       onDismissed: ((direction) => {
-            _deleteTask(context, id!),
+            _markAsDeleted(context, id!),
           }),
       child: InkWell(
         onTap: () {

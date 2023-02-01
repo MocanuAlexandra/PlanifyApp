@@ -13,9 +13,11 @@ class MapScreen extends StatefulWidget {
         latitude: 0,
         longitude: 0,
       ),
-      this.isSelecting = false});
+      this.isSelecting = false,
+      required this.zoom});
   final TaskAdress initialAdress;
   final bool isSelecting;
+  final double zoom;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -29,6 +31,7 @@ class _MapScreenState extends State<MapScreen> {
   String? _searchAddr;
   LatLng? _searchCoords;
   LatLng? _pickedLocation;
+  bool _isMapLoading = true;
 
   @override
   Widget build(BuildContext context) {
@@ -94,29 +97,35 @@ class _MapScreenState extends State<MapScreen> {
           ),
           // This is the map
           Expanded(
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              onTap: _selectLocation,
-              markers: (_pickedLocation == null && widget.isSelecting == true)
-                  ? {}
-                  : {
-                    // Add a marker to the picked location
-                      Marker(
-                        markerId: const MarkerId('m1'),
-                        position: _pickedLocation ??
-                            LatLng(widget.initialAdress.latitude!,
-                                widget.initialAdress.longitude!),
-                        infoWindow:
-                            const InfoWindow(title: 'Your selected location'),
-                      ),
-                    },
-              // Set the initial camera position to the initial address (the current location of the user)
-              initialCameraPosition: CameraPosition(
-                target: LatLng(widget.initialAdress.latitude!,
-                    widget.initialAdress.longitude!),
-                zoom: 16,
+            child: Stack(children: [
+              GoogleMap(
+                onMapCreated: _onMapCreated,
+                onTap: _selectLocation,
+                markers: (_pickedLocation == null && widget.isSelecting == true)
+                    ? {}
+                    : {
+                        // Add a marker to the picked location
+                        Marker(
+                          markerId: const MarkerId('m1'),
+                          position: _pickedLocation ??
+                              LatLng(widget.initialAdress.latitude!,
+                                  widget.initialAdress.longitude!),
+                          infoWindow:
+                              const InfoWindow(title: 'Your selected location'),
+                        ),
+                      },
+                // Set the initial camera position to the initial address (the current location of the user)
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(widget.initialAdress.latitude!,
+                      widget.initialAdress.longitude!),
+                  zoom: widget.zoom,
+                ),
               ),
-            ),
+              if (_isMapLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ]),
           ),
         ],
       ),
@@ -127,6 +136,7 @@ class _MapScreenState extends State<MapScreen> {
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
       mapController = controller;
+      _isMapLoading = false;
     });
   }
 

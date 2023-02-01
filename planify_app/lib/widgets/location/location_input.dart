@@ -54,17 +54,42 @@ class _LocationInputState extends State<LocationInput> {
 
   // select the location on the map
   Future<void> _selectOnMap() async {
-    final locData = await Location().getLocation();
+    double zoom = 16;
 
-    _initialAdress =
-        TaskAdress(latitude: locData.latitude!, longitude: locData.longitude!);
+    //check if the user has granted the permission
+    final locPermission = await Location().hasPermission();
+    if (locPermission == PermissionStatus.granted) {
+      final locData = await Location().getLocation();
+      _initialAdress = TaskAdress(
+          latitude: locData.latitude!, longitude: locData.longitude!);
+    } else {
+      // if not, ask for it
+      final locPermission = await Location().requestPermission();
+
+      if (locPermission == PermissionStatus.granted ||
+          locPermission == PermissionStatus.grantedLimited) {
+        final locData = await Location().getLocation();
+        _initialAdress = TaskAdress(
+            latitude: locData.latitude!, longitude: locData.longitude!);
+        zoom = 16;
+      }
+      // if the user refuses, display the map with the default location and zoomed out
+      else if (locPermission == PermissionStatus.denied ||
+          locPermission == PermissionStatus.deniedForever) {
+        _initialAdress = const TaskAdress(latitude: 0.0, longitude: 0.0);
+        zoom = 2;
+      }
+    }
 
     // ignore: use_build_context_synchronously
     final selectedLocation = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (ctx) =>
-            MapScreen(initialAdress: _initialAdress!, isSelecting: true),
+        builder: (ctx) => MapScreen(
+          initialAdress: _initialAdress!,
+          isSelecting: true,
+          zoom: zoom,
+        ),
       ),
     );
 
@@ -99,8 +124,17 @@ class _LocationInputState extends State<LocationInput> {
                   style: TextStyle(fontSize: 15),
                   textAlign: TextAlign.center,
                 )
-              : Image.network(_previewImageUrl!,
-                  fit: BoxFit.fitHeight, width: double.infinity),
+              : Image.network(
+                  _previewImageUrl!,
+                  fit: BoxFit.fitHeight,
+                  width: double.infinity,
+                  loadingBuilder: (context, child, loadingProgress) =>
+                      loadingProgress == null
+                          ? child
+                          : const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                ),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
