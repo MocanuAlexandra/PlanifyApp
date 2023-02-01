@@ -44,7 +44,7 @@ class DBHelper {
 
   // function for adding tasks to the database
   static void addTask(Task newTask) async {
-    if (newTask.title == null || newTask.dueDate == null) {
+    if (newTask.title == null) {
       return;
     }
 
@@ -65,6 +65,12 @@ class DBHelper {
           address: address);
     }
 
+    //check if the user picked a due date
+    String updatedDueDate = '--/--/----';
+    if (newTask.dueDate != null) {
+      updatedDueDate = newTask.dueDate!.toIso8601String();
+    }
+
     //add the task in the tasks collection of the connected user
     await FirebaseFirestore.instance
         .collection('users')
@@ -72,7 +78,7 @@ class DBHelper {
         .collection('tasks')
         .add({
       'title': newTask.title,
-      'dueDate': newTask.dueDate!.toIso8601String(),
+      'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(newTask.time),
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,

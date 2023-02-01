@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planify_app/helpers/utility.dart';
 import '../database/database_helper.dart';
 import '../models/task.dart';
 import '../models/task_adress.dart';
@@ -29,7 +30,7 @@ class Tasks with ChangeNotifier {
         return Task(
           id: task['id'],
           title: task['title'],
-          dueDate: DateTime.parse(task['dueDate']),
+          dueDate: Utility.stringToDateTime(task['dueDate']),
           address: TaskAdress(
             latitude: task['latitude'],
             longitude: task['longitude'],

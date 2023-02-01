@@ -228,17 +228,12 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
       }
       // if we didn't get an id, it means that we are adding a new task
       else {
-        if (_editedTask.dueDate == null) {
-          //show an alert dialog to the user if the due date is not selected
-          _displayDialogForNotPickDate();
-        } else {
-          //add the task in the database
-          DBHelper.addTask(_editedTask);
+        //add the task in the database
+        DBHelper.addTask(_editedTask);
 
-          // go back to overall agenda screen
-          Navigator.of(context)
-              .pushReplacementNamed(OverallAgendaScreen.routeName);
-        }
+        // go back to overall agenda screen
+        Navigator.of(context)
+            .pushReplacementNamed(OverallAgendaScreen.routeName);
       }
     }
   }
@@ -359,25 +354,6 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
     );
   }
 
-  void _displayDialogForNotPickDate() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Notification"),
-            content: const Text('Please select a due date'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-  }
-
   void _displayDialogForDoneTask() {
     showDialog(
         context: context,
@@ -399,7 +375,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                     time: _editedTask.time,
                     priority: _editedTask.priority,
                     isDone: false,
-                    isDeleted:_editedTask.isDeleted,
+                    isDeleted: _editedTask.isDeleted,
                   );
 
                   //update the task in the database
@@ -422,7 +398,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
                     time: _editedTask.time,
                     priority: _editedTask.priority,
                     isDone: true,
-                     isDeleted:_editedTask.isDeleted,
+                    isDeleted: _editedTask.isDeleted,
                   );
 
                   //update the task in the database

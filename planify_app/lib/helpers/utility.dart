@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/task.dart';
 
-// Utility class 
+// Utility class
 class Utility {
   static String priorityEnumToString(Priority? priority) {
     String priorityString = '';
@@ -71,5 +72,23 @@ class Utility {
       timeOfDay = null;
     }
     return timeOfDay;
+  }
+
+  static DateTime? stringToDateTime(String? date) {
+    DateTime? dateTime;
+    if (date != null && date != '--/--/----') {
+      dateTime = DateTime.parse(date);
+    } else {
+      dateTime = null;
+    }
+    return dateTime;
+  }
+
+  static dateTimeToString(DateTime? dueDate) {
+    String date = '--/--/----';
+    if (dueDate != null) {
+      date = DateFormat('dd/MM/yyyy').format(dueDate);
+    }
+    return date;
   }
 }

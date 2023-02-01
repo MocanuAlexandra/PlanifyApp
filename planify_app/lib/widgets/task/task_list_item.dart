@@ -10,7 +10,7 @@ import '../../screens/task_detail_screen.dart';
 class TaskListItem extends StatelessWidget {
   final String? id;
   final String? title;
-  final DateTime? dueDate;
+  final String? dueDate;
   final TaskAdress? address;
   final String? time;
   final String? priority;
@@ -87,9 +87,7 @@ class TaskListItem extends StatelessWidget {
       const SizedBox(
         width: 6,
       ),
-      Text(
-        DateFormat('dd/MM/yyyy').format(dueDate!),
-      ),
+      Text(dueDate!),
     ]);
   }
 

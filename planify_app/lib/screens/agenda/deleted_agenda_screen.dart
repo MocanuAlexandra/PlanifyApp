@@ -22,7 +22,7 @@ class DeletedAgendaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     selectedOption = FilterOptions.Deleted;
-   
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trash'),
@@ -43,7 +43,8 @@ class DeletedAgendaScreen extends StatelessWidget {
                         itemBuilder: (context, index) => TaskListItem(
                           id: tasks.tasksList[index].id,
                           title: tasks.tasksList[index].title,
-                          dueDate: tasks.tasksList[index].dueDate,
+                          dueDate: Utility.dateTimeToString(
+                              tasks.tasksList[index].dueDate),
                           address: tasks.tasksList[index].address,
                           time: Utility.timeOfDayToString(
                               tasks.tasksList[index].time),
