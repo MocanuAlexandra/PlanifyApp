@@ -47,12 +47,16 @@ class Tasks with ChangeNotifier {
     //check if the user wants to fetch today agenda
     if (today != null) {
       _tasks = _tasks
-          .where((task) => task.dueDate!.day == DateTime.now().day)
+          .where((task) =>
+              task.dueDate != null && task.dueDate!.day == DateTime.now().day)
           .toList();
       //check if the user wants to fetch a certain month agenda
     } else if (month != null) {
+      //check if task has a due date
+
       _tasks = _tasks
           .where((task) =>
+              task.dueDate != null &&
               task.dueDate!.month == selectedDate!.month &&
               task.dueDate!.year == selectedDate.year)
           .toList();

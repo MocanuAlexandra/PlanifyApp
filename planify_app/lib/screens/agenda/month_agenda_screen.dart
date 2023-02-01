@@ -32,7 +32,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
     final DateTime? picked = await showMonthPicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      firstDate: DateTime(2023),
       lastDate: DateTime(2100),
     );
     if (picked != null && picked != _selectedDate) {
