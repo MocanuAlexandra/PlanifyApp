@@ -7,23 +7,27 @@ import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../../widgets/task/add_new_task_form.dart';
 
-class OverallAgendaScreen extends StatelessWidget {
+class OverallAgendaScreen extends StatefulWidget {
   static const routeName = '/overall-agenda';
-
-  static FilterOptions selectedOption = FilterOptions.In_progress;
 
   const OverallAgendaScreen({super.key});
 
-  Future<void> _fetchTasks(
-      BuildContext context, FilterOptions? selectedOption) async {
+  @override
+  State<OverallAgendaScreen> createState() => _OverallAgendaScreenState();
+}
+
+class _OverallAgendaScreenState extends State<OverallAgendaScreen> {
+  bool _focusMode = false;
+  FilterOptions selectedOption = FilterOptions.In_progress;
+
+  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
+      bool? focusMode) async {
     await Provider.of<Tasks>(context, listen: false)
-        .fetchTasks(null, null, null, selectedOption);
+        .fetchTasks(null, null, null, selectedOption, focusMode);
   }
 
   @override
   Widget build(BuildContext context) {
-    selectedOption = FilterOptions.In_progress;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Overall'),
@@ -31,8 +35,10 @@ class OverallAgendaScreen extends StatelessWidget {
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             onSelected: (FilterOptions selectedValue) {
-              selectedOption = selectedValue;
-              _fetchTasks(context, selectedOption);
+              setState(() {
+                selectedOption = selectedValue;
+              });
+              _fetchTasks(context, selectedOption, _focusMode);
             },
             itemBuilder: (_) => [
               PopupMenuItem(
@@ -79,34 +85,61 @@ class OverallAgendaScreen extends StatelessWidget {
         ],
       ),
       drawer: const MainDrawer(),
-      body: FutureBuilder(
-        future: _fetchTasks(context, FilterOptions.In_progress),
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () => _fetchTasks(context, selectedOption),
-                    child: Consumer<Tasks>(
-                      builder: (context, tasks, ch) => ListView.builder(
-                        itemCount: tasks.tasksList.length,
-                        itemBuilder: (context, index) => TaskListItem(
-                          id: tasks.tasksList[index].id,
-                          title: tasks.tasksList[index].title,
-                          dueDate: Utility.dateTimeToString(
-                              tasks.tasksList[index].dueDate),
-                          address: tasks.tasksList[index].address,
-                          time: Utility.timeOfDayToString(
-                              tasks.tasksList[index].time),
-                          priority: Utility.priorityEnumToString(
-                              tasks.tasksList[index].priority),
-                          isDone: tasks.tasksList[index].isDone,
-                          isDeleted: tasks.tasksList[index].isDeleted,
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Text(
+                'Focus Mode',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              Switch.adaptive(
+                activeColor: Theme.of(context).colorScheme.secondary,
+                value: _focusMode,
+                onChanged: (bool value) {
+                  setState(() {
+                    _focusMode = value;
+                  });
+                },
+              ),
+            ],
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: _fetchTasks(context, selectedOption, _focusMode),
+              builder: (context, snapshot) =>
+                  snapshot.connectionState == ConnectionState.waiting
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: () =>
+                              _fetchTasks(context, selectedOption, _focusMode),
+                          child: Consumer<Tasks>(
+                            builder: (context, tasks, ch) => ListView.builder(
+                              itemCount: tasks.tasksList.length,
+                              itemBuilder: (context, index) => TaskListItem(
+                                id: tasks.tasksList[index].id,
+                                title: tasks.tasksList[index].title,
+                                dueDate: Utility.dateTimeToString(
+                                    tasks.tasksList[index].dueDate),
+                                address: tasks.tasksList[index].address,
+                                time: Utility.timeOfDayToString(
+                                    tasks.tasksList[index].time),
+                                priority: Utility.priorityEnumToString(
+                                    tasks.tasksList[index].priority),
+                                isDone: tasks.tasksList[index].isDone,
+                                isDeleted: tasks.tasksList[index].isDeleted,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

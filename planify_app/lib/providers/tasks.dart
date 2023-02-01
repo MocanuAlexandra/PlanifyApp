@@ -9,6 +9,7 @@ enum FilterOptions {
   In_progress,
   Done,
   Deleted,
+  FocusMode,
 }
 
 class Tasks with ChangeNotifier {
@@ -22,7 +23,8 @@ class Tasks with ChangeNotifier {
       [bool? today,
       bool? month,
       DateTime? selectedDate,
-      FilterOptions? selectedOption]) async {
+      FilterOptions? selectedOption,
+      bool? focusMode]) async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -65,25 +67,52 @@ class Tasks with ChangeNotifier {
     //check for filters
     switch (selectedOption) {
       case FilterOptions.All:
-        _tasks = _tasks
-            .where((task) =>
-                (task.isDone == false || task.isDone == true) &&
-                task.isDeleted == false)
-            .toList();
+        if (focusMode!) {
+          _tasks = _tasks
+              .where((task) =>
+                  (task.isDone == false || task.isDone == true) &&
+                  task.isDeleted == false &&
+                  task.priority == Priority.important)
+              .toList();
+        } else {
+          _tasks = _tasks
+              .where((task) =>
+                  (task.isDone == false || task.isDone == true) &&
+                  task.isDeleted == false)
+              .toList();
+        }
         break;
       case FilterOptions.In_progress:
-        _tasks = _tasks
-            .where((task) => task.isDone == false && task.isDeleted == false)
-            .toList();
+        if (focusMode!) {
+          _tasks = _tasks
+              .where((task) =>
+                  task.isDone == false &&
+                  task.isDeleted == false &&
+                  task.priority == Priority.important)
+              .toList();
+        } else {
+          _tasks = _tasks
+              .where((task) => task.isDone == false && task.isDeleted == false)
+              .toList();
+        }
         break;
       case FilterOptions.Done:
-        _tasks = _tasks
-            .where((task) => task.isDone == true && task.isDeleted == false)
-            .toList();
+        if (focusMode!) {
+          _tasks = _tasks
+              .where((task) =>
+                  task.isDone == true &&
+                  task.isDeleted == false &&
+                  task.priority == Priority.important)
+              .toList();
+        } else {
+          _tasks = _tasks
+              .where((task) => task.isDone == true && task.isDeleted == false)
+              .toList();
+        }
         break;
       case FilterOptions.Deleted:
         _tasks = _tasks.where((task) => task.isDeleted == true).toList();
-        break;
+        break;    
       default:
         _tasks = _tasks
             .where((task) => task.isDone == false || task.isDone == true)
