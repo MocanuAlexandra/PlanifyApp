@@ -130,7 +130,14 @@ class TaskListItem extends StatelessWidget {
                         color: Colors.green,
                       ),
                       onPressed: () {
-                        _markAsUndeleted(context, id!);
+                        // display alert dialog
+                        displayAlertDialog(context,
+                                'Do you want to move the task back from Trash?')
+                            .then((value) {
+                          if (value!) {
+                            _markAsUndeleted(context, id!);
+                          }
+                        });
                       },
                     )
                   : const SizedBox(width: 0),
@@ -138,13 +145,27 @@ class TaskListItem extends StatelessWidget {
               ? IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
-                    _markAsDeleted(context, id!);
+                    // display alert dialog
+                    displayAlertDialog(
+                            context, 'Do you want to move the task in Trash?')
+                        .then((value) {
+                      if (value!) {
+                        _markAsDeleted(context, id!);
+                      }
+                    });
                   },
                 )
               : IconButton(
                   icon: const Icon(Icons.delete_forever, color: Colors.red),
                   onPressed: () {
-                    _deleteTask(context, id!);
+                    // display alert dialog
+                    displayAlertDialog(context,
+                            'Do you want to permanently delete the task?')
+                        .then((value) {
+                      if (value!) {
+                        _deleteTask(context, id!);
+                      }
+                    });
                   },
                 ),
         ],
@@ -152,12 +173,12 @@ class TaskListItem extends StatelessWidget {
     );
   }
 
-  Future<bool?> displayAlertDialogForDelete(BuildContext context) {
+  Future<bool?> displayAlertDialog(BuildContext context, String text) {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Question'),
-              content: const Text('Do you want to move the task in Trash?'),
+              content: Text(text),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -190,9 +211,11 @@ class TaskListItem extends StatelessWidget {
           size: 40.0,
         ),
       ),
-      direction: DismissDirection.endToStart,
+      direction:
+          isDeleted! ? DismissDirection.none : DismissDirection.endToStart,
       confirmDismiss: (direction) {
-        return displayAlertDialogForDelete(context);
+        return displayAlertDialog(
+            context, 'Do you want to move the task in Trash?');
       },
       onDismissed: ((direction) => {
             _markAsDeleted(context, id!),
