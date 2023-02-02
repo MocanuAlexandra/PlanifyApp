@@ -7,6 +7,33 @@ import '../models/task.dart';
 import '../models/task_address.dart';
 
 class DBHelper {
+  // function for fetching categories from the database from the connected user
+  static Future<List<Map<String, dynamic>>> fetchCategories() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the categories from the connected user
+    final categories = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .get();
+
+    //check if there is no categories
+    if (categories.docs.isEmpty) {
+      return [];
+    }
+
+    //convert the categories to a list of maps
+    final categoriesList = categories.docs.map((category) {
+      return {
+        'id': category.id,
+        'name': category['name'],
+      };
+    }).toList();
+
+    return categoriesList;
+  }
+
   // function for fetching tasks from the database from the connected user
   static Future<List<Map<String, dynamic>>> fetchTasks() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -36,6 +63,7 @@ class DBHelper {
         'priority': Utility.stringToPriorityEnum(task['priority']),
         'isDone': task['isDone'],
         'isDeleted': task['isDeleted'],
+        'category': task['category'],
       };
     }).toList();
 
@@ -71,6 +99,12 @@ class DBHelper {
       updatedDueDate = newTask.dueDate!.toIso8601String();
     }
 
+    //check if user picked a category
+    String updatedCategory = 'No category';
+    if (newTask.category != null) {
+      updatedCategory = newTask.category!;
+    }
+
     //add the task in the tasks collection of the connected user
     await FirebaseFirestore.instance
         .collection('users')
@@ -86,6 +120,7 @@ class DBHelper {
       'priority': Utility.priorityEnumToString(newTask.priority),
       'isDone': false,
       'isDeleted': false,
+      'category': updatedCategory,
     });
   }
 
@@ -147,6 +182,7 @@ class DBHelper {
       'priority': Utility.priorityEnumToString(editedTask.priority),
       'isDone': editedTask.isDone,
       'isDeleted': editedTask.isDeleted,
+      'category': editedTask.category,
     });
   }
 

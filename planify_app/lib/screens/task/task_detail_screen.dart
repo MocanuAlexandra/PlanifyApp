@@ -76,6 +76,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
+  Row displayCategory(Task loadedTask) {
+    return Row(
+      children: [
+        const Icon(Icons.category),
+        const SizedBox(width: 10),
+        Text(loadedTask.category!, style: const TextStyle(fontSize: 16)),
+      ],
+    );
+  }
+
   Row displayDueDate(Task loadedTask) {
     return Row(
       children: [
@@ -169,6 +179,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   //priority
                   const SizedBox(height: 10),
                   displayPriority(loadedTask),
+                  const SizedBox(height: 10),
+                  displayCategory(loadedTask),
                   //address
                   const SizedBox(height: 10),
                   displayAddress(loadedTask),

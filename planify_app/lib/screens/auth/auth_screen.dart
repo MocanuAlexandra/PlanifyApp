@@ -39,8 +39,15 @@ class _AuthScreenState extends State<AuthScreen> {
           .collection('users')
           .doc(userCredentials.user!.uid)
           .set({'email': userCredentials.user!.email});
+
+      //add 'categories' collection to the user
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredentials.user!.uid)
+          .collection('categories')
+          .add({'name': 'No category'});
     } on FirebaseAuthException catch (error) {
-      var message = 'An error occured, please check your credentials';
+      var message = 'An error occurred, please check your credentials';
       if (error.message != null) {
         message = error.message!;
       }
@@ -85,10 +92,17 @@ class _AuthScreenState extends State<AuthScreen> {
             .collection('users')
             .doc(userCredential.user!.uid)
             .set({'email': email});
+
+        //add 'categories' collection to the user
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .collection('categories')
+            .add({'name': 'No category'});
       }
       //handle errors
     } on FirebaseAuthException catch (error) {
-      var message = 'An error occured, please check your credentials';
+      var message = 'An error occurred, please check your credentials';
       if (error.message != null) {
         message = error.message!;
       }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:planify_app/providers/categories.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/category.dart';
 import '../agenda/overall_agenda_screen.dart';
 import '../../database/database_helper.dart';
 import '../../models/task.dart';
@@ -30,6 +32,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     priority: null,
     isDone: false,
     isDeleted: false,
+    category: null,
   );
   var _initValues = {
     'title': '',
@@ -39,6 +42,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     'priority': null,
     'isDone': false,
     'isDeleted': false,
+    'category': null,
   };
 
   var _isInit = true;
@@ -59,6 +63,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           'priority': _editedTask.priority,
           'isDone': _editedTask.isDone,
           'isDeleted': _editedTask.isDeleted,
+          'category': _editedTask.category,
         };
       }
     }
@@ -87,6 +92,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           time: _editedTask.time,
           priority: _editedTask.priority,
           isDone: _editedTask.isDone,
+          category: _editedTask.category,
         );
       },
     );
@@ -124,6 +130,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   time: _editedTask.time,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
+                  category: _editedTask.category,
                 );
               });
             },
@@ -164,6 +171,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   time: null,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
+                  category: _editedTask.category,
                 );
               });
             },
@@ -223,6 +231,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             time: _editedTask.time,
             priority: value,
             isDone: _editedTask.isDone,
+            category: _editedTask.category,
           );
         });
       },
@@ -230,6 +239,46 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         'Select priority',
         style: TextStyle(fontSize: 16),
       ),
+    );
+  }
+
+  FutureBuilder<void> categoryField(BuildContext context) {
+    return FutureBuilder(
+      future: _fetchCategories(context),
+      builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.waiting
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DropdownButtonFormField<String>(
+                  value: _editedTask.category,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _editedTask = Task(
+                        id: _editedTask.id,
+                        title: _editedTask.title,
+                        dueDate: _editedTask.dueDate,
+                        address: _editedTask.address,
+                        time: _editedTask.time,
+                        priority: _editedTask.priority,
+                        isDone: _editedTask.isDone,
+                        category: value,
+                      );
+                    });
+                  },
+                  items: Provider.of<Categories>(context)
+                      .categoriesList
+                      .map<DropdownMenuItem<String>>((Category category) {
+                    return DropdownMenuItem<String>(
+                      value: category.name,
+                      child: Text(category.name!),
+                    );
+                  }).toList(),
+                  hint: const Text(
+                    'Select category',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
     );
   }
 
@@ -273,56 +322,68 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: _editedTask.id == null
-              ? const Text('Add new task')
-              : const Text('Edit task'),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Form(
-              key: _formKey,
-              child: Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        titleField(),
-                        const SizedBox(height: 10),
-                        dueDateField(),
-                        dueTimeField(),
-                        locationField(),
-                        const SizedBox(height: 10),
-                        priorityField(),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
+      appBar: AppBar(
+        title: _editedTask.id == null
+            ? const Text('Add new task')
+            : const Text('Edit task'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Form(
+            key: _formKey,
+            child: Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      titleField(),
+                      const SizedBox(height: 10),
+                      dueDateField(),
+                      dueTimeField(),
+                      locationField(),
+                      const SizedBox(height: 10),
+                      priorityField(),
+                      const SizedBox(height: 10),
+                      categoryField(context),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.only(top: 70),
+                        child: ElevatedButton(
+                            onPressed: _addEditTask,
+                            style: ElevatedButton.styleFrom(
+                              elevation: 5,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0),
+                              ),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                            ),
+                            child: const Text(
+                              'Submit',
+                              style: TextStyle(fontSize: 18),
+                            )),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            //submit button
-            ElevatedButton(
-                onPressed: _addEditTask,
-                style: ElevatedButton.styleFrom(
-                  elevation: 5,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(fontSize: 18),
-                )),
-          ],
-        ));
+          )
+        ],
+      ),
+    );
   }
 
   //auxiliary functions
+  Future<void> _fetchCategories(BuildContext context) async {
+    await Provider.of<Categories>(context, listen: false).fetchCategories();
+  }
+
   void _presentDatePicker() {
     showDatePicker(
       context: context,
@@ -344,6 +405,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   isDeleted: _editedTask.isDeleted,
+                  category: _editedTask.category,
                 );
               }),
             }
@@ -367,6 +429,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   isDeleted: _editedTask.isDeleted,
+                  category: _editedTask.category,
                 );
               }),
             }
@@ -383,6 +446,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       priority: _editedTask.priority,
       isDone: _editedTask.isDone,
       isDeleted: _editedTask.isDeleted,
+      category: _editedTask.category,
     );
   }
 
@@ -408,6 +472,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     priority: _editedTask.priority,
                     isDone: false,
                     isDeleted: _editedTask.isDeleted,
+                    category: _editedTask.category,
                   );
 
                   //update the task in the database
@@ -431,6 +496,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     priority: _editedTask.priority,
                     isDone: true,
                     isDeleted: _editedTask.isDeleted,
+                    category: _editedTask.category,
                   );
 
                   //update the task in the database

@@ -13,6 +13,7 @@ class Task {
   final Priority? priority;
   bool isDone;
   bool isDeleted;
+  final String? category;
 
   Task({
     this.id,
@@ -23,5 +24,6 @@ class Task {
     this.priority,
     this.isDone = false,
     this.isDeleted = false,
+    this.category,
   });
 }

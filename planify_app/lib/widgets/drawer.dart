@@ -89,6 +89,26 @@ class MainDrawer extends StatelessWidget {
               .pushReplacementNamed(MonthAgendaScreen.routeName);
         }),
         const Divider(),
+        ExpansionTile(
+          title: const Text(
+            "Categories",
+            style: TextStyle(fontSize: 20),
+          ),
+          leading: const Icon(Icons.category),
+          childrenPadding: const EdgeInsets.only(left: 60),
+          children: [
+            ListTile(
+              title: Text("Category 1"),
+              onTap: () {},
+            ),
+            ListTile(
+              title: Text("Category 2"),
+              onTap: () {},
+            ),
+          ],
+        ),
+
+        const Divider(),
         buildListTile('Trash', Icons.delete, () {
           Navigator.of(context)
               .pushReplacementNamed(DeletedAgendaScreen.routeName);

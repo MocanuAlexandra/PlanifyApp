@@ -42,6 +42,7 @@ class Tasks with ChangeNotifier {
           priority: task['priority'],
           isDone: task['isDone'],
           isDeleted: task['isDeleted'],
+          category: task['category'],
         );
       },
     ).toList();
