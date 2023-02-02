@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:planify_app/models/task_adress.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
+import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
-import '../../screens/task_detail_screen.dart';
+import '../../models/task_address.dart';
+import '../../screens/task/task_detail_screen.dart';
 
 class TaskListItem extends StatelessWidget {
   final String? id;
   final String? title;
   final String? dueDate;
-  final TaskAdress? address;
+  final TaskAddress? address;
   final String? time;
   final String? priority;
   final bool? isDone;
@@ -63,7 +63,7 @@ class TaskListItem extends StatelessWidget {
 
   Row displayPriority() {
     return Row(children: [
-      Icon(_prorityIcon(priority!), color: _priorityIconColor(priority!)),
+      Icon(_priorityIcon(priority!), color: _priorityIconColor(priority!)),
       const SizedBox(
         width: 6,
       ),
@@ -131,7 +131,7 @@ class TaskListItem extends StatelessWidget {
                       ),
                       onPressed: () {
                         // display alert dialog
-                        displayAlertDialog(context,
+                        Utility.displayAlertDialog(context,
                                 'Do you want to move the task back from Trash?')
                             .then((value) {
                           if (value!) {
@@ -146,7 +146,7 @@ class TaskListItem extends StatelessWidget {
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
                     // display alert dialog
-                    displayAlertDialog(
+                    Utility.displayAlertDialog(
                             context, 'Do you want to move the task in Trash?')
                         .then((value) {
                       if (value!) {
@@ -159,7 +159,7 @@ class TaskListItem extends StatelessWidget {
                   icon: const Icon(Icons.delete_forever, color: Colors.red),
                   onPressed: () {
                     // display alert dialog
-                    displayAlertDialog(context,
+                    Utility.displayAlertDialog(context,
                             'Do you want to permanently delete the task?')
                         .then((value) {
                       if (value!) {
@@ -171,27 +171,6 @@ class TaskListItem extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<bool?> displayAlertDialog(BuildContext context, String text) {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: const Text('Question'),
-              content: Text(text),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                    child: const Text('Yes')),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(false);
-                    },
-                    child: const Text('No')),
-              ],
-            ));
   }
 
   @override
@@ -214,7 +193,7 @@ class TaskListItem extends StatelessWidget {
       direction:
           isDeleted! ? DismissDirection.none : DismissDirection.endToStart,
       confirmDismiss: (direction) {
-        return displayAlertDialog(
+        return Utility.displayAlertDialog(
             context, 'Do you want to move the task in Trash?');
       },
       onDismissed: ((direction) => {
@@ -259,7 +238,7 @@ class TaskListItem extends StatelessWidget {
     );
   }
 
-  IconData? _prorityIcon(String priority) {
+  IconData? _priorityIcon(String priority) {
     return priority == "Important"
         ? Icons.priority_high
         : priority == "Necessary"

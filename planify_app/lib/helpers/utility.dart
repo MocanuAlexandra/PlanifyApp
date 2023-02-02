@@ -91,4 +91,26 @@ class Utility {
     }
     return date;
   }
+
+  static Future<bool?> displayAlertDialog(BuildContext context, String text) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Question'),
+              content: Text(text),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Yes')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: const Text('No')),
+              ],
+            ));
+  }
+
 }

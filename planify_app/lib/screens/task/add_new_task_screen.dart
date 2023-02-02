@@ -3,23 +3,23 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
-import '../../screens/agenda/overall_agenda_screen.dart';
+import '../agenda/overall_agenda_screen.dart';
 import '../../database/database_helper.dart';
 import '../../models/task.dart';
-import '../../models/task_adress.dart';
+import '../../models/task_address.dart';
 import '../../providers/tasks.dart';
-import '../location/location_input.dart';
+import '../../widgets/location/location_input.dart';
 
-class AddEditTaskForm extends StatefulWidget {
-  const AddEditTaskForm({super.key});
+class AddEditTaskScreen extends StatefulWidget {
+  const AddEditTaskScreen({super.key});
 
   static const routeName = '/add-task';
 
   @override
-  State<AddEditTaskForm> createState() => _AddEditTaskFormState();
+  State<AddEditTaskScreen> createState() => _AddEditTaskScreenState();
 }
 
-class _AddEditTaskFormState extends State<AddEditTaskForm> {
+class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   final _formKey = GlobalKey<FormState>();
   var _editedTask = Task(
     id: null,
@@ -113,19 +113,21 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
           ),
         ),
         //delete selected date
-        IconButton(onPressed: () {
-          setState(() {
-            _editedTask = Task(
-              id: _editedTask.id,
-              title: _editedTask.title,
-              dueDate: null,
-              address: _editedTask.address,
-              time: _editedTask.time,
-              priority: _editedTask.priority,
-              isDone: _editedTask.isDone,
-            );
-          });
-        }, icon: const Icon(Icons.delete))
+        IconButton(
+            onPressed: () {
+              setState(() {
+                _editedTask = Task(
+                  id: _editedTask.id,
+                  title: _editedTask.title,
+                  dueDate: null,
+                  address: _editedTask.address,
+                  time: _editedTask.time,
+                  priority: _editedTask.priority,
+                  isDone: _editedTask.isDone,
+                );
+              });
+            },
+            icon: const Icon(Icons.delete))
       ],
     );
   }
@@ -151,26 +153,28 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
           ),
         ),
         //delete selected time
-        IconButton(onPressed: () {
-           setState(() {
-            _editedTask = Task(
-              id: _editedTask.id,
-              title: _editedTask.title,
-              dueDate: _editedTask.dueDate,
-              address: _editedTask.address,
-              time:null,
-              priority: _editedTask.priority,
-              isDone: _editedTask.isDone,
-            );
-          });
-        }, icon: const Icon(Icons.delete))
+        IconButton(
+            onPressed: () {
+              setState(() {
+                _editedTask = Task(
+                  id: _editedTask.id,
+                  title: _editedTask.title,
+                  dueDate: _editedTask.dueDate,
+                  address: _editedTask.address,
+                  time: null,
+                  priority: _editedTask.priority,
+                  isDone: _editedTask.isDone,
+                );
+              });
+            },
+            icon: const Icon(Icons.delete))
       ],
     );
   }
 
   LocationInput locationField() {
     return LocationInput(
-      previousAdress: _editedTask.address,
+      previousAddress: _editedTask.address,
       onSelectPlace: _selectPlace,
     );
   }
@@ -190,7 +194,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
         DropdownMenuItem(
           value: Priority.necessary,
           child: Text(
-            'Neccessary',
+            'Necessary',
             style: TextStyle(fontSize: 16),
           ),
         ),
@@ -374,7 +378,7 @@ class _AddEditTaskFormState extends State<AddEditTaskForm> {
       id: _editedTask.id,
       title: _editedTask.title,
       dueDate: _editedTask.dueDate,
-      address: TaskAdress(latitude: lat, longitude: lng),
+      address: TaskAddress(latitude: lat, longitude: lng),
       time: _editedTask.time,
       priority: _editedTask.priority,
       isDone: _editedTask.isDone,

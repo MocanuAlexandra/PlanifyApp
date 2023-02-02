@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:planify_app/models/task.dart';
 import 'package:provider/provider.dart';
 
-import '../database/database_helper.dart';
-import '../helpers/utility.dart';
-import '../providers/tasks.dart';
-import '../widgets/task/add_new_task_form.dart';
+import '../../database/database_helper.dart';
+import '../../helpers/utility.dart';
+import '../../providers/tasks.dart';
+import '../../models/task.dart';
+import 'add_new_task_screen.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   const TaskDetailScreen({super.key});
@@ -21,11 +20,11 @@ class TaskDetailScreen extends StatefulWidget {
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   bool _isMapLoading = true;
 
-  void _deleteTask(BuildContext context, String id) {
-    // delete task from database
-    DBHelper.deleteTask(id);
+  void _markAsDeleted(BuildContext context, String id) {
+    // mark task as deleted in database
+    DBHelper.markTaskAsDeleted(id);
 
-    // delete task from UI
+    // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
 
@@ -138,8 +137,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.white),
             onPressed: () {
-              _deleteTask(context, loadedTask.id!);
-              Navigator.of(context).pop();
+              // display alert dialog
+              Utility.displayAlertDialog(
+                      context, 'Do you want to move the task in Trash?')
+                  .then((value) {
+                if (value!) {
+                  _markAsDeleted(context, loadedTask.id!);
+                  Navigator.of(context).pop();
+                }
+              });
             },
           ),
         ],
@@ -163,7 +169,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   //priority
                   const SizedBox(height: 10),
                   displayPriority(loadedTask),
-                  //adress
+                  //address
                   const SizedBox(height: 10),
                   displayAddress(loadedTask),
                   const SizedBox(height: 10),
@@ -180,7 +186,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context)
-              .pushNamed(AddEditTaskForm.routeName, arguments: taskId);
+              .pushNamed(AddEditTaskScreen.routeName, arguments: taskId);
         },
         child: const Icon(Icons.edit),
       ),

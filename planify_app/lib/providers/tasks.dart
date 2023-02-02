@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/helpers/utility.dart';
+
+import '../helpers/utility.dart';
 import '../database/database_helper.dart';
 import '../models/task.dart';
-import '../models/task_adress.dart';
+import '../models/task_address.dart';
 
 enum FilterOptions {
-  All,
-  In_progress,
-  Done,
-  Deleted,
-  FocusMode,
+  all,
+  inProgress,
+  done,
+  deleted,
 }
 
 class Tasks with ChangeNotifier {
@@ -33,7 +33,7 @@ class Tasks with ChangeNotifier {
           id: task['id'],
           title: task['title'],
           dueDate: Utility.stringToDateTime(task['dueDate']),
-          address: TaskAdress(
+          address: TaskAddress(
             latitude: task['latitude'],
             longitude: task['longitude'],
             address: task['address'],
@@ -54,8 +54,6 @@ class Tasks with ChangeNotifier {
           .toList();
       //check if the user wants to fetch a certain month agenda
     } else if (month != null) {
-      //check if task has a due date
-
       _tasks = _tasks
           .where((task) =>
               task.dueDate != null &&
@@ -66,7 +64,7 @@ class Tasks with ChangeNotifier {
 
     //check for filters
     switch (selectedOption) {
-      case FilterOptions.All:
+      case FilterOptions.all:
         if (focusMode!) {
           _tasks = _tasks
               .where((task) =>
@@ -82,7 +80,7 @@ class Tasks with ChangeNotifier {
               .toList();
         }
         break;
-      case FilterOptions.In_progress:
+      case FilterOptions.inProgress:
         if (focusMode!) {
           _tasks = _tasks
               .where((task) =>
@@ -96,7 +94,7 @@ class Tasks with ChangeNotifier {
               .toList();
         }
         break;
-      case FilterOptions.Done:
+      case FilterOptions.done:
         if (focusMode!) {
           _tasks = _tasks
               .where((task) =>
@@ -110,9 +108,9 @@ class Tasks with ChangeNotifier {
               .toList();
         }
         break;
-      case FilterOptions.Deleted:
+      case FilterOptions.deleted:
         _tasks = _tasks.where((task) => task.isDeleted == true).toList();
-        break;    
+        break;
       default:
         _tasks = _tasks
             .where((task) => task.isDone == false || task.isDone == true)

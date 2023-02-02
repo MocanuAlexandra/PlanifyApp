@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:planify_app/widgets/auth/square_tile_buttons.dart';
 
-enum AuthMode { Signup, Login }
+import '../../widgets/auth/square_tile_buttons.dart';
+
+enum AuthMode { signUp, login }
 
 class AuthForm extends StatefulWidget {
   final void Function(
@@ -24,7 +25,7 @@ class AuthForm extends StatefulWidget {
 class _AuthFormState extends State<AuthForm>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  AuthMode _authMode = AuthMode.Login;
+  AuthMode _authMode = AuthMode.login;
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   final _passwordNode = FocusNode();
@@ -37,8 +38,8 @@ class _AuthFormState extends State<AuthForm>
   Animation<Offset>? _slideAnimation;
   Animation<double>? _opacityAnimation;
 
-  // we need this for animating the switch between login and signup
-  // and to disaplay the confirm password field in sign up mode
+  // we need this for animating the switch between login and sign up
+  // and to display the confirm password field in sign up mode
   @override
   void initState() {
     super.initState();
@@ -67,17 +68,17 @@ class _AuthFormState extends State<AuthForm>
     );
   }
 
-  // switch between login and signup
+  // switch between login and sign up
   void _switchAuthMode() {
-    if (_authMode == AuthMode.Login) {
+    if (_authMode == AuthMode.login) {
       setState(() {
-        _authMode = AuthMode.Signup;
+        _authMode = AuthMode.signUp;
       });
       _controller!.forward();
       _formKey.currentState!.reset();
     } else {
       setState(() {
-        _authMode = AuthMode.Login;
+        _authMode = AuthMode.login;
       });
       _controller!.reverse();
       _formKey.currentState!.reset();
@@ -94,10 +95,11 @@ class _AuthFormState extends State<AuthForm>
     if (isValid) {
       _formKey.currentState!.save();
       widget.submitFn(userEmail!.trim(), userPass!.trim(),
-          _authMode == AuthMode.Login, context);
+          _authMode == AuthMode.login, context);
     }
   }
 
+  // login with google credentials
   void _trySignInWithGoogle() {
     widget.googleSignIn(context);
   }
@@ -106,8 +108,8 @@ class _AuthFormState extends State<AuthForm>
   AnimatedContainer confirmPasswordField() {
     return AnimatedContainer(
       constraints: BoxConstraints(
-        minHeight: _authMode == AuthMode.Signup ? 60 : 0,
-        maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
+        minHeight: _authMode == AuthMode.signUp ? 60 : 0,
+        maxHeight: _authMode == AuthMode.signUp ? 120 : 0,
       ),
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeIn,
@@ -117,9 +119,9 @@ class _AuthFormState extends State<AuthForm>
           position: _slideAnimation!,
           child: FormBuilderTextField(
               name: 'confirmPassword',
-              enabled: _authMode == AuthMode.Signup,
+              enabled: _authMode == AuthMode.signUp,
               decoration: InputDecoration(
-                labelText: 'Confirm assword',
+                labelText: 'Confirm password',
                 suffixIcon: IconButton(
                   icon: Icon(_confirmPasswordVisible
                       ? Icons.visibility_off
@@ -132,7 +134,7 @@ class _AuthFormState extends State<AuthForm>
                 ),
               ),
               obscureText: !_confirmPasswordVisible,
-              validator: _authMode == AuthMode.Signup
+              validator: _authMode == AuthMode.signUp
                   ? FormBuilderValidators.compose([
                       FormBuilderValidators.required(errorText: 'Required'),
                       FormBuilderValidators.match(_passwordController.text,
@@ -212,9 +214,9 @@ least 8 characters and no space.'''),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeIn,
-        height: _authMode == AuthMode.Signup ? 430 : 360,
+        height: _authMode == AuthMode.signUp ? 430 : 360,
         constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 430 : 360),
+            BoxConstraints(minHeight: _authMode == AuthMode.signUp ? 430 : 360),
         width: deviceSize.width * 0.75,
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -232,7 +234,7 @@ least 8 characters and no space.'''),
               ),
               // if the request is being handled, display circular indicator
               if (widget.isLoading) const CircularProgressIndicator(),
-              // else display the sumbit button with login/sign up
+              // else display the submit button with login/sign up
               if (!widget.isLoading)
                 ElevatedButton(
                   onPressed: _trySubmit,
@@ -247,7 +249,7 @@ least 8 characters and no space.'''),
                         horizontal: 30.0, vertical: 8.0),
                   ),
                   child: Text(
-                    _authMode == AuthMode.Login ? 'Login' : 'Signup',
+                    _authMode == AuthMode.login ? 'Login' : 'Signup',
                   ),
                 ),
               //change the form to be for sign up/login
@@ -262,7 +264,7 @@ least 8 characters and no space.'''),
                   ),
                   onPressed: _switchAuthMode,
                   child: Text(
-                    _authMode == AuthMode.Login
+                    _authMode == AuthMode.login
                         ? 'Create a new account'
                         : 'I already have an account',
                   ),
@@ -277,7 +279,7 @@ least 8 characters and no space.'''),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SquareTile(
-                    imapgePath: 'assets/images/google.jpg',
+                    imagePath: 'assets/images/google.jpg',
                     onTap: _trySignInWithGoogle,
                   ),
                 )

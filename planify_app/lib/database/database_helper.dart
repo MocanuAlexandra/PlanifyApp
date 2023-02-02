@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
 import '../models/task.dart';
-import '../models/task_adress.dart';
+import '../models/task_address.dart';
 
 class DBHelper {
   // function for fetching tasks from the database from the connected user
@@ -51,15 +51,15 @@ class DBHelper {
     //get the connected user
     final user = FirebaseAuth.instance.currentUser;
 
-    var updatedLocation = const TaskAdress(
+    var updatedLocation = const TaskAddress(
         latitude: 0, longitude: 0, address: 'No address chosen');
-    //check if the user picked an adress
+    //check if the user picked an address
     if (newTask.address != null) {
       // get the address of the picked location
       final address = await LocationHelper.getPlaceAddress(
           newTask.address!.latitude!, newTask.address!.longitude!);
-      // create a new task adress with the address
-      updatedLocation = TaskAdress(
+      // create a new task address with the address
+      updatedLocation = TaskAddress(
           latitude: newTask.address!.latitude,
           longitude: newTask.address!.longitude,
           address: address);
@@ -104,9 +104,9 @@ class DBHelper {
   static void updateTask(String editedTaskId, Task editedTask) async {
     final user = FirebaseAuth.instance.currentUser;
 
-    var updatedLocation = const TaskAdress(
+    var updatedLocation = const TaskAddress(
         latitude: 0.0, longitude: 0.0, address: 'No address chosen');
-    //check if the user picked an adress
+    //check if the user picked an address
     if ((editedTask.address != null &&
                 editedTask.address!.latitude != null &&
                 editedTask.address!.longitude !=
@@ -120,8 +120,8 @@ class DBHelper {
       // get the address of the picked location
       final address = await LocationHelper.getPlaceAddress(
           editedTask.address!.latitude!, editedTask.address!.longitude!);
-      // create a new task adress with the address
-      updatedLocation = TaskAdress(
+      // create a new task address with the address
+      updatedLocation = TaskAddress(
           latitude: editedTask.address!.latitude,
           longitude: editedTask.address!.longitude,
           address: address);
@@ -161,6 +161,7 @@ class DBHelper {
         .update({'isDone': true});
   }
 
+  // function for marking a task as deleted
   static void markTaskAsDeleted(String id) {
     final user = FirebaseAuth.instance.currentUser;
     FirebaseFirestore.instance
@@ -171,6 +172,7 @@ class DBHelper {
         .update({'isDeleted': true});
   }
 
+  // function for marking a task as undeleted
   static void markTaskAsUndeleted(String id) {
     final user = FirebaseAuth.instance.currentUser;
     FirebaseFirestore.instance

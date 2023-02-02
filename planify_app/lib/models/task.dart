@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/models/task_adress.dart';
+
+import 'task_address.dart';
 
 enum Priority { casual, necessary, important, unknown }
 
@@ -8,7 +9,7 @@ class Task {
   final String? title;
   final DateTime? dueDate;
   final TimeOfDay? time;
-  final TaskAdress? address;
+  final TaskAddress? address;
   final Priority? priority;
   bool isDone;
   bool isDeleted;

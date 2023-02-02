@@ -3,14 +3,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import '../../helpers/location_helper.dart';
-import '../../models/task_adress.dart';
+import '../../models/task_address.dart';
 import '../../screens/location/map_screen.dart';
 
 class LocationInput extends StatefulWidget {
   final Function onSelectPlace;
-  final TaskAdress? previousAdress;
+  final TaskAddress? previousAddress;
   const LocationInput(
-      {super.key, required this.onSelectPlace, this.previousAdress});
+      {super.key, required this.onSelectPlace, this.previousAddress});
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -18,16 +18,16 @@ class LocationInput extends StatefulWidget {
 
 class _LocationInputState extends State<LocationInput> {
   String? _previewImageUrl;
-  TaskAdress? _initialAdress;
+  TaskAddress? _initialAddress;
 
   @override
   void initState() {
-    if (widget.previousAdress != null &&
-        widget.previousAdress!.latitude != 0.0 &&
-        widget.previousAdress!.longitude != 0.0) {
+    if (widget.previousAddress != null &&
+        widget.previousAddress!.latitude != 0.0 &&
+        widget.previousAddress!.longitude != 0.0) {
       _previewImageUrl = LocationHelper.generateLocPreviewImg(
-          latitude: widget.previousAdress!.latitude,
-          longitude: widget.previousAdress!.longitude);
+          latitude: widget.previousAddress!.latitude,
+          longitude: widget.previousAddress!.longitude);
     }
     super.initState();
   }
@@ -60,7 +60,7 @@ class _LocationInputState extends State<LocationInput> {
     final locPermission = await Location().hasPermission();
     if (locPermission == PermissionStatus.granted) {
       final locData = await Location().getLocation();
-      _initialAdress = TaskAdress(
+      _initialAddress = TaskAddress(
           latitude: locData.latitude!, longitude: locData.longitude!);
     } else {
       // if not, ask for it
@@ -69,14 +69,14 @@ class _LocationInputState extends State<LocationInput> {
       if (locPermission == PermissionStatus.granted ||
           locPermission == PermissionStatus.grantedLimited) {
         final locData = await Location().getLocation();
-        _initialAdress = TaskAdress(
+        _initialAddress = TaskAddress(
             latitude: locData.latitude!, longitude: locData.longitude!);
         zoom = 16;
       }
       // if the user refuses, display the map with the default location and zoomed out
       else if (locPermission == PermissionStatus.denied ||
           locPermission == PermissionStatus.deniedForever) {
-        _initialAdress = const TaskAdress(latitude: 0.0, longitude: 0.0);
+        _initialAddress = const TaskAddress(latitude: 0.0, longitude: 0.0);
         zoom = 2;
       }
     }
@@ -86,7 +86,7 @@ class _LocationInputState extends State<LocationInput> {
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (ctx) => MapScreen(
-          initialAdress: _initialAdress!,
+          initialAddress: _initialAddress!,
           isSelecting: true,
           zoom: zoom,
         ),

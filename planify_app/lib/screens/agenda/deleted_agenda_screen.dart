@@ -9,7 +9,7 @@ import '../../widgets/task/task_list_item.dart';
 class DeletedAgendaScreen extends StatelessWidget {
   static const routeName = '/deleted-agenda';
 
-  static FilterOptions selectedOption = FilterOptions.Deleted;
+  static FilterOptions selectedOption = FilterOptions.deleted;
 
   const DeletedAgendaScreen({super.key});
 
@@ -21,7 +21,7 @@ class DeletedAgendaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    selectedOption = FilterOptions.Deleted;
+    selectedOption = FilterOptions.deleted;
 
     return Scaffold(
       appBar: AppBar(
@@ -29,7 +29,7 @@ class DeletedAgendaScreen extends StatelessWidget {
       ),
       drawer: const MainDrawer(),
       body: FutureBuilder(
-        future: _fetchTasks(context, FilterOptions.Deleted),
+        future: _fetchTasks(context, FilterOptions.deleted),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(

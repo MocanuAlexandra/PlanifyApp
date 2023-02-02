@@ -6,7 +6,7 @@ import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
-import '../../widgets/task/add_new_task_form.dart';
+import '../task/add_new_task_screen.dart';
 
 class MonthAgendaScreen extends StatefulWidget {
   static const routeName = '/month-agenda';
@@ -19,7 +19,7 @@ class MonthAgendaScreen extends StatefulWidget {
 
 class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
   bool _focusMode = false;
-  FilterOptions selectedOption = FilterOptions.In_progress;
+  FilterOptions selectedOption = FilterOptions.inProgress;
   DateTime? _selectedDate = DateTime.now();
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
@@ -62,7 +62,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
             },
             itemBuilder: (_) => [
               PopupMenuItem(
-                value: FilterOptions.All,
+                value: FilterOptions.all,
                 child: Row(
                   children: const [
                     Icon(
@@ -75,7 +75,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
                 ),
               ),
               PopupMenuItem(
-                value: FilterOptions.In_progress,
+                value: FilterOptions.inProgress,
                 child: Row(
                   children: const [
                     Icon(
@@ -88,7 +88,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
                 ),
               ),
               PopupMenuItem(
-                value: FilterOptions.Done,
+                value: FilterOptions.done,
                 child: Row(
                   children: const [
                     Icon(
@@ -163,7 +163,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(AddEditTaskForm.routeName);
+          Navigator.of(context).pushNamed(AddEditTaskScreen.routeName);
         },
         child: const Icon(Icons.add),
       ),

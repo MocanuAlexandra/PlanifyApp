@@ -7,12 +7,12 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 import '../../providers/tasks.dart';
-import '../../screens/task_detail_screen.dart';
+import 'screens/task/task_detail_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
 import '../../screens/auth/auth_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
-import '../../widgets/task/add_new_task_form.dart';
+import 'screens/task/add_new_task_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
                 const OverallAgendaScreen(),
             TodayAgendaScreen.routeName: (context) => const TodayAgendaScreen(),
             MonthAgendaScreen.routeName: (context) => const MonthAgendaScreen(),
-            AddEditTaskForm.routeName: (context) => const AddEditTaskForm(),
+            AddEditTaskScreen.routeName: (context) => const AddEditTaskScreen(),
             TaskDetailScreen.routeName: (context) => const TaskDetailScreen(),
             AuthScreen.routeName: (context) => const AuthScreen(),
             DeletedAgendaScreen.routeName: (context) =>

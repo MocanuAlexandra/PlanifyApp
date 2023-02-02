@@ -4,18 +4,18 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_maps_webservice_ex/places.dart';
 
 import '../../helpers/location_helper.dart';
-import '../../models/task_adress.dart';
+import '../../models/task_address.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen(
       {super.key,
-      this.initialAdress = const TaskAdress(
+      this.initialAddress = const TaskAddress(
         latitude: 0,
         longitude: 0,
       ),
       this.isSelecting = false,
       required this.zoom});
-  final TaskAdress initialAdress;
+  final TaskAddress initialAddress;
   final bool isSelecting;
   final double zoom;
 
@@ -108,16 +108,16 @@ class _MapScreenState extends State<MapScreen> {
                         Marker(
                           markerId: const MarkerId('m1'),
                           position: _pickedLocation ??
-                              LatLng(widget.initialAdress.latitude!,
-                                  widget.initialAdress.longitude!),
+                              LatLng(widget.initialAddress.latitude!,
+                                  widget.initialAddress.longitude!),
                           infoWindow:
                               const InfoWindow(title: 'Your selected location'),
                         ),
                       },
                 // Set the initial camera position to the initial address (the current location of the user)
                 initialCameraPosition: CameraPosition(
-                  target: LatLng(widget.initialAdress.latitude!,
-                      widget.initialAdress.longitude!),
+                  target: LatLng(widget.initialAddress.latitude!,
+                      widget.initialAddress.longitude!),
                   zoom: widget.zoom,
                 ),
               ),
@@ -160,7 +160,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _selectLocation(LatLng position,
-      [PlacesDetailsResponse? place, String? searchAdress]) {
+      [PlacesDetailsResponse? place, String? searchAddress]) {
     // Move the camera to the search coordinates and add marker
     mapController.animateCamera(
       CameraUpdate.newLatLngZoom(position, 16),
@@ -174,8 +174,8 @@ class _MapScreenState extends State<MapScreen> {
     }
 
     // If the user searched for a place, set the search text to the search address
-    if (searchAdress != null) {
-      _searchController.text = searchAdress;
+    if (searchAddress != null) {
+      _searchController.text = searchAddress;
     }
 
     // Set the picked location
