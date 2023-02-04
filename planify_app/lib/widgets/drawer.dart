@@ -1,15 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
+import '../providers/categories.dart';
 import '../screens/auth/auth_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
+
+  //auxiliary functions
+  Future<void> _fetchCategories(BuildContext context) async {
+    await Provider.of<Categories>(context, listen: false).fetchCategories();
+  }
 
   Widget buildListTile(String title, IconData icon, Function tapHandler) {
     return ListTile(
@@ -90,23 +97,37 @@ class MainDrawer extends StatelessWidget {
         }),
         const Divider(),
         ExpansionTile(
-          title: const Text(
-            "Categories",
-            style: TextStyle(fontSize: 20),
-          ),
-          leading: const Icon(Icons.category),
-          childrenPadding: const EdgeInsets.only(left: 60),
-          children: [
-            ListTile(
-              title: Text("Category 1"),
-              onTap: () {},
+            title: const Text(
+              "Categories",
+              style: TextStyle(fontSize: 20),
             ),
-            ListTile(
-              title: Text("Category 2"),
-              onTap: () {},
-            ),
-          ],
-        ),
+            leading: const Icon(Icons.category),
+            childrenPadding: const EdgeInsets.only(left: 60),
+            children: [
+              FutureBuilder(
+                future: _fetchCategories(context),
+                builder: (context, snapshot) => snapshot.connectionState ==
+                        ConnectionState.waiting
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Consumer<Categories>(
+                        builder: (context, categories, _) => ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: categories.categoriesList.length,
+                          itemBuilder: (context, index) => ListTile(
+                            title: Text(
+                              categories.categoriesList[index].name!,
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            onTap: () {
+                              //TODO add category view screen
+                            },
+                          ),
+                        ),
+                      ),
+              )
+            ]),
 
         const Divider(),
         buildListTile('Trash', Icons.delete, () {
