@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../widgets/task/task_list_item.dart';
+import '../task/add_edit_task_screen.dart';
 
 class CategoryAgendaScreen extends StatefulWidget {
   static const routeName = '/category-agenda';
@@ -45,10 +46,18 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
       appBar:
           AppBar(title: Text(_category!), actions: [displayFilters(context)]),
       drawer: const MainDrawer(),
-      body: Column(children: [
-        changeFocusMode(context),
-        displayTasks(context),
-      ]),
+      body: Column(
+        children: [
+          changeFocusMode(context),
+          displayTasks(context),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(AddEditTaskScreen.routeName);
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 

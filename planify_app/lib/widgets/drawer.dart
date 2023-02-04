@@ -11,8 +11,15 @@ import '../../screens/agenda/today_agenda_screen.dart';
 import '../providers/categories.dart';
 import '../screens/auth/auth_screen.dart';
 
-class MainDrawer extends StatelessWidget {
+class MainDrawer extends StatefulWidget {
   const MainDrawer({super.key});
+
+  @override
+  State<MainDrawer> createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
+  final ScrollController _controller = ScrollController();
 
   //auxiliary functions
   Future<void> _fetchCategories(BuildContext context) async {
@@ -38,50 +45,36 @@ class MainDrawer extends StatelessWidget {
   }
 
   Widget buildLogoutTile(BuildContext context) {
-    return Expanded(
-      child: Align(
-        alignment: FractionalOffset.bottomCenter,
-        child: ListTile(
-          hoverColor: Colors.blue,
-          dense: true,
-          visualDensity: const VisualDensity(vertical: -4),
-          leading: const Icon(
-            Icons.logout,
-          ),
-          title: const Text('Logout',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-              )),
-          onTap: () {
-            FirebaseAuth.instance.signOut();
-            GoogleSignIn().signOut();
-            Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
-          },
-        ),
+    return ListTile(
+      dense: true,
+      visualDensity: const VisualDensity(vertical: -4),
+      leading: const Icon(
+        Icons.logout,
       ),
+      title: const Text('Logout',
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.black,
+          )),
+      onTap: () {
+        FirebaseAuth.instance.signOut();
+        GoogleSignIn().signOut();
+        Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(children: [
-        Container(
-          height: 120,
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          alignment: Alignment.centerLeft,
-          color: Theme.of(context).colorScheme.secondary,
-          child: const Text(
-            'Planify App',
-            style: TextStyle(
-              fontSize: 30,
-              color: Colors.white,
-            ),
-          ),
-        ),
+        child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        //drawer header
+        buildHeader(context),
         const SizedBox(height: 10),
+
+        //drawer items
         buildListTile('Overall', Icons.calendar_view_week, () {
           Navigator.of(context)
               .pushReplacementNamed(OverallAgendaScreen.routeName);
@@ -104,9 +97,27 @@ class MainDrawer extends StatelessWidget {
               .pushReplacementNamed(DeletedAgendaScreen.routeName);
         }),
         const Divider(),
+
         //logout
         buildLogoutTile(context),
-      ]),
+      ],
+    ));
+  }
+
+  Container buildHeader(BuildContext context) {
+    return Container(
+      height: 120,
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      alignment: Alignment.centerLeft,
+      color: Theme.of(context).colorScheme.secondary,
+      child: const Text(
+        'Planify App',
+        style: TextStyle(
+          fontSize: 30,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 
@@ -127,20 +138,29 @@ class MainDrawer extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       )
                     : Consumer<Categories>(
-                        builder: (context, categories, _) => ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: categories.categoriesList.length,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Text(
-                              categories.categoriesList[index].name!,
-                              style: const TextStyle(fontSize: 18),
+                        builder: (context, categories, _) => SizedBox(
+                          height: 150,
+                          child: Scrollbar(
+                            controller: _controller,
+                            thumbVisibility: true,
+                            thickness: 10,
+                            child: ListView.builder(
+                              controller: _controller,
+                              shrinkWrap: true,
+                              itemCount: categories.categoriesList.length,
+                              itemBuilder: (context, index) => ListTile(
+                                title: Text(
+                                  categories.categoriesList[index].name!,
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                onTap: () {
+                                  Navigator.of(context).pushReplacementNamed(
+                                      CategoryAgendaScreen.routeName,
+                                      arguments: categories
+                                          .categoriesList[index].name!);
+                                },
+                              ),
                             ),
-                            onTap: () {
-                              Navigator.of(context).pushReplacementNamed(
-                                  CategoryAgendaScreen.routeName,
-                                  arguments:
-                                      categories.categoriesList[index].name!);
-                            },
                           ),
                         ),
                       ),
