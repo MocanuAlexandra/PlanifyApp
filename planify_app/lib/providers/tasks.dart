@@ -24,7 +24,8 @@ class Tasks with ChangeNotifier {
       bool? month,
       DateTime? selectedDate,
       FilterOptions? selectedOption,
-      bool? focusMode]) async {
+      bool? focusMode,
+      String? category]) async {
     final tasksData = await DBHelper.fetchTasks();
 
     _tasks = tasksData.map(
@@ -61,6 +62,11 @@ class Tasks with ChangeNotifier {
               task.dueDate!.month == selectedDate!.month &&
               task.dueDate!.year == selectedDate.year)
           .toList();
+    }
+
+    //check if the user selected a category
+    if (category != null) {
+      _tasks = _tasks.where((task) => task.category == category).toList();
     }
 
     //check for filters

@@ -6,7 +6,7 @@ import '../../database/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../models/task.dart';
-import 'add_new_task_screen.dart';
+import 'add_edit_task_screen.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   const TaskDetailScreen({super.key});

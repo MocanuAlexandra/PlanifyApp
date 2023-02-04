@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:planify_app/providers/categories.dart';
+import 'package:planify_app/screens/agenda/category_agenda_screen.dart';
 import 'package:planify_app/screens/agenda/deleted_agenda_screen.dart';
 
 import 'package:provider/provider.dart';
@@ -13,7 +14,7 @@ import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
 import '../../screens/auth/auth_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
-import 'screens/task/add_new_task_screen.dart';
+import 'screens/task/add_edit_task_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
             AuthScreen.routeName: (context) => const AuthScreen(),
             DeletedAgendaScreen.routeName: (context) =>
                 const DeletedAgendaScreen(),
+                CategoryAgendaScreen.routeName: (context) => const CategoryAgendaScreen(),
           },
         ));
   }

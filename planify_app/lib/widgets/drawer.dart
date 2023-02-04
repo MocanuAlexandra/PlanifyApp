@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
+import '../../screens/agenda/category_agenda_screen.dart';
 import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
@@ -96,18 +97,32 @@ class MainDrawer extends StatelessWidget {
               .pushReplacementNamed(MonthAgendaScreen.routeName);
         }),
         const Divider(),
-        ExpansionTile(
-            title: const Text(
-              "Categories",
-              style: TextStyle(fontSize: 20),
-            ),
-            leading: const Icon(Icons.category),
-            childrenPadding: const EdgeInsets.only(left: 60),
-            children: [
-              FutureBuilder(
-                future: _fetchCategories(context),
-                builder: (context, snapshot) => snapshot.connectionState ==
-                        ConnectionState.waiting
+        buildCategoriesTile(context),
+        const Divider(),
+        buildListTile('Trash', Icons.delete, () {
+          Navigator.of(context)
+              .pushReplacementNamed(DeletedAgendaScreen.routeName);
+        }),
+        const Divider(),
+        //logout
+        buildLogoutTile(context),
+      ]),
+    );
+  }
+
+  ExpansionTile buildCategoriesTile(BuildContext context) {
+    return ExpansionTile(
+        title: const Text(
+          "Categories",
+          style: TextStyle(fontSize: 20),
+        ),
+        leading: const Icon(Icons.category),
+        childrenPadding: const EdgeInsets.only(left: 60),
+        children: [
+          FutureBuilder(
+            future: _fetchCategories(context),
+            builder: (context, snapshot) =>
+                snapshot.connectionState == ConnectionState.waiting
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
@@ -121,22 +136,15 @@ class MainDrawer extends StatelessWidget {
                               style: const TextStyle(fontSize: 18),
                             ),
                             onTap: () {
-                              //TODO add category view screen
+                              Navigator.of(context).pushReplacementNamed(
+                                  CategoryAgendaScreen.routeName,
+                                  arguments:
+                                      categories.categoriesList[index].name!);
                             },
                           ),
                         ),
                       ),
-              )
-            ]),
-
-        const Divider(),
-        buildListTile('Trash', Icons.delete, () {
-          Navigator.of(context)
-              .pushReplacementNamed(DeletedAgendaScreen.routeName);
-        }),
-        //logout
-        buildLogoutTile(context),
-      ]),
-    );
+          )
+        ]);
   }
 }

@@ -28,35 +28,39 @@ class DeletedAgendaScreen extends StatelessWidget {
         title: const Text('Trash'),
       ),
       drawer: const MainDrawer(),
-      body: FutureBuilder(
-        future: _fetchTasks(context, FilterOptions.deleted),
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () => _fetchTasks(context, selectedOption),
-                    child: Consumer<Tasks>(
-                      builder: (context, tasks, ch) => ListView.builder(
-                        itemCount: tasks.tasksList.length,
-                        itemBuilder: (context, index) => TaskListItem(
-                          id: tasks.tasksList[index].id,
-                          title: tasks.tasksList[index].title,
-                          dueDate: Utility.dateTimeToString(
-                              tasks.tasksList[index].dueDate),
-                          address: tasks.tasksList[index].address,
-                          time: Utility.timeOfDayToString(
-                              tasks.tasksList[index].time),
-                          priority: Utility.priorityEnumToString(
-                              tasks.tasksList[index].priority),
-                          isDone: tasks.tasksList[index].isDone,
-                          isDeleted: tasks.tasksList[index].isDeleted,
-                        ),
-                      ),
-                    ),
+      body: displayTasks(context),
+    );
+  }
+
+  FutureBuilder<void> displayTasks(BuildContext context) {
+    return FutureBuilder(
+      future: _fetchTasks(context, FilterOptions.deleted),
+      builder: (context, snapshot) => snapshot.connectionState ==
+              ConnectionState.waiting
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : RefreshIndicator(
+              onRefresh: () => _fetchTasks(context, selectedOption),
+              child: Consumer<Tasks>(
+                builder: (context, tasks, ch) => ListView.builder(
+                  itemCount: tasks.tasksList.length,
+                  itemBuilder: (context, index) => TaskListItem(
+                    id: tasks.tasksList[index].id,
+                    title: tasks.tasksList[index].title,
+                    dueDate: Utility.dateTimeToString(
+                        tasks.tasksList[index].dueDate),
+                    address: tasks.tasksList[index].address,
+                    time:
+                        Utility.timeOfDayToString(tasks.tasksList[index].time),
+                    priority: Utility.priorityEnumToString(
+                        tasks.tasksList[index].priority),
+                    isDone: tasks.tasksList[index].isDone,
+                    isDeleted: tasks.tasksList[index].isDeleted,
                   ),
-      ),
+                ),
+              ),
+            ),
     );
   }
 }
