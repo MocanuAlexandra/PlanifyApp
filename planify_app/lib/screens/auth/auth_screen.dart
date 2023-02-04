@@ -40,12 +40,34 @@ class _AuthScreenState extends State<AuthScreen> {
           .doc(userCredentials.user!.uid)
           .set({'email': userCredentials.user!.email});
 
-      //add 'categories' collection to the user
-      await FirebaseFirestore.instance
+      //get the user's categories
+      final categories = await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredentials.user!.uid)
           .collection('categories')
-          .add({'name': 'No category'});
+          .get();
+
+      //check if the user has categories
+      if (categories.docs.isEmpty) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredentials.user!.uid)
+            .collection('categories')
+            .add({'name': 'No category'});
+      } else {
+        //add default category if it doesn't exist
+        for (var element in categories.docs) {
+          if (element.data()['name'] == 'No category') {
+            return;
+          } else {
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userCredentials.user!.uid)
+                .collection('categories')
+                .add({'name': 'No category'});
+          }
+        }
+      }
     } on FirebaseAuthException catch (error) {
       var message = 'An error occurred, please check your credentials';
       if (error.message != null) {

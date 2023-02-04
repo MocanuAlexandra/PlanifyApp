@@ -73,8 +73,10 @@ class MyApp extends StatelessWidget {
             AuthScreen.routeName: (context) => const AuthScreen(),
             DeletedAgendaScreen.routeName: (context) =>
                 const DeletedAgendaScreen(),
-                CategoryAgendaScreen.routeName: (context) => const CategoryAgendaScreen(),
-                AddEditCategoryScreen.routeName: (context) => const AddEditCategoryScreen(),
+            CategoryAgendaScreen.routeName: (context) =>
+                const CategoryAgendaScreen(),
+            AddEditCategoryScreen.routeName: (context) =>
+                const AddEditCategoryScreen(),
           },
         ));
   }
