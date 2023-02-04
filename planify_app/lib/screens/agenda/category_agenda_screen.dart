@@ -4,7 +4,11 @@ import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
+import '../../widgets/helpers/expandable_fab/action_button.dart';
+import '../../widgets/helpers/expandable_fab/expandable_fab.dart';
+import '../../widgets/helpers/expandable_fab/expandable_floating_action_button.dart';
 import '../../widgets/task/task_list_item.dart';
+import '../task/add_edit_category_screen.dart';
 import '../task/add_edit_task_screen.dart';
 
 class CategoryAgendaScreen extends StatefulWidget {
@@ -43,8 +47,16 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          AppBar(title: Text(_category!), actions: [displayFilters(context)]),
+      appBar: AppBar(title: Text(_category!), actions: [
+        IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            Navigator.of(context).pushNamed(AddEditCategoryScreen.routeName,
+                arguments: _category);
+          },
+        ),
+        displayFilters(context)
+      ]),
       drawer: const MainDrawer(),
       body: Column(
         children: [
@@ -52,12 +64,7 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
           displayTasks(context),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(AddEditTaskScreen.routeName);
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: const ExpandableFloatingActionButton(),
     );
   }
 

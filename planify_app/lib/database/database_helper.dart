@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:planify_app/models/category.dart';
 
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
@@ -167,7 +169,7 @@ class DBHelper {
       updatedDueDate = editedTask.dueDate!.toIso8601String();
     }
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
@@ -217,5 +219,39 @@ class DBHelper {
         .collection('tasks')
         .doc(id)
         .update({'isDeleted': false});
+  }
+
+  static void updateCategory(String id, Category editedCategory) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('categories')
+        .doc(id)
+        .update({'name': editedCategory.name});
+  }
+
+  static void insertCategory(Category editedCategory) async {
+    if (editedCategory.name == null) {
+      return;
+    }
+
+    final user = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .add({
+      'name': editedCategory.name,
+    });
+  }
+
+  static void deleteCategory(String categoryId) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .doc(categoryId)
+        .delete();
   }
 }

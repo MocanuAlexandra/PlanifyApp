@@ -22,4 +22,8 @@ class Categories with ChangeNotifier {
       },
     ).toList();
   }
+
+  Category findByName(String categoryName) {
+    return _categories.firstWhere((category) => category.name == categoryName);
+  }
 }

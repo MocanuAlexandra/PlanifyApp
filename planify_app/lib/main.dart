@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:planify_app/providers/categories.dart';
 import 'package:planify_app/screens/agenda/category_agenda_screen.dart';
 import 'package:planify_app/screens/agenda/deleted_agenda_screen.dart';
+import 'package:planify_app/screens/task/add_edit_category_screen.dart';
 
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
             DeletedAgendaScreen.routeName: (context) =>
                 const DeletedAgendaScreen(),
                 CategoryAgendaScreen.routeName: (context) => const CategoryAgendaScreen(),
+                AddEditCategoryScreen.routeName: (context) => const AddEditCategoryScreen(),
           },
         ));
   }

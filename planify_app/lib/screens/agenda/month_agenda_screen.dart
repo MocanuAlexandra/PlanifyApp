@@ -5,7 +5,11 @@ import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../widgets/drawer.dart';
+import '../../widgets/helpers/expandable_fab/action_button.dart';
+import '../../widgets/helpers/expandable_fab/expandable_fab.dart';
+import '../../widgets/helpers/expandable_fab/expandable_floating_action_button.dart';
 import '../../widgets/task/task_list_item.dart';
+import '../task/add_edit_category_screen.dart';
 import '../task/add_edit_task_screen.dart';
 
 class MonthAgendaScreen extends StatefulWidget {
@@ -62,12 +66,7 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
           displayTasks(context),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(AddEditTaskScreen.routeName);
-        },
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: const ExpandableFloatingActionButton(),
     );
   }
 
