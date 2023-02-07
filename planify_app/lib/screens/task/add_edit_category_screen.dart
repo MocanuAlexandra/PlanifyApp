@@ -82,20 +82,35 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
         actions: [
           if (_editedCategory.id != null)
             IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                // display alert dialog
-                Utility.displayAlertDialog(context,
-                        'Do you want to permanently delete this category?')
-                    .then((value) {
-                  if (value!) {
-                    _deleteCategory(context, _editedCategory.id!);
-                    Navigator.of(context)
-                        .pushReplacementNamed(OverallAgendaScreen.routeName);
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  //check if the category is the default category
+                  if (_editedCategory.name == 'No category') {
+                    Utility.displayInformationalDialog(
+                        context, 'You cannot delete the default category.');
+                    return;
+                  } else {
+                    //check if the category is used in any task
+                    DBHelper.isCategoryUsed(_editedCategory.id!).then((value) {
+                      if (value) {
+                        Utility.displayInformationalDialog(context,
+                            'You cannot delete this category because it is used in one or more tasks.');
+                        return;
+                      } else {
+                        //delete category
+                        Utility.displayAlertDialog(context,
+                                'Do you want to permanently delete this category?')
+                            .then((value) {
+                          if (value!) {
+                            _deleteCategory(context, _editedCategory.id!);
+                            Navigator.of(context).pushReplacementNamed(
+                                OverallAgendaScreen.routeName);
+                          }
+                        });
+                      }
+                    });
                   }
-                });
-              },
-            ),
+                }),
         ],
       ),
       body: Column(

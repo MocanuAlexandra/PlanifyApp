@@ -254,4 +254,22 @@ class DBHelper {
         .doc(categoryId)
         .delete();
   }
+
+  //check if the category is used in any task
+  static Future<bool> isCategoryUsed(String categoryId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final category = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .doc(categoryId)
+        .get();
+    final tasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('tasks')
+        .where('category', isEqualTo: category['name'])
+        .get();
+    return tasks.docs.isNotEmpty;
+  }
 }

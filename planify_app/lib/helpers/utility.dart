@@ -113,4 +113,20 @@ class Utility {
             ));
   }
 
+  static Future<bool?> displayInformationalDialog(
+      BuildContext context, String text) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Information'),
+              content: Text(text),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Ok')),
+              ],
+            ));
+  }
 }
