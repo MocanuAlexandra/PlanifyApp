@@ -1,8 +1,10 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/notification_helper.dart';
 import '../../providers/categories.dart';
 import '../../models/category.dart';
 import '../agenda/overall_agenda_screen.dart';
@@ -302,6 +304,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //update the task in the database
           DBHelper.updateTask(_editedTask.id!, _editedTask);
 
+          if (_editedTask.time != null) {
+            //delete the old notification for the task
+            NotificationHelper.deleteNotification(_editedTask);
+
+            //create the new notification for the task
+            NotificationHelper.addNotification(_editedTask);
+          }
+
           // go back to overall agenda screen
           Navigator.of(context)
               .pushReplacementNamed(OverallAgendaScreen.routeName);
@@ -311,6 +321,11 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       else {
         //add the task in the database
         DBHelper.addTask(_editedTask);
+
+        if (_editedTask.time != null) {
+          //create the notification for the task
+          NotificationHelper.addNotification(_editedTask);
+        }
 
         // go back to overall agenda screen
         Navigator.of(context)

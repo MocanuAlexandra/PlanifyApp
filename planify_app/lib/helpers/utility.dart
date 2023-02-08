@@ -129,4 +129,20 @@ class Utility {
               ],
             ));
   }
+
+  static TimeOfDay tenMinutesBefore(TimeOfDay originalTime) {
+    int hour = originalTime.hour;
+    int minute = originalTime.minute - 10;
+
+    if (minute < 0) {
+      hour--;
+      minute += 60;
+    }
+
+    if (hour < 0) {
+      hour += 24;
+    }
+
+    return TimeOfDay(hour: hour, minute: minute);
+  }
 }

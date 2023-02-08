@@ -1,5 +1,7 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:planify_app/helpers/notification_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
@@ -20,12 +22,16 @@ class TaskDetailScreen extends StatefulWidget {
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   bool _isMapLoading = true;
 
-  void _markAsDeleted(BuildContext context, String id) {
+  void _markAsDeleted(BuildContext context, Task task) {
     // mark task as deleted in database
-    DBHelper.markTaskAsDeleted(id);
+    DBHelper.markTaskAsDeleted(task.id!);
 
+    if (task.time != null) {
+      // delete the notification for this task
+      NotificationHelper.deleteNotification(task);
+    }
     // remove task from UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+    Provider.of<Tasks>(context, listen: false).deleteTask(task.id!);
   }
 
   //auxiliary methods
@@ -152,7 +158,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       context, 'Do you want to move the task in Trash?')
                   .then((value) {
                 if (value!) {
-                  _markAsDeleted(context, loadedTask.id!);
+                  _markAsDeleted(context, loadedTask);
                   Navigator.of(context).pop();
                 }
               });

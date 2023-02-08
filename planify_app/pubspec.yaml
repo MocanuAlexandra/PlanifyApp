@@ -56,6 +56,7 @@ dependencies:
   flutter_typeahead: ^4.3.2 # For typeahead search
   http: ^0.13.5 # For HTTP requests 
   month_picker_dialog_2: ^0.6.1+2 # For month/year picker
+  awesome_notifications: ^0.7.4+1 # For notifications
 
 
 dev_dependencies:

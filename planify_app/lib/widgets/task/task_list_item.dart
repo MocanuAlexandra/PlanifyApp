@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
+import '../../helpers/notification_helper.dart';
 import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
 import '../../models/task_address.dart';
@@ -41,6 +42,12 @@ class TaskListItem extends StatelessWidget {
     // mark task as deleted in database
     DBHelper.markTaskAsDeleted(id);
 
+    if (time != null) {
+      // delete the notification for this task
+      NotificationHelper.deleteNotificationWithMoreArguments(
+          title!, Utility.stringToTimeOfDay(time));
+    }
+
     // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
@@ -49,6 +56,11 @@ class TaskListItem extends StatelessWidget {
     // mark task as undeleted in database
     DBHelper.markTaskAsUndeleted(id);
 
+    if (time != null) {
+      // create the notification for this task
+      NotificationHelper.createNotificationWithMoreArguments(
+          title!, Utility.stringToTimeOfDay(time));
+    }
     // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
@@ -56,6 +68,12 @@ class TaskListItem extends StatelessWidget {
   void _markTaskAsDone(BuildContext context, String id) {
     // mark task as done in database
     DBHelper.markTaskAsDone(id);
+
+    if (time != null) {
+      // delete the notification for this task
+      NotificationHelper.deleteNotificationWithMoreArguments(
+          title!, Utility.stringToTimeOfDay(time));
+    }
 
     // mark task as done in UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
