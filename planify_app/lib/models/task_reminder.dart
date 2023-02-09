@@ -1,10 +1,12 @@
-class TaskNotification {
+class TaskReminder {
   final String? id;
+  final String? taskId;
   final int contentId;
   final String reminder;
 
-  TaskNotification({
+  TaskReminder({
     this.id,
+    this.taskId,
     required this.contentId,
     required this.reminder,
   });

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:planify_app/providers/reminders.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
 import '../../helpers/notification_helper.dart';
-import '../../models/task_notification.dart';
+import '../../models/task_reminder.dart';
 import '../../providers/categories.dart';
 import '../../models/category.dart';
 import '../../widgets/helpers/check_box.dart';
@@ -53,7 +54,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   List<String> _selectedReminders = [];
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     if (_isInit) {
       final taskId = ModalRoute.of(context)!.settings.arguments as String?;
 
@@ -252,9 +253,42 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
   Widget _showReminderPicker(
       [bool? isDueTimeSelected, bool? isDueDateSelected]) {
-    return CheckboxList(
-        items: Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected),
-        selectedItems: _selectedReminders);
+    return _editedTask.id != null
+        ? FutureBuilder(
+            future: _fetchReminders(context, _editedTask.id!),
+            builder: (context, snapshot) => snapshot.connectionState ==
+                    ConnectionState.waiting
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Consumer<TaskReminders>(
+                    builder: (context, reminders, ch) => CheckboxList(
+                          items: Utility.getReminderTypes(
+                              isDueTimeSelected, isDueDateSelected),
+                          selectedItems: determineAlreadySelectedReminders(
+                              reminders, isDueTimeSelected, isDueDateSelected),
+                        )),
+          )
+        : CheckboxList(
+            items:
+                Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected),
+            selectedItems: _selectedReminders);
+  }
+
+  List<String> determineAlreadySelectedReminders(TaskReminders reminders,
+      bool? isDueTimeSelected, bool? isDueDateSelected) {
+    List<String> reminderTypes =
+        Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected);
+    List<TaskReminder> alreadySelectedReminders = reminders.remindersList;
+
+    for (var reminderType in reminderTypes) {
+      if (alreadySelectedReminders
+          .any((element) => element.reminder == reminderType)) {
+        _selectedReminders.add(reminderType);
+      }
+    }
+
+    return _selectedReminders;
   }
 
   DropdownButtonFormField<Priority> priorityField() {
@@ -372,6 +406,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //update the task in the database
           DBHelper.updateTask(_editedTask.id!, _editedTask);
 
+          //TODO delete the notifications and add new ones
+          
+          
           //update the notifications for the task
           addNotificationsForTask(_editedTask.id!);
 
@@ -462,14 +499,19 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     await Provider.of<Categories>(context, listen: false).fetchCategories();
   }
 
+  Future<void> _fetchReminders(BuildContext context, String taskId) async {
+    await Provider.of<TaskReminders>(context, listen: false)
+        .fetchReminders(taskId);
+  }
+
   void addNotificationsForTask(String taskId) {
     //parse the selected reminders and create a notification for each one
     if (_selectedReminders.isNotEmpty) {
       for (String reminder in _selectedReminders) {
-        TaskNotification newNotification;
+        TaskReminder newReminder;
         //check if the user selected only due date
         if (_editedTask.dueDate != null && _editedTask.time == null) {
-          newNotification = TaskNotification(
+          newReminder = TaskReminder(
             contentId: taskId.hashCode +
                 _editedTask.dueDate!.day +
                 _editedTask.dueDate!.month +
@@ -480,7 +522,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         }
         //check if the user selected only time
         else if (_editedTask.dueDate == null && _editedTask.time != null) {
-          newNotification = TaskNotification(
+          newReminder = TaskReminder(
             contentId: taskId.hashCode +
                 _editedTask.time!.hour +
                 _editedTask.time!.minute +
@@ -489,7 +531,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           );
           //else it means that the user selected both due date and time
         } else {
-          newNotification = TaskNotification(
+          newReminder = TaskReminder(
             contentId: taskId.hashCode +
                 _editedTask.dueDate!.day +
                 _editedTask.dueDate!.month +
@@ -502,12 +544,11 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         }
 
         //add the notification to database
-        DBHelper.addNotification(taskId, newNotification);
+        DBHelper.addReminder(taskId, newReminder);
 
         //add the notification to system
-        // ignore: use_build_context_synchronously
         NotificationHelper.createNotification(
-            context, _editedTask, reminder, newNotification);
+            context, _editedTask, reminder, newReminder);
       }
     }
   }

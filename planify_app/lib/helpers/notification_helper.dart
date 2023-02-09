@@ -1,7 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 
-import '../models/task_notification.dart';
+import '../models/task_reminder.dart';
 import '../helpers/utility.dart';
 import '../models/task.dart';
 
@@ -55,7 +55,7 @@ class NotificationHelper {
       BuildContext context, ReceivedAction receivedAction) async {}
 
   static void createNotification(BuildContext context, Task newTask,
-      String reminder, TaskNotification newNotification) {
+      String reminder, TaskReminder newReminder) {
     //set the date & time of the notification
     TimeOfDay? notificationTime;
     DateTime? notificationDate;
@@ -70,7 +70,7 @@ class NotificationHelper {
     //create the notification
     AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: newNotification.contentId,
+        id: newReminder.contentId,
         channelKey: 'basic_channel',
         title: "Reminder for task: ${newTask.title}",
         body: Utility.notificationBodyString(newTask.dueDate, newTask.time),
@@ -95,7 +95,7 @@ class NotificationHelper {
   }
 
   static void deleteNotification(String id) {
-     //TODO delete all notifications for this task
+    //TODO delete all notifications for this task
   }
 
   static void deleteNotificationWithMoreArguments(

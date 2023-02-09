@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:planify_app/models/category.dart';
 
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
-import '../models/task_notification.dart';
+import '../models/task_reminder.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';
 
@@ -74,6 +72,37 @@ class DBHelper {
     return tasksList;
   }
 
+  static Future<List<Map<String, dynamic>>> fetchReminders(
+      String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the categories from the connected user
+    final reminders = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('reminders')
+        .get();
+
+    //check if there is no categories
+    if (reminders.docs.isEmpty) {
+      return [];
+    }
+
+    //convert the categories to a list of maps
+    final remindersList = reminders.docs.map((reminder) {
+      return {
+        'id': reminder.id,
+        'contentId': reminder['contentId'],
+        'taskId': reminder['taskId'],
+        'reminder': reminder['reminder'],
+      };
+    }).toList();
+
+    return remindersList;
+  }
+
   // function for adding tasks to the database
   static Future<String> addTask(Task newTask) async {
     if (newTask.title == null) {
@@ -110,7 +139,7 @@ class DBHelper {
     }
 
     //add the task in the tasks collection of the connected user
-   final doc= await FirebaseFirestore.instance
+    final doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
@@ -125,7 +154,7 @@ class DBHelper {
       'isDone': false,
       'isDeleted': false,
       'category': updatedCategory,
-    }); 
+    });
 
     return doc.id;
   }
@@ -234,7 +263,7 @@ class DBHelper {
         .update({'name': editedCategory.name});
   }
 
-  static void insertCategory(Category editedCategory) async {
+  static void addCategory(Category editedCategory) async {
     if (editedCategory.name == null) {
       return;
     }
@@ -278,8 +307,7 @@ class DBHelper {
   }
 
   //function that adds a new notification for a certain task
-  static void addNotification(String taskId, TaskNotification notification) async {
-  
+  static void addReminder(String taskId, TaskReminder reminder) async {
     final user = FirebaseAuth.instance.currentUser;
     //add the notification to the database
     await FirebaseFirestore.instance
@@ -287,21 +315,11 @@ class DBHelper {
         .doc(user!.uid)
         .collection('tasks')
         .doc(taskId)
-        .collection('notifications')
+        .collection('reminders')
         .add({
-      'contentId': notification.contentId,
-      'reminder': notification.reminder,
+      'contentId': reminder.contentId,
+      'reminder': reminder.reminder,
+      'taskId': taskId,
     });
-  }
-
-  static fetchNotifications(String taskId) {
-    final user = FirebaseAuth.instance.currentUser;
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .collection('notifications')
-        .snapshots();
   }
 }

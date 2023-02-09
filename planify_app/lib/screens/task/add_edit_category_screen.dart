@@ -63,7 +63,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
             .pushReplacementNamed(OverallAgendaScreen.routeName);
       } else {
         //add category
-        DBHelper.insertCategory(_editedCategory);
+        DBHelper.addCategory(_editedCategory);
 
         // go back to overall agenda screen
         Navigator.of(context)

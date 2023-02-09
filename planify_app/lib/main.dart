@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:planify_app/providers/reminders.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -27,9 +28,6 @@ void main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -51,9 +49,11 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(
             create: (context) => Categories(),
           ),
+          ChangeNotifierProvider(
+            create: (context) => TaskReminders(),
+          ),
         ],
         child: MaterialApp(
-          navigatorKey: MyApp.navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Planify App',
           theme: ThemeData(
