@@ -42,10 +42,10 @@ class TaskListItem extends StatelessWidget {
     // mark task as deleted in database
     DBHelper.markTaskAsDeleted(id);
 
-    if (time != null) {
+    if (time != '--:--') {
       // delete the notification for this task
       NotificationHelper.deleteNotificationWithMoreArguments(
-          title!, Utility.stringToTimeOfDay(time));
+          id, Utility.stringToTimeOfDay(time));
     }
 
     // remove task from UI
@@ -56,11 +56,12 @@ class TaskListItem extends StatelessWidget {
     // mark task as undeleted in database
     DBHelper.markTaskAsUndeleted(id);
 
-    if (time != null) {
-      // create the notification for this task
-      NotificationHelper.createNotificationWithMoreArguments(
-          title!, Utility.stringToTimeOfDay(time));
-    }
+    // if (time != '--:--') {
+    //   // create the notification for this task
+    //   NotificationHelper.createNotificationWithMoreArguments(
+    //       id, Utility.stringToTimeOfDay(time));
+    // }
+    
     // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);
   }
@@ -69,11 +70,11 @@ class TaskListItem extends StatelessWidget {
     // mark task as done in database
     DBHelper.markTaskAsDone(id);
 
-    if (time != null) {
-      // delete the notification for this task
-      NotificationHelper.deleteNotificationWithMoreArguments(
-          title!, Utility.stringToTimeOfDay(time));
-    }
+    // if (time != null) {
+    //   // delete all notifications for this task
+    //   NotificationHelper.deleteNotificationWithMoreArguments(
+    //      id, Utility.stringToTimeOfDay(time));
+    // }
 
     // mark task as done in UI
     Provider.of<Tasks>(context, listen: false).deleteTask(id);

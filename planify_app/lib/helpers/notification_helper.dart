@@ -1,8 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/helpers/utility.dart';
 
-import '../screens/agenda/overall_agenda_screen.dart';
+import '../models/task_notification.dart';
+import '../helpers/utility.dart';
 import '../models/task.dart';
 
 class NotificationHelper {
@@ -52,68 +52,59 @@ class NotificationHelper {
   /// Use this method to detect when the user taps on a notification or action button
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
-      BuildContext context, ReceivedAction receivedAction) async {
-    // Navigate into pages, avoiding to open the notification details page over another details page already opened
-    Navigator.of(context).pushNamed(OverallAgendaScreen.routeName);
-  }
+      BuildContext context, ReceivedAction receivedAction) async {}
 
-  static void addNotification(Task newTask) {
-    //set the notification time to 10 minutes before the task time
-    TimeOfDay notificationTime = Utility.tenMinutesBefore(newTask.time!);
+  static void createNotification(BuildContext context, Task newTask,
+      String reminder, TaskNotification newNotification) {
+    //set the date & time of the notification
+    TimeOfDay? notificationTime;
+    DateTime? notificationDate;
 
+    if (newTask.time != null) {
+      notificationTime = Utility.reminderToTime(reminder, newTask.time!);
+    }
+    if (newTask.dueDate != null) {
+      notificationDate = Utility.reminderToDate(reminder, newTask.dueDate!);
+    }
+
+    //create the notification
     AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: newTask.title.hashCode + newTask.time!.hour + newTask.time!.minute,
+        id: newNotification.contentId,
         channelKey: 'basic_channel',
         title: "Reminder for task: ${newTask.title}",
-        body: "Due time: ${newTask.time!.hour}:${newTask.time!.minute}",
-        payload: {'id': newTask.id},
+        body: Utility.notificationBodyString(newTask.dueDate, newTask.time),
         displayOnBackground: true,
         displayOnForeground: true,
-        category: NotificationCategory.Event,
       ),
-      schedule: NotificationCalendar(
-        hour: notificationTime.hour,
-        minute: notificationTime.minute,
-        second: 0,
-        millisecond: 0,
-        repeats: false,
-      ),
+      schedule: notificationDate != null
+          ? NotificationCalendar(
+              day: notificationDate.day,
+              month: notificationDate.month,
+              year: notificationDate.year,
+              repeats: false,
+            )
+          : notificationTime != null
+              ? NotificationCalendar(
+                  hour: notificationTime.hour,
+                  minute: notificationTime.minute,
+                  repeats: false,
+                )
+              : null,
     );
   }
 
-  static void deleteNotification(Task task) {
-    AwesomeNotifications().cancelSchedule(
-        task.title.hashCode + task.time!.hour + task.time!.minute);
+  static void deleteNotification(String id) {
+     //TODO delete all notifications for this task
   }
 
   static void deleteNotificationWithMoreArguments(
-      String title, TimeOfDay? time) {
-    AwesomeNotifications()
-        .cancelSchedule(title.hashCode + time!.hour + time.minute);
+      String id, TimeOfDay? stringToTimeOfDay) {
+    //TODO delete all notifications for this task
   }
 
   static void createNotificationWithMoreArguments(
-      String title, TimeOfDay? time) {
-    TimeOfDay notificationTime = Utility.tenMinutesBefore(time!);
-
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: title.hashCode + notificationTime.hour + notificationTime.minute,
-        channelKey: 'basic_channel',
-        title: "Reminder for task: $title",
-        body: "Due time: ${notificationTime.hour}:${notificationTime.minute}",
-        displayOnBackground: true,
-        displayOnForeground: true,
-        category: NotificationCategory.Event,
-      ),
-      schedule: NotificationCalendar(
-        hour: notificationTime.hour,
-        minute: notificationTime.minute,
-        second: 0,
-        millisecond: 0,
-        repeats: false,
-      ),
-    );
+      String id, TimeOfDay? stringToTimeOfDay) {
+    //TODO create all notifications for this task
   }
 }

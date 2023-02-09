@@ -130,19 +130,160 @@ class Utility {
             ));
   }
 
-  static TimeOfDay tenMinutesBefore(TimeOfDay originalTime) {
-    int hour = originalTime.hour;
-    int minute = originalTime.minute - 10;
-
-    if (minute < 0) {
-      hour--;
-      minute += 60;
+  static List<String> getReminderTypes(
+      bool? isDueTimeSelected, bool? isDueDateSelected) {
+    //if the user selected only due time
+    if (isDueDateSelected == false && isDueTimeSelected == true) {
+      return [
+        '5 minutes before',
+        '10 minutes before',
+        '15 minutes before',
+        '30 minutes before',
+        '1 hour before',
+        '2 hours before',
+      ];
+      // if the user selected only due date
+    } else if (isDueDateSelected == true && isDueTimeSelected == false) {
+      return [
+        '1 day before',
+        '2 days before',
+        '1 week before',
+        '2 weeks before',
+        '1 month before',
+        '2 months before',
+        '3 months before',
+        '6 months before',
+        '1 year before',
+      ];
     }
+    // if the suer selected both
+    return [
+      '5 minutes before',
+      '10 minutes before',
+      '15 minutes before',
+      '30 minutes before',
+      '1 hour before',
+      '2 hours before',
+      '1 day before',
+      '2 days before',
+      '1 week before',
+      '2 weeks before',
+      '1 month before',
+      '2 months before',
+      '3 months before',
+      '6 months before',
+      '1 year before',
+    ];
+  }
 
-    if (hour < 0) {
-      hour += 24;
+  static TimeOfDay? reminderToTime(String reminderType, TimeOfDay dueTime) {
+    TimeOfDay? time;
+    switch (reminderType) {
+      case '5 minutes before':
+        time = TimeOfDay(
+            hour: dueTime.hour,
+            minute: dueTime.minute - 5 < 0
+                ? 60 + dueTime.minute - 5
+                : dueTime.minute - 5);
+        break;
+      case '10 minutes before':
+        time = TimeOfDay(
+            hour: dueTime.hour,
+            minute: dueTime.minute - 10 < 0
+                ? 60 + dueTime.minute - 10
+                : dueTime.minute - 10);
+        break;
+      case '15 minutes before':
+        time = TimeOfDay(
+            hour: dueTime.hour,
+            minute: dueTime.minute - 15 < 0
+                ? 60 + dueTime.minute - 15
+                : dueTime.minute - 15);
+        break;
+      case '30 minutes before':
+        time = TimeOfDay(
+            hour: dueTime.hour,
+            minute: dueTime.minute - 30 < 0
+                ? 60 + dueTime.minute - 30
+                : dueTime.minute - 30);
+        break;
+      case '1 hour before':
+        time = TimeOfDay(
+            hour:
+                dueTime.hour - 1 < 0 ? 24 + dueTime.hour - 1 : dueTime.hour - 1,
+            minute: dueTime.minute);
+        break;
+      case '2 hours before':
+        time = TimeOfDay(
+            hour:
+                dueTime.hour - 2 < 0 ? 24 + dueTime.hour - 2 : dueTime.hour - 2,
+            minute: dueTime.minute);
+        break;
     }
+    return time;
+  }
 
-    return TimeOfDay(hour: hour, minute: minute);
+  static DateTime? reminderToDate(String reminderType, DateTime dueDate) {
+    DateTime? date;
+    switch (reminderType) {
+      case '1 day before':
+        date = dueDate.subtract(const Duration(days: 1));
+        break;
+      case '2 days before':
+        date = dueDate.subtract(const Duration(days: 2));
+        break;
+      case '1 week before':
+        date = dueDate.subtract(const Duration(days: 7));
+        break;
+      case '2 weeks before':
+        date = dueDate.subtract(const Duration(days: 14));
+        break;
+      case '1 month before':
+        date = dueDate.subtract(const Duration(days: 30));
+        break;
+      case '2 months before':
+        date = dueDate.subtract(const Duration(days: 60));
+        break;
+      case '3 months before':
+        date = dueDate.subtract(const Duration(days: 90));
+        break;
+      case '6 months before':
+        date = dueDate.subtract(const Duration(days: 180));
+        break;
+      case '1 year before':
+        date = dueDate.subtract(const Duration(days: 365));
+        break;
+    }
+    return date;
+  }
+
+  static String notificationBodyString(DateTime? dueDate, TimeOfDay? dueTime) {
+    //if the user selected only due time
+    if (dueDate == null && dueTime != null) {
+      return dueTime.hour < 10
+          ? dueTime.minute < 10
+              ? '''Due time: 0${dueTime.hour}:0${dueTime.minute}'''
+              : '''Due time: 0${dueTime.hour}:${dueTime.minute}'''
+          : dueTime.minute < 10
+              ? '''Due time: ${dueTime.hour}:0${dueTime.minute}'''
+              : '''Due time: ${dueTime.hour}:${dueTime.minute}''';
+    } //of the user selected only due date
+    else if (dueDate != null && dueTime == null) {
+      return '''Due date:  ${DateFormat('dd/MM/yyyy').format(dueDate)}''';
+    } //of the user selected both
+    else if (dueDate != null && dueTime != null) {
+      return dueTime.hour < 10
+          ? dueTime.minute < 10
+              ? '''Due date: ${DateFormat('dd/MM/yyyy').format(dueDate)}
+              Due time: 0${dueTime.hour}:0${dueTime.minute}'''
+              : '''Due date: ${DateFormat('dd/MM/yyyy').format(dueDate)}
+              Due time: 0${dueTime.hour}:${dueTime.minute}'''
+          : dueTime.minute < 10
+              ? '''Due date: ${DateFormat('dd/MM/yyyy').format(dueDate)}
+              Due time: ${dueTime.hour}:0${dueTime.minute}'''
+              : '''Due date: ${DateFormat('dd/MM/yyyy').format(dueDate)}
+              Due time: ${dueTime.hour}:${dueTime.minute}''';
+    }
+    return '';
   }
 }

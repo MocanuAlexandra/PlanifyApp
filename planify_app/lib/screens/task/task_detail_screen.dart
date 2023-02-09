@@ -26,10 +26,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     // mark task as deleted in database
     DBHelper.markTaskAsDeleted(task.id!);
 
-    if (task.time != null) {
-      // delete the notification for this task
-      NotificationHelper.deleteNotification(task);
-    }
     // remove task from UI
     Provider.of<Tasks>(context, listen: false).deleteTask(task.id!);
   }

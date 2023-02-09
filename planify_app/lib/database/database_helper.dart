@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:planify_app/models/category.dart';
 
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
+import '../models/task_notification.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';
 
@@ -73,9 +75,9 @@ class DBHelper {
   }
 
   // function for adding tasks to the database
-  static void addTask(Task newTask) async {
+  static Future<String> addTask(Task newTask) async {
     if (newTask.title == null) {
-      return;
+      return '';
     }
 
     //get the connected user
@@ -108,7 +110,7 @@ class DBHelper {
     }
 
     //add the task in the tasks collection of the connected user
-    await FirebaseFirestore.instance
+   final doc= await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
@@ -123,7 +125,9 @@ class DBHelper {
       'isDone': false,
       'isDeleted': false,
       'category': updatedCategory,
-    });
+    }); 
+
+    return doc.id;
   }
 
   // function for deleting tasks in the database
@@ -271,5 +275,33 @@ class DBHelper {
         .where('category', isEqualTo: category['name'])
         .get();
     return tasks.docs.isNotEmpty;
+  }
+
+  //function that adds a new notification for a certain task
+  static void addNotification(String taskId, TaskNotification notification) async {
+  
+    final user = FirebaseAuth.instance.currentUser;
+    //add the notification to the database
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('notifications')
+        .add({
+      'contentId': notification.contentId,
+      'reminder': notification.reminder,
+    });
+  }
+
+  static fetchNotifications(String taskId) {
+    final user = FirebaseAuth.instance.currentUser;
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('notifications')
+        .snapshots();
   }
 }
