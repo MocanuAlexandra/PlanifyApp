@@ -372,7 +372,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //update the task in the database
           DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-          //TODO add the notification for update as well
+          //update the notifications for the task
+          addNotificationsForTask(_editedTask.id!);
 
           // go back to overall agenda screen
           Navigator.of(context)
@@ -384,7 +385,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         //add the task in the database
         final taskId = await DBHelper.addTask(_editedTask);
 
-        //parse the selected reminders and create a notification for each one
+        //create a notifications for the task
         addNotificationsForTask(taskId);
 
         // go back to overall agenda screen
