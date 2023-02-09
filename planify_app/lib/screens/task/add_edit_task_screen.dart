@@ -52,6 +52,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
   var _isInit = true;
   List<String> _selectedReminders = [];
+  bool _dueTimeDueDateChanged = false;
 
   @override
   void didChangeDependencies() async {
@@ -139,6 +140,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                 );
               });
+              _dueTimeDueDateChanged = true;
+              Utility.displayInformationalDialog(context,
+                  'The previous reminders were deleted because the due date was deleted.');
+              setState(() {
+                _selectedReminders = [];
+              });
             },
             icon: const Icon(Icons.delete))
       ],
@@ -179,6 +186,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
                 );
+              });
+              _dueTimeDueDateChanged = true;
+              Utility.displayInformationalDialog(context,
+                  'The previous reminders were deleted because the due time was deleted.');
+              setState(() {
+                _selectedReminders = [];
               });
             },
             icon: const Icon(Icons.delete))
@@ -253,26 +266,32 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
   Widget _showReminderPicker(
       [bool? isDueTimeSelected, bool? isDueDateSelected]) {
-    return _editedTask.id != null
-        ? FutureBuilder(
-            future: _fetchReminders(context, _editedTask.id!),
-            builder: (context, snapshot) => snapshot.connectionState ==
-                    ConnectionState.waiting
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Consumer<TaskReminders>(
-                    builder: (context, reminders, ch) => CheckboxList(
+    return _editedTask.id != null && _dueTimeDueDateChanged == true
+        ? CheckboxList(
+            items:
+                Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected),
+            selectedItems: _selectedReminders)
+        : _editedTask.id != null && _dueTimeDueDateChanged == false
+            ? FutureBuilder(
+                future: _fetchReminders(context, _editedTask.id!),
+                builder: (context, snapshot) => snapshot.connectionState ==
+                        ConnectionState.waiting
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Consumer<TaskReminders>(
+                        builder: (context, reminders, ch) => CheckboxList(
                           items: Utility.getReminderTypes(
                               isDueTimeSelected, isDueDateSelected),
                           selectedItems: determineAlreadySelectedReminders(
                               reminders, isDueTimeSelected, isDueDateSelected),
-                        )),
-          )
-        : CheckboxList(
-            items:
-                Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected),
-            selectedItems: _selectedReminders);
+                        ),
+                      ),
+              )
+            : CheckboxList(
+                items: Utility.getReminderTypes(
+                    isDueTimeSelected, isDueDateSelected),
+                selectedItems: _selectedReminders);
   }
 
   List<String> determineAlreadySelectedReminders(TaskReminders reminders,
@@ -387,7 +406,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   //main method
-  void _addEditTask() async {
+  Future<void> _addEditTask() async {
     //check for validation of the form
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
@@ -404,17 +423,18 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           _displayDialogForDoneTask();
         } else {
           //update the task in the database
-          DBHelper.updateTask(_editedTask.id!, _editedTask);
+          await DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-          //delete the notifications for the task
-          deleteNotificationsForTask(_editedTask.id!);
-
-          //update the notifications for the task
-          addNotificationsForTask(_editedTask.id!);
-
-          // go back to overall agenda screen
-          Navigator.of(context)
-              .pushReplacementNamed(OverallAgendaScreen.routeName);
+          //delete the notifications for the task and then add the new ones
+          {
+            await deleteNotificationsForTask(_editedTask.id!).then((value) => {
+                  //check if the user selected a due date or time
+                  if (_editedTask.dueDate != null || _editedTask.time != null)
+                    {
+                      addNotificationsForTask(_editedTask.id!),
+                    }
+                });
+          }
         }
       }
       // if we didn't get an id, it means that we are adding a new task
@@ -422,28 +442,25 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         //add the task in the database
         final taskId = await DBHelper.addTask(_editedTask);
 
-        //create a notifications for the task
-        addNotificationsForTask(taskId);
-
-        // go back to overall agenda screen
-        // ignore: use_build_context_synchronously
-        Navigator.of(context)
-            .pushReplacementNamed(OverallAgendaScreen.routeName);
+        //check if the user selected a due date or time
+        if (_editedTask.dueDate != null || _editedTask.time != null) {
+          //add notifications for the task
+          await addNotificationsForTask(taskId);
+        }
       }
     }
   }
 
   //auxiliary methods
-
-  void deleteNotificationsForTask(String taskId) {
+  Future<void> deleteNotificationsForTask(String taskId) async {
     //delete the notifications for the task from the notification center
-    DBHelper.deleteNotificationsForTask(taskId);
+    await DBHelper.deleteNotificationsForTask(taskId);
 
     //delete the notifications for the task from the database
     NotificationHelper.deleteNotification(taskId);
   }
 
-  void addNotificationsForTask(String taskId) {
+  Future<void> addNotificationsForTask(String taskId) async {
     //parse the selected reminders and create a notification for each one
     if (_selectedReminders.isNotEmpty) {
       for (String reminder in _selectedReminders) {
@@ -458,6 +475,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 reminder.hashCode,
             reminder: reminder,
           );
+          //add the notification to database
+          await DBHelper.addReminder(taskId, newReminder);
         }
         //check if the user selected only time
         else if (_editedTask.dueDate == null && _editedTask.time != null) {
@@ -468,6 +487,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 reminder.hashCode,
             reminder: reminder,
           );
+          //add the notification to database
+          await DBHelper.addReminder(taskId, newReminder);
           //else it means that the user selected both due date and time
         } else {
           newReminder = TaskReminder(
@@ -480,14 +501,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 reminder.hashCode,
             reminder: reminder,
           );
+          //add the notification to database
+          await DBHelper.addReminder(taskId, newReminder);
         }
 
-        //add the notification to database
-        DBHelper.addReminder(taskId, newReminder);
-
-        //add the notification to system
+        //add the notification to notification center
         NotificationHelper.createNotification(
-            context, _editedTask, reminder, newReminder, taskId);
+            _editedTask, reminder, newReminder, taskId);
       }
     }
   }
@@ -527,7 +547,11 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       Container(
                         padding: const EdgeInsets.only(top: 70),
                         child: ElevatedButton(
-                            onPressed: _addEditTask,
+                            onPressed: () {
+                              _addEditTask();
+                              Navigator.of(context).pushReplacementNamed(
+                                  OverallAgendaScreen.routeName);
+                            },
                             style: ElevatedButton.styleFrom(
                               elevation: 5,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -588,6 +612,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                 );
               }),
+              _dueTimeDueDateChanged = true,
+              Utility.displayInformationalDialog(context,
+                  'The previous reminders were deleted because the due date was changed.'),
+              setState(() {
+                _selectedReminders = [];
+              })
             }
         });
   }
@@ -613,6 +643,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                 );
               }),
+              _dueTimeDueDateChanged = true,
+              Utility.displayInformationalDialog(context,
+                  'The previous reminders were deleted because the due time was changed.'),
+              setState(() {
+                _selectedReminders = [];
+              })
             }
         });
   }

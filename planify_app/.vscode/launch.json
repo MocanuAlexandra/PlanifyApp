@@ -4,22 +4,22 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "name": "planify_app",
-        //     "request": "launch",
-        //     "type": "dart"
-        // },
+        {
+            "name": "planify_app",
+            "request": "launch",
+            "type": "dart"
+        },
         // {
         //     "name": "planify_app (profile mode)",
         //     "request": "launch",
         //     "type": "dart",
         //     "flutterMode": "profile"
         // },
-        {
-            "name": "planify_app (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
+        // {
+        //     "name": "planify_app (release mode)",
+        //     "request": "launch",
+        //     "type": "dart",
+        //     "flutterMode": "release"
+        // }
     ]
 }

@@ -54,8 +54,8 @@ class NotificationHelper {
   static Future<void> onActionReceivedMethod(
       BuildContext context, ReceivedAction receivedAction) async {}
 
-  static void createNotification(BuildContext context, Task newTask,
-      String reminder, TaskReminder newReminder, String taskId) {
+  static void createNotification(
+      Task newTask, String reminder, TaskReminder newReminder, String taskId) {
     //set the date & time of the notification
     TimeOfDay? notificationTime;
     DateTime? notificationDate;

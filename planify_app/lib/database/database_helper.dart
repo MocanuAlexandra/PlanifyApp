@@ -170,7 +170,7 @@ class DBHelper {
   }
 
   // function for updating tasks in the database
-  static void updateTask(String editedTaskId, Task editedTask) async {
+  static Future<void> updateTask(String editedTaskId, Task editedTask) async {
     final user = FirebaseAuth.instance.currentUser;
 
     var updatedLocation = const TaskAddress(
@@ -306,7 +306,7 @@ class DBHelper {
   }
 
   //function that adds a new notification for a certain task
-  static void addReminder(String taskId, TaskReminder reminder) async {
+  static Future<void> addReminder(String taskId, TaskReminder reminder) async {
     final user = FirebaseAuth.instance.currentUser;
     //add the notification to the database
     await FirebaseFirestore.instance
@@ -321,19 +321,19 @@ class DBHelper {
     });
   }
 
-  static void deleteNotificationsForTask(String taskId) {
+  static Future<void> deleteNotificationsForTask(String taskId) async {
     final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
+    final reminders = await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
         .doc(taskId)
         .collection('reminders')
-        .get()
-        .then((value) {
-      for (var doc in value.docs) {
-        doc.reference.delete();
+        .get();
+    if (reminders.docs.isNotEmpty) {
+      for (var reminder in reminders.docs) {
+        reminder.reference.delete();
       }
-    });
+    }
   }
 }
