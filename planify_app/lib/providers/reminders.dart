@@ -17,7 +17,6 @@ class TaskReminders with ChangeNotifier {
       (reminder) {
         return TaskReminder(
           id: reminder['id'],
-          taskId: reminder['taskId'],
           contentId: reminder['contentId'],
           reminder: reminder['reminder'],
         );

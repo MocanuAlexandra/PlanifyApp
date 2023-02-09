@@ -95,7 +95,6 @@ class DBHelper {
       return {
         'id': reminder.id,
         'contentId': reminder['contentId'],
-        'taskId': reminder['taskId'],
         'reminder': reminder['reminder'],
       };
     }).toList();
@@ -319,7 +318,6 @@ class DBHelper {
         .add({
       'contentId': reminder.contentId,
       'reminder': reminder.reminder,
-      'taskId': taskId,
     });
   }
 

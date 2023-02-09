@@ -566,7 +566,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   void _presentDatePicker() {
     showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate:
+          _editedTask.dueDate != null ? _editedTask.dueDate! : DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
       initialDatePickerMode: DatePickerMode.day,
@@ -594,7 +595,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   void _presentTimePicker() {
     showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime:
+          _editedTask.time != null ? _editedTask.time! : TimeOfDay.now(),
     ).then((pickedTime) => {
           if (pickedTime != null)
             {
