@@ -322,4 +322,20 @@ class DBHelper {
       'taskId': taskId,
     });
   }
+
+  static void deleteNotificationsForTask(String taskId) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('reminders')
+        .get()
+        .then((value) {
+      for (var doc in value.docs) {
+        doc.reference.delete();
+      }
+    });
+  }
 }

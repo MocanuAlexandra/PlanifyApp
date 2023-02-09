@@ -193,7 +193,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     );
   }
 
-  Row selectReminders() {
+  Row remindersField() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -406,9 +406,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //update the task in the database
           DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-          //TODO delete the notifications and add new ones
-          
-          
+          //delete the notifications for the task
+          deleteNotificationsForTask(_editedTask.id!);
+
           //update the notifications for the task
           addNotificationsForTask(_editedTask.id!);
 
@@ -433,75 +433,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _editedTask.id == null
-            ? const Text('Add new task')
-            : const Text('Edit task'),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Form(
-            key: _formKey,
-            child: Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      titleField(),
-                      const SizedBox(height: 10),
-                      dueDateField(),
-                      dueTimeField(),
-                      selectReminders(),
-                      locationField(),
-                      const SizedBox(height: 10),
-                      priorityField(),
-                      const SizedBox(height: 10),
-                      categoryField(context),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.only(top: 70),
-                        child: ElevatedButton(
-                            onPressed: _addEditTask,
-                            style: ElevatedButton.styleFrom(
-                              elevation: 5,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0),
-                              ),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                            ),
-                            child: const Text(
-                              'Submit',
-                              style: TextStyle(fontSize: 18),
-                            )),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
+  //auxiliary methods
 
-  //auxiliary functions
-  Future<void> _fetchCategories(BuildContext context) async {
-    await Provider.of<Categories>(context, listen: false).fetchCategories();
-  }
+  void deleteNotificationsForTask(String taskId) {
+    //delete the notifications for the task from the notification center
+    DBHelper.deleteNotificationsForTask(taskId);
 
-  Future<void> _fetchReminders(BuildContext context, String taskId) async {
-    await Provider.of<TaskReminders>(context, listen: false)
-        .fetchReminders(taskId);
+    //delete the notifications for the task from the database
+    NotificationHelper.deleteNotification(taskId);
   }
 
   void addNotificationsForTask(String taskId) {
@@ -548,9 +487,80 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
         //add the notification to system
         NotificationHelper.createNotification(
-            context, _editedTask, reminder, newReminder);
+            context, _editedTask, reminder, newReminder, taskId);
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: _editedTask.id == null
+            ? const Text('Add new task')
+            : const Text('Edit task'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Form(
+            key: _formKey,
+            child: Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      titleField(),
+                      const SizedBox(height: 10),
+                      dueDateField(),
+                      dueTimeField(),
+                      remindersField(),
+                      locationField(),
+                      const SizedBox(height: 10),
+                      priorityField(),
+                      const SizedBox(height: 10),
+                      categoryField(context),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.only(top: 70),
+                        child: ElevatedButton(
+                            onPressed: _addEditTask,
+                            style: ElevatedButton.styleFrom(
+                              elevation: 5,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0),
+                              ),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                            ),
+                            child: const Text(
+                              'Submit',
+                              style: TextStyle(fontSize: 18),
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  //auxiliary functions
+  Future<void> _fetchCategories(BuildContext context) async {
+    await Provider.of<Categories>(context, listen: false).fetchCategories();
+  }
+
+  Future<void> _fetchReminders(BuildContext context, String taskId) async {
+    await Provider.of<TaskReminders>(context, listen: false)
+        .fetchReminders(taskId);
   }
 
   void _presentDatePicker() {

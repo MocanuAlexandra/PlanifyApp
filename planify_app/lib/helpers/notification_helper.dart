@@ -55,7 +55,7 @@ class NotificationHelper {
       BuildContext context, ReceivedAction receivedAction) async {}
 
   static void createNotification(BuildContext context, Task newTask,
-      String reminder, TaskReminder newReminder) {
+      String reminder, TaskReminder newReminder, String taskId) {
     //set the date & time of the notification
     TimeOfDay? notificationTime;
     DateTime? notificationDate;
@@ -76,6 +76,7 @@ class NotificationHelper {
         body: Utility.notificationBodyString(newTask.dueDate, newTask.time),
         displayOnBackground: true,
         displayOnForeground: true,
+        groupKey: taskId,
       ),
       schedule: notificationDate != null
           ? NotificationCalendar(
@@ -94,17 +95,8 @@ class NotificationHelper {
     );
   }
 
-  static void deleteNotification(String id) {
-    //TODO delete all notifications for this task
-  }
-
-  static void deleteNotificationWithMoreArguments(
-      String id, TimeOfDay? stringToTimeOfDay) {
-    //TODO delete all notifications for this task
-  }
-
-  static void createNotificationWithMoreArguments(
-      String id, TimeOfDay? stringToTimeOfDay) {
-    //TODO create all notifications for this task
+//delete all notifications for a group key
+  static void deleteNotification(String groupKey) {
+    AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
   }
 }
