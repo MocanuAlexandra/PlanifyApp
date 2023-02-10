@@ -127,33 +127,34 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
     return Expanded(
       child: FutureBuilder(
         future: _fetchTasks(context, selectedOption, _focusMode),
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () =>
-                        _fetchTasks(context, selectedOption, _focusMode),
-                    child: Consumer<Tasks>(
-                      builder: (context, tasks, ch) => ListView.builder(
-                        itemCount: tasks.tasksList.length,
-                        itemBuilder: (context, index) => TaskListItem(
-                          id: tasks.tasksList[index].id,
-                          title: tasks.tasksList[index].title,
-                          dueDate: Utility.dateTimeToString(
-                              tasks.tasksList[index].dueDate),
-                          address: tasks.tasksList[index].address,
-                          time: Utility.timeOfDayToString(
-                              tasks.tasksList[index].time),
-                          priority: Utility.priorityEnumToString(
-                              tasks.tasksList[index].priority),
-                          isDone: tasks.tasksList[index].isDone,
-                          isDeleted: tasks.tasksList[index].isDeleted,
-                        ),
-                      ),
+        builder: (context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh: () =>
+                    _fetchTasks(context, selectedOption, _focusMode),
+                child: Consumer<Tasks>(
+                  builder: (context, tasks, ch) => ListView.builder(
+                    itemCount: tasks.tasksList.length,
+                    itemBuilder: (context, index) => TaskListItem(
+                      id: tasks.tasksList[index].id,
+                      title: tasks.tasksList[index].title,
+                      dueDate: Utility.dateTimeToString(
+                          tasks.tasksList[index].dueDate),
+                      address: tasks.tasksList[index].address,
+                      time: Utility.timeOfDayToString(
+                          tasks.tasksList[index].time),
+                      priority: Utility.priorityEnumToString(
+                          tasks.tasksList[index].priority),
+                      isDone: tasks.tasksList[index].isDone,
+                      isDeleted: tasks.tasksList[index].isDeleted,
+                      locationCategory: tasks.tasksList[index].locationCategory,
                     ),
                   ),
+                ),
+              ),
       ),
     );
   }

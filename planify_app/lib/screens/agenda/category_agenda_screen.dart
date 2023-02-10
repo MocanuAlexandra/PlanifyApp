@@ -95,6 +95,7 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
                           tasks.tasksList[index].priority),
                       isDone: tasks.tasksList[index].isDone,
                       isDeleted: tasks.tasksList[index].isDeleted,
+                      locationCategory: tasks.tasksList[index].locationCategory,
                     ),
                   ),
                 ),

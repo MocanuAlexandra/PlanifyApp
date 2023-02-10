@@ -98,7 +98,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
                         return;
                       } else {
                         //delete category
-                        Utility.displayAlertDialog(context,
+                        Utility.displayQuestionDialog(context,
                                 'Do you want to permanently delete this category?')
                             .then((value) {
                           if (value!) {

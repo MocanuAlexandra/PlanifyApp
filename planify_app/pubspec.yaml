@@ -33,9 +33,9 @@ dependencies:
     sdk: flutter
 
   # Firebase dependencies
-  firebase_core: ^2.4.1 # For Firebase Core
-  cloud_firestore: ^4.3.1 # For Cloud Firestore
-  firebase_auth: ^4.2.5 # For authentication
+  firebase_core: ^2.5.0 # For Firebase Core
+  cloud_firestore: ^4.3.2 # For Cloud Firestore
+  firebase_auth: ^4.2.6 # For authentication
   google_sign_in: ^5.4.4 # For Google Sign In
 
   # Validation dependencies
@@ -43,7 +43,7 @@ dependencies:
   form_builder_validators: ^8.4.0 # For form validation
 
   # UI dependencies
-  intl: ^0.17.0 # For date formatting
+  intl: ^0.17.0 # For date formatting (don't use 0.18.0, it has a bug)
   provider: ^6.0.5 # For state management
 
   # Maps dependencies
@@ -53,9 +53,9 @@ dependencies:
   google_maps_webservice_ex: ^0.0.1+2 # For Google Maps API
 
   # Other dependencies
-  flutter_typeahead: ^4.3.2 # For typeahead search
+  flutter_typeahead: ^4.3.3 # For typeahead search
   http: ^0.13.5 # For HTTP requests 
-  month_picker_dialog_2: ^0.6.1+2 # For month/year picker
+  month_picker_dialog_2: ^0.6.1+2 # For month picker
   awesome_notifications: ^0.7.4+1 # For notifications
 
 

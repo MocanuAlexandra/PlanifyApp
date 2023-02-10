@@ -5,12 +5,19 @@ import 'package:location/location.dart';
 import '../../helpers/location_helper.dart';
 import '../../models/task_address.dart';
 import '../../screens/location/map_screen.dart';
+import 'location_category.dart';
 
 class LocationInput extends StatefulWidget {
   final Function onSelectPlace;
+  final Function onSelectCategory;
   final TaskAddress? previousAddress;
+  final String? previousLocationCategory;
   const LocationInput(
-      {super.key, required this.onSelectPlace, this.previousAddress});
+      {super.key,
+      required this.onSelectPlace,
+      this.previousAddress,
+      required this.onSelectCategory,
+      this.previousLocationCategory});
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -19,6 +26,7 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   String? _previewImageUrl;
   TaskAddress? _initialAddress;
+  String? _selectedLocationCategory;
 
   @override
   void initState() {
@@ -28,6 +36,11 @@ class _LocationInputState extends State<LocationInput> {
       _previewImageUrl = LocationHelper.generateLocPreviewImg(
           latitude: widget.previousAddress!.latitude,
           longitude: widget.previousAddress!.longitude);
+      _selectedLocationCategory = 'No location category chosen';
+    } else if (widget.previousLocationCategory != null ||
+        widget.previousLocationCategory != 'No location category chosen') {
+      _selectedLocationCategory = widget.previousLocationCategory;
+      _previewImageUrl = null;
     }
     super.initState();
   }
@@ -39,17 +52,6 @@ class _LocationInputState extends State<LocationInput> {
     setState(() {
       _previewImageUrl = staticMapUrl;
     });
-  }
-
-  // get the current location
-  Future<void> _getCurrentUserLocation() async {
-    try {
-      final locData = await Location().getLocation();
-      _showPreview(locData.latitude!, locData.longitude!);
-      widget.onSelectPlace(locData.latitude, locData.longitude);
-    } catch (error) {
-      return;
-    }
   }
 
   // select the location on the map
@@ -98,13 +100,16 @@ class _LocationInputState extends State<LocationInput> {
     }
     _showPreview(selectedLocation.latitude, selectedLocation.longitude);
     widget.onSelectPlace(selectedLocation.latitude, selectedLocation.longitude);
+    _selectedLocationCategory = 'No location category chosen';
   }
 
   void _deleteLocation() {
     setState(() {
       _previewImageUrl = null;
+      _selectedLocationCategory = 'No location category chosen';
     });
     widget.onSelectPlace(null, null);
+    widget.onSelectCategory(null);
   }
 
   @override
@@ -118,29 +123,25 @@ class _LocationInputState extends State<LocationInput> {
           decoration: BoxDecoration(
             border: Border.all(width: 1, color: Colors.grey),
           ),
-          child: _previewImageUrl == null
-              ? const Text(
-                  'No location chosen',
-                  style: TextStyle(fontSize: 15),
-                  textAlign: TextAlign.center,
-                )
-              : Image.network(
-                  _previewImageUrl!,
-                  fit: BoxFit.fitHeight,
-                  width: double.infinity,
-                  loadingBuilder: (context, child, loadingProgress) =>
-                      loadingProgress == null
-                          ? child
-                          : const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                ),
+          child: _previewImageUrl == null &&
+                  _selectedLocationCategory != 'No location category chosen'
+              ? displayLocationCategoryChosen()
+              : _previewImageUrl != null &&
+                      _selectedLocationCategory == 'No location category chosen'
+                  ? displayLocationPreview()
+                  : const Text(
+                      'No location or location category chosen',
+                      style: TextStyle(fontSize: 15),
+                      textAlign: TextAlign.center,
+                    ),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton.icon(
-              onPressed: (){},
+              onPressed: () => {
+                selectLocationCategory(context),
+              },
               icon: const Icon(Icons.share_location_sharp),
               label: const Text(
                 'Category',
@@ -176,5 +177,64 @@ class _LocationInputState extends State<LocationInput> {
         ),
       ],
     );
+  }
+
+  Image displayLocationPreview() {
+    return Image.network(
+      _previewImageUrl!,
+      fit: BoxFit.fitHeight,
+      width: double.infinity,
+      loadingBuilder: (context, child, loadingProgress) =>
+          loadingProgress == null
+              ? child
+              : const Center(
+                  child: CircularProgressIndicator(),
+                ),
+    );
+  }
+
+  Column displayLocationCategoryChosen() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Location category chosen: ',
+          style: TextStyle(
+            fontSize: 17,
+          ),
+          softWrap: true,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          _selectedLocationCategory!,
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+          softWrap: true,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Future<dynamic> selectLocationCategory(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) => LocationCategory(
+              onSelectLocationCategory: _selectLocationCategory,
+              previousLocationCategory: widget.previousLocationCategory,
+            ));
+  }
+
+// set the selected location category
+  void _selectLocationCategory(String category) {
+    setState(() {
+      _selectedLocationCategory = category;
+      _previewImageUrl = null;
+    });
+    widget.onSelectPlace(null, null);
+    widget.onSelectCategory(category);
   }
 }

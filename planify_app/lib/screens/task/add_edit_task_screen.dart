@@ -38,6 +38,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     isDone: false,
     isDeleted: false,
     category: null,
+    locationCategory: null,
   );
   var _initValues = {
     'title': '',
@@ -48,6 +49,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     'isDone': false,
     'isDeleted': false,
     'category': null,
+    'locationCategory': null,
   };
 
   var _isInit = true;
@@ -71,6 +73,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           'isDone': _editedTask.isDone,
           'isDeleted': _editedTask.isDeleted,
           'category': _editedTask.category,
+          'locationCategory': _editedTask.locationCategory,
         };
       }
     }
@@ -100,6 +103,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           priority: _editedTask.priority,
           isDone: _editedTask.isDone,
           category: _editedTask.category,
+          locationCategory: _editedTask.locationCategory,
         );
       },
     );
@@ -138,6 +142,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
+                  locationCategory: _editedTask.locationCategory,
                 );
               });
               _dueTimeDueDateChanged = true;
@@ -185,6 +190,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
+                  locationCategory: _editedTask.locationCategory,
                 );
               });
               _dueTimeDueDateChanged = true;
@@ -202,7 +208,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   LocationInput locationField() {
     return LocationInput(
       previousAddress: _editedTask.address,
+      previousLocationCategory: _editedTask.locationCategory,
       onSelectPlace: _selectPlace,
+      onSelectCategory: _selectCategory,
     );
   }
 
@@ -355,6 +363,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             priority: value,
             isDone: _editedTask.isDone,
             category: _editedTask.category,
+            locationCategory: _editedTask.locationCategory,
           );
         });
       },
@@ -386,6 +395,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         priority: _editedTask.priority,
                         isDone: _editedTask.isDone,
                         category: value,
+                        locationCategory: _editedTask.locationCategory,
                       );
                     });
                   },
@@ -610,6 +620,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDone: _editedTask.isDone,
                   isDeleted: _editedTask.isDeleted,
                   category: _editedTask.category,
+                  locationCategory: _editedTask.locationCategory,
                 );
               }),
               _dueTimeDueDateChanged = true,
@@ -641,6 +652,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDone: _editedTask.isDone,
                   isDeleted: _editedTask.isDeleted,
                   category: _editedTask.category,
+                  locationCategory: _editedTask.locationCategory,
                 );
               }),
               _dueTimeDueDateChanged = true,
@@ -664,6 +676,22 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       isDone: _editedTask.isDone,
       isDeleted: _editedTask.isDeleted,
       category: _editedTask.category,
+      locationCategory: null,
+    );
+  }
+
+  void _selectCategory(String? selectedLocationCategory) {
+    _editedTask = Task(
+      id: _editedTask.id,
+      title: _editedTask.title,
+      dueDate: _editedTask.dueDate,
+      address: null,
+      time: _editedTask.time,
+      priority: _editedTask.priority,
+      isDone: _editedTask.isDone,
+      isDeleted: _editedTask.isDeleted,
+      category: _editedTask.category,
+      locationCategory: selectedLocationCategory,
     );
   }
 
@@ -690,6 +718,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     isDone: false,
                     isDeleted: _editedTask.isDeleted,
                     category: _editedTask.category,
+                    locationCategory: _editedTask.locationCategory,
                   );
 
                   //update the task in the database
@@ -714,6 +743,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     isDone: true,
                     isDeleted: _editedTask.isDeleted,
                     category: _editedTask.category,
+                    locationCategory: _editedTask.locationCategory,
                   );
 
                   //update the task in the database

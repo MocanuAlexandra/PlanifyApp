@@ -14,6 +14,7 @@ class Task {
   bool isDone;
   bool isDeleted;
   final String? category;
+  final String? locationCategory;
 
   Task({
     this.id,
@@ -25,5 +26,6 @@ class Task {
     this.isDone = false,
     this.isDeleted = false,
     this.category,
+    this.locationCategory,
   });
 }

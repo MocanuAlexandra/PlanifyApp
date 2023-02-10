@@ -92,7 +92,8 @@ class Utility {
     return date;
   }
 
-  static Future<bool?> displayAlertDialog(BuildContext context, String text) {
+  static Future<bool?> displayQuestionDialog(
+      BuildContext context, String text) {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(

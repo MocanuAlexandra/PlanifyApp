@@ -57,6 +57,7 @@ class DeletedAgendaScreen extends StatelessWidget {
                         tasks.tasksList[index].priority),
                     isDone: tasks.tasksList[index].isDone,
                     isDeleted: tasks.tasksList[index].isDeleted,
+                    locationCategory: tasks.tasksList[index].locationCategory,
                   ),
                 ),
               ),

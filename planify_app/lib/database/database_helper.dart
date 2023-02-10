@@ -66,6 +66,7 @@ class DBHelper {
         'isDone': task['isDone'],
         'isDeleted': task['isDeleted'],
         'category': task['category'],
+        'locationCategory': task['locationCategory'],
       };
     }).toList();
 
@@ -137,6 +138,12 @@ class DBHelper {
       updatedCategory = newTask.category!;
     }
 
+    //check fi user selected a location category
+    String updatedLocationCategory = 'No location category chosen';
+    if (newTask.locationCategory != null) {
+      updatedLocationCategory = newTask.locationCategory!;
+    }
+
     //add the task in the tasks collection of the connected user
     final doc = await FirebaseFirestore.instance
         .collection('users')
@@ -153,6 +160,7 @@ class DBHelper {
       'isDone': false,
       'isDeleted': false,
       'category': updatedCategory,
+      'locationCategory': updatedLocationCategory,
     });
 
     return doc.id;
@@ -201,6 +209,11 @@ class DBHelper {
       updatedDueDate = editedTask.dueDate!.toIso8601String();
     }
 
+    String updatedLocationCategory = 'No location category chosen';
+    if (editedTask.locationCategory != null) {
+      updatedLocationCategory = editedTask.locationCategory!;
+    }
+
     await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
@@ -217,6 +230,7 @@ class DBHelper {
       'isDone': editedTask.isDone,
       'isDeleted': editedTask.isDeleted,
       'category': editedTask.category,
+      'locationCategory': updatedLocationCategory,
     });
   }
 

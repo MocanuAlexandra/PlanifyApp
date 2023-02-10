@@ -128,18 +128,45 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  Row displayAddress(Task loadedTask) {
-    return Row(children: [
-      const Icon(Icons.location_pin),
-      Expanded(
-        child: Text(
-          loadedTask.address!.address!,
-          softWrap: true,
-          maxLines: 3,
-          style: const TextStyle(fontSize: 16),
-        ),
-      ),
-    ]);
+  Row displayAddressOrLocationCategory(Task loadedTask) {
+    return loadedTask.address!.address! == 'No address chosen'
+        ? loadedTask.locationCategory == 'No location category chosen'
+            ? Row(
+                children: const [
+                  Icon(Icons.location_off),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text('No address or location category chosen',
+                        style: TextStyle(fontSize: 16)),
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  const Icon(Icons.share_location),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                        'Location category: ${loadedTask.locationCategory!}',
+                        style: const TextStyle(fontSize: 16)),
+                  ),
+                ],
+              )
+        : Row(children: [
+            const Icon(Icons.location_pin),
+            const SizedBox(width: 10),
+            Expanded(
+              child: loadedTask.address!.address! == 'No address chosen'
+                  ? loadedTask.locationCategory == 'No location category chosen'
+                      ? const Text('No address or location category chosen',
+                          style: TextStyle(fontSize: 16))
+                      : Text(
+                          'Location category: ${loadedTask.locationCategory!}',
+                          style: const TextStyle(fontSize: 16))
+                  : Text(loadedTask.address!.address!,
+                      style: const TextStyle(fontSize: 16)),
+            ),
+          ]);
   }
 
   @override
@@ -156,7 +183,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             icon: const Icon(Icons.delete, color: Colors.white),
             onPressed: () {
               // display alert dialog
-              Utility.displayAlertDialog(
+              Utility.displayQuestionDialog(
                       context, 'Do you want to move the task in Trash?')
                   .then((value) {
                 if (value!) {
@@ -191,7 +218,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   displayCategory(loadedTask),
                   //address
                   const SizedBox(height: 10),
-                  displayAddress(loadedTask),
+                  displayAddressOrLocationCategory(loadedTask),
                   const SizedBox(height: 10),
                   //show map
                   displayMap(loadedTask),

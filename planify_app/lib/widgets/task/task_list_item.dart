@@ -17,6 +17,7 @@ class TaskListItem extends StatelessWidget {
   final String? priority;
   final bool? isDone;
   final bool? isDeleted;
+  final String? locationCategory;
 
   const TaskListItem({
     super.key,
@@ -28,6 +29,7 @@ class TaskListItem extends StatelessWidget {
     this.priority,
     this.isDone,
     this.isDeleted,
+    this.locationCategory,
   });
 
   void _deleteTask(BuildContext context, String id) {
@@ -112,17 +114,42 @@ class TaskListItem extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      //address
-      subtitle: Row(children: [
-        const Icon(Icons.location_pin),
-        Expanded(
-          child: Text(
-            address!.address!,
-            softWrap: true,
-            maxLines: 3,
-          ),
-        ),
-      ]),
+      //address or location category
+      subtitle: address!.address! == 'No address chosen'
+          ? locationCategory == 'No location category chosen'
+              ? Row(children: const [
+                  Icon(Icons.location_off_sharp),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'No address or location category chosen',
+                      softWrap: true,
+                      maxLines: 3,
+                    ),
+                  ),
+                ])
+              : Row(children: [
+                  const Icon(Icons.share_location_sharp),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Location category: ${locationCategory!}',
+                      softWrap: true,
+                      maxLines: 3,
+                    ),
+                  ),
+                ])
+          : Row(children: [
+              const Icon(Icons.location_pin),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  address!.address!,
+                  softWrap: true,
+                  maxLines: 3,
+                ),
+              ),
+            ]),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -144,7 +171,7 @@ class TaskListItem extends StatelessWidget {
                       ),
                       onPressed: () {
                         // display alert dialog
-                        Utility.displayAlertDialog(context,
+                        Utility.displayQuestionDialog(context,
                                 'Do you want to move the task back from Trash? You will have to set back the reminders.')
                             .then((value) {
                           if (value!) {
@@ -159,7 +186,7 @@ class TaskListItem extends StatelessWidget {
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
                     // display alert dialog
-                    Utility.displayAlertDialog(
+                    Utility.displayQuestionDialog(
                             context, 'Do you want to move the task in Trash?')
                         .then((value) {
                       if (value!) {
@@ -172,7 +199,7 @@ class TaskListItem extends StatelessWidget {
                   icon: const Icon(Icons.delete_forever, color: Colors.red),
                   onPressed: () {
                     // display alert dialog
-                    Utility.displayAlertDialog(context,
+                    Utility.displayQuestionDialog(context,
                             'Do you want to permanently delete the task?')
                         .then((value) {
                       if (value!) {
@@ -206,7 +233,7 @@ class TaskListItem extends StatelessWidget {
       direction:
           isDeleted! ? DismissDirection.none : DismissDirection.endToStart,
       confirmDismiss: (direction) {
-        return Utility.displayAlertDialog(
+        return Utility.displayQuestionDialog(
             context, 'Do you want to move the task in Trash?');
       },
       onDismissed: ((direction) => {
