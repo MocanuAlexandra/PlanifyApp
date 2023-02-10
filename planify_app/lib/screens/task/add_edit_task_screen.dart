@@ -458,6 +458,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           await addNotificationsForTask(taskId);
         }
       }
+
+      Navigator.of(context).pushReplacementNamed(OverallAgendaScreen.routeName);
     }
   }
 
@@ -555,13 +557,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       categoryField(context),
                       const SizedBox(height: 10),
                       Container(
-                        padding: const EdgeInsets.only(top: 70),
+                        padding: const EdgeInsets.only(top: 25),
                         child: ElevatedButton(
-                            onPressed: () {
-                              _addEditTask();
-                              Navigator.of(context).pushReplacementNamed(
-                                  OverallAgendaScreen.routeName);
-                            },
+                            onPressed: _addEditTask,
                             style: ElevatedButton.styleFrom(
                               elevation: 5,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
