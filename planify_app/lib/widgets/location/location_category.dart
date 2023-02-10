@@ -181,6 +181,7 @@ class _LocationCategoryState extends State<LocationCategory> {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
+            //TODO fix the bug where the category is not set to empty when the dialog is cancelled
           },
           child: const Text("Cancel"),
         ),

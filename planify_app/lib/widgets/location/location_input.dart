@@ -124,16 +124,22 @@ class _LocationInputState extends State<LocationInput> {
             border: Border.all(width: 1, color: Colors.grey),
           ),
           child: _previewImageUrl == null &&
-                  _selectedLocationCategory != 'No location category chosen'
+                  (_selectedLocationCategory != 'No location category chosen' &&
+                      _selectedLocationCategory != null)
               ? displayLocationCategoryChosen()
               : _previewImageUrl != null &&
                       _selectedLocationCategory == 'No location category chosen'
                   ? displayLocationPreview()
-                  : const Text(
-                      'No location or location category chosen',
-                      style: TextStyle(fontSize: 15),
-                      textAlign: TextAlign.center,
-                    ),
+                  : _previewImageUrl == null &&
+                          (_selectedLocationCategory ==
+                                  'No location category chosen' ||
+                              _selectedLocationCategory == null)
+                      ? const Text(
+                          'No location or location category chosen',
+                          style: TextStyle(fontSize: 15),
+                          textAlign: TextAlign.center,
+                        )
+                      : null,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
