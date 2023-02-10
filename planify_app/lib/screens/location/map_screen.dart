@@ -51,6 +51,11 @@ class _MapScreenState extends State<MapScreen> {
             ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _getCurrentLocation,
+        child: const Icon(Icons.my_location),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       body: Column(
         children: [
           // This is the search bar
@@ -102,7 +107,16 @@ class _MapScreenState extends State<MapScreen> {
                 onMapCreated: _onMapCreated,
                 onTap: _selectLocation,
                 markers: (_pickedLocation == null && widget.isSelecting == true)
-                    ? {}
+                    ? {
+                        // Add a marker to initial location
+                        Marker(
+                          markerId: const MarkerId('m1'),
+                          position: LatLng(widget.initialAddress.latitude!,
+                              widget.initialAddress.longitude!),
+                          infoWindow:
+                              const InfoWindow(title: 'Your selected location'),
+                        ),
+                      }
                     : {
                         // Add a marker to the picked location
                         Marker(
@@ -130,6 +144,24 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
     );
+  }
+
+  // get the current location
+  Future<void> _getCurrentLocation() async {
+    try {
+      final locData = await LocationHelper.getCurrentLocation();
+      mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(locData.latitude!, locData.longitude!),
+          16,
+        ),
+      );
+      setState(() {
+        _pickedLocation = LatLng(locData.latitude!, locData.longitude!);
+      });
+    } catch (error) {
+      return;
+    }
   }
 
   // This is called when the map is created

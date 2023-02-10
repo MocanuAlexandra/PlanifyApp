@@ -140,10 +140,10 @@ class _LocationInputState extends State<LocationInput> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton.icon(
-              onPressed: _getCurrentUserLocation,
-              icon: const Icon(Icons.location_on),
+              onPressed: (){},
+              icon: const Icon(Icons.share_location_sharp),
               label: const Text(
-                'Your location',
+                'Category',
                 style: TextStyle(fontSize: 15),
               ),
               style: TextButton.styleFrom(
