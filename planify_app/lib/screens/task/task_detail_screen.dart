@@ -36,6 +36,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     Provider.of<Tasks>(context, listen: false).deleteTask(task.id!);
   }
 
+  void _deleteTask(BuildContext context, String id) {
+    // delete task from database
+    DBHelper.deleteTask(id);
+
+    // remove task from UI
+    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+  }
+
   //auxiliary methods
   Container displayMap(Task loadedTask) {
     return Container(
@@ -182,15 +190,27 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.white),
             onPressed: () {
-              // display alert dialog
-              Utility.displayQuestionDialog(
-                      context, 'Do you want to move the task in Trash?')
-                  .then((value) {
-                if (value!) {
-                  _markAsDeleted(context, loadedTask);
-                  Navigator.of(context).pop();
-                }
-              });
+              loadedTask.isDeleted == false
+                  ?
+                  // display alert dialog
+                  Utility.displayQuestionDialog(
+                          context, 'Do you want to move the task in Trash?')
+                      .then((value) {
+                      if (value!) {
+                        _markAsDeleted(context, loadedTask);
+                        Navigator.of(context).pop();
+                      }
+                    })
+                  :
+                  // display alert dialog
+                  Utility.displayQuestionDialog(context,
+                          'Do you want to permanently delete the task?')
+                      .then((value) {
+                      if (value!) {
+                        _deleteTask(context, loadedTask.id!);
+                        Navigator.of(context).pop();
+                      }
+                    });
             },
           ),
         ],
