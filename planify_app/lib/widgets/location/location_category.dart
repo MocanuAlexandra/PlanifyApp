@@ -18,12 +18,10 @@ class LocationCategory extends StatefulWidget {
 class _LocationCategoryState extends State<LocationCategory> {
   @override
   void initState() {
-    //if we have a previous category, set it as the initial value
-    //of the search bar and the selected category
+    //if we have a previous category, set it as the initial value of the selected category
     if (widget.previousLocationCategory != null &&
         widget.previousLocationCategory != 'No location category chosen') {
       _selectedLocationCategory = widget.previousLocationCategory!;
-      _searchController.text = _selectedLocationCategory;
     }
     super.initState();
   }
@@ -168,8 +166,6 @@ class _LocationCategoryState extends State<LocationCategory> {
                     //set the selected category and the search bar text
                     _selectedLocationCategory = suggestion;
                     _searchController.text = suggestion;
-                    //call the function that will be used to set the category
-                    widget.onSelectLocationCategory(suggestion);
                   });
                 },
               ),
@@ -181,7 +177,6 @@ class _LocationCategoryState extends State<LocationCategory> {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            //TODO fix the bug where the category is not set to empty when the dialog is cancelled
           },
           child: const Text("Cancel"),
         ),

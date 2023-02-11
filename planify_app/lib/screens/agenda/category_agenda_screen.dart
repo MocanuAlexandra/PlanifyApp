@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/widgets/drawer.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/drawer.dart';
 import '../../helpers/utility.dart';
 import '../../providers/tasks.dart';
-import '../../widgets/helpers/expandable_fab/action_button.dart';
-import '../../widgets/helpers/expandable_fab/expandable_fab.dart';
 import '../../widgets/helpers/expandable_fab/expandable_floating_action_button.dart';
 import '../../widgets/task/task_list_item.dart';
 import '../task/add_edit_category_screen.dart';
-import '../task/add_edit_task_screen.dart';
 
 class CategoryAgendaScreen extends StatefulWidget {
   static const routeName = '/category-agenda';
