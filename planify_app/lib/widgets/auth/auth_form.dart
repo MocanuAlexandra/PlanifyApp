@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-import '../../widgets/auth/square_tile_buttons.dart';
+import '../other/square_tile_buttons.dart';
 
 enum AuthMode { signUp, login }
 

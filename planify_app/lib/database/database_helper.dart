@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:planify_app/models/category.dart';
+import 'package:planify_app/models/location_category.dart';
 
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
@@ -267,7 +267,7 @@ class DBHelper {
         .update({'isDeleted': false});
   }
 
-  static void updateCategory(String id, Category editedCategory) async {
+  static void updateCategory(String id, LocationCategory editedCategory) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -276,7 +276,7 @@ class DBHelper {
         .update({'name': editedCategory.name});
   }
 
-  static void addCategory(Category editedCategory) async {
+  static void addCategory(LocationCategory editedCategory) async {
     if (editedCategory.name == null) {
       return;
     }

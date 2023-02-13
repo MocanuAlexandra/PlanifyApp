@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:planify_app/providers/reminders.dart';
+import 'package:planify_app/providers/task_reminder_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
-import '../../helpers/notification_helper.dart';
+import '../../services/notification_service.dart';
 import '../../models/task_reminder.dart';
-import '../../providers/categories.dart';
-import '../../models/category.dart';
-import '../../widgets/helpers/check_box.dart';
+import '../../providers/category_provider.dart';
+import '../../models/location_category.dart';
+import '../../widgets/other/check_box.dart';
 import '../agenda/overall_agenda_screen.dart';
 import '../../database/database_helper.dart';
 import '../../models/task.dart';
 import '../../models/task_address.dart';
-import '../../providers/tasks.dart';
+import '../../providers/task_provider.dart';
 import '../../widgets/location/location_input.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
@@ -63,7 +63,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
       if (taskId != null) {
         _editedTask =
-            Provider.of<Tasks>(context, listen: false).findById(taskId);
+            Provider.of<TaskProvider>(context, listen: false).findById(taskId);
         _initValues = {
           'title': _editedTask.title,
           'dueDate': _editedTask.dueDate,
@@ -287,7 +287,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
-                    : Consumer<TaskReminders>(
+                    : Consumer<TaskReminderProvider>(
                         builder: (context, reminders, ch) => CheckboxList(
                           items: Utility.getReminderTypes(
                               isDueTimeSelected, isDueDateSelected),
@@ -302,7 +302,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 selectedItems: _selectedReminders);
   }
 
-  List<String> determineAlreadySelectedReminders(TaskReminders reminders,
+  List<String> determineAlreadySelectedReminders(TaskReminderProvider reminders,
       bool? isDueTimeSelected, bool? isDueDateSelected) {
     List<String> reminderTypes =
         Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected);
@@ -377,41 +377,41 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   FutureBuilder<void> categoryField(BuildContext context) {
     return FutureBuilder(
       future: _fetchCategories(context),
-      builder: (context, snapshot) =>
-          snapshot.connectionState == ConnectionState.waiting
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : DropdownButtonFormField<String>(
-                  value: _editedTask.category,
-                  onChanged: (String? value) {
-                    setState(() {
-                      _editedTask = Task(
-                        id: _editedTask.id,
-                        title: _editedTask.title,
-                        dueDate: _editedTask.dueDate,
-                        address: _editedTask.address,
-                        time: _editedTask.time,
-                        priority: _editedTask.priority,
-                        isDone: _editedTask.isDone,
-                        category: value,
-                        locationCategory: _editedTask.locationCategory,
-                      );
-                    });
-                  },
-                  items: Provider.of<Categories>(context)
-                      .categoriesList
-                      .map<DropdownMenuItem<String>>((Category category) {
-                    return DropdownMenuItem<String>(
-                      value: category.name,
-                      child: Text(category.name!),
-                    );
-                  }).toList(),
-                  hint: const Text(
-                    'Select category',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
+      builder: (context, snapshot) => snapshot.connectionState ==
+              ConnectionState.waiting
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : DropdownButtonFormField<String>(
+              value: _editedTask.category,
+              onChanged: (String? value) {
+                setState(() {
+                  _editedTask = Task(
+                    id: _editedTask.id,
+                    title: _editedTask.title,
+                    dueDate: _editedTask.dueDate,
+                    address: _editedTask.address,
+                    time: _editedTask.time,
+                    priority: _editedTask.priority,
+                    isDone: _editedTask.isDone,
+                    category: value,
+                    locationCategory: _editedTask.locationCategory,
+                  );
+                });
+              },
+              items: Provider.of<CategoryProvider>(context)
+                  .categoriesList
+                  .map<DropdownMenuItem<String>>((LocationCategory category) {
+                return DropdownMenuItem<String>(
+                  value: category.name,
+                  child: Text(category.name!),
+                );
+              }).toList(),
+              hint: const Text(
+                'Select category',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
     );
   }
 
@@ -469,7 +469,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     await DBHelper.deleteNotificationsForTask(taskId);
 
     //delete the notifications for the task from the database
-    NotificationHelper.deleteNotification(taskId);
+    NotificationService.deleteNotification(taskId);
   }
 
   Future<void> addNotificationsForTask(String taskId) async {
@@ -518,7 +518,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         }
 
         //add the notification to notification center
-        NotificationHelper.createNotification(
+        NotificationService.createNotification(
             _editedTask, reminder, newReminder, taskId);
       }
     }
@@ -587,11 +587,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
   //auxiliary functions
   Future<void> _fetchCategories(BuildContext context) async {
-    await Provider.of<Categories>(context, listen: false).fetchCategories();
+    await Provider.of<CategoryProvider>(context, listen: false)
+        .fetchCategories();
   }
 
   Future<void> _fetchReminders(BuildContext context, String taskId) async {
-    await Provider.of<TaskReminders>(context, listen: false)
+    await Provider.of<TaskReminderProvider>(context, listen: false)
         .fetchReminders(taskId);
   }
 

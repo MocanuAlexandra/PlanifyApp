@@ -3,24 +3,25 @@ import 'package:provider/provider.dart';
 
 import '../../widgets/drawer.dart';
 import '../../helpers/utility.dart';
-import '../../providers/tasks.dart';
-import '../../widgets/helpers/expandable_fab/expandable_floating_action_button.dart';
+import '../../providers/task_provider.dart';
+import '../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
 import '../../widgets/task/task_list_item.dart';
-import '../task/add_edit_category_screen.dart';
+import '../task/add_edit_task_category_screen.dart';
 
-class CategoryAgendaScreen extends StatefulWidget {
+class TaskCategoryAgendaScreen extends StatefulWidget {
   static const routeName = '/category-agenda';
 
-  const CategoryAgendaScreen({super.key});
+  const TaskCategoryAgendaScreen({super.key});
 
   @override
-  State<CategoryAgendaScreen> createState() => _CategoryAgendaScreenState();
+  State<TaskCategoryAgendaScreen> createState() =>
+      _TaskCategoryAgendaScreenState();
 }
 
-class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
+class _TaskCategoryAgendaScreenState extends State<TaskCategoryAgendaScreen> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
-  var _category = null;
+  var _category;
   var _isInit = true;
 
   @override
@@ -37,7 +38,7 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode, String? category) async {
-    await Provider.of<Tasks>(context, listen: false)
+    await Provider.of<TaskProvider>(context, listen: false)
         .fetchTasks(null, null, null, selectedOption, focusMode, _category);
   }
 
@@ -48,7 +49,7 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
-            Navigator.of(context).pushNamed(AddEditCategoryScreen.routeName,
+            Navigator.of(context).pushNamed(AddEditTaskCategoryScreen.routeName,
                 arguments: _category);
           },
         ),
@@ -77,7 +78,7 @@ class _CategoryAgendaScreenState extends State<CategoryAgendaScreen> {
             : RefreshIndicator(
                 onRefresh: () =>
                     _fetchTasks(context, selectedOption, _focusMode, _category),
-                child: Consumer<Tasks>(
+                child: Consumer<TaskProvider>(
                   builder: (context, tasks, ch) => ListView.builder(
                     itemCount: tasks.tasksList.length,
                     itemBuilder: (context, index) => TaskListItem(

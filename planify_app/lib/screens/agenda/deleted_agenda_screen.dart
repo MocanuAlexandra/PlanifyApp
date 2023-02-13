@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
-import '../../providers/tasks.dart';
+import '../../providers/task_provider.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 
@@ -15,7 +15,7 @@ class DeletedAgendaScreen extends StatelessWidget {
 
   Future<void> _fetchTasks(
       BuildContext context, FilterOptions? selectedOption) async {
-    await Provider.of<Tasks>(context, listen: false)
+    await Provider.of<TaskProvider>(context, listen: false)
         .fetchTasks(null, null, null, selectedOption);
   }
 
@@ -42,7 +42,7 @@ class DeletedAgendaScreen extends StatelessWidget {
             )
           : RefreshIndicator(
               onRefresh: () => _fetchTasks(context, selectedOption),
-              child: Consumer<Tasks>(
+              child: Consumer<TaskProvider>(
                 builder: (context, tasks, ch) => ListView.builder(
                   itemCount: tasks.tasksList.length,
                   itemBuilder: (context, index) => TaskListItem(

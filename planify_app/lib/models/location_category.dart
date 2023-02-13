@@ -1,8 +1,8 @@
-class Category {
+class LocationCategory {
   final String? id;
   final String? name;
 
-  Category({
+  LocationCategory({
     this.id,
     this.name,
   });

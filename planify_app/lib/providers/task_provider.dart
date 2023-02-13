@@ -12,7 +12,7 @@ enum FilterOptions {
   deleted,
 }
 
-class Tasks with ChangeNotifier {
+class TaskProvider with ChangeNotifier {
   List<Task> _tasks = [];
 
   List<Task> get tasksList {

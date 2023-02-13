@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
-import '../../helpers/notification_helper.dart';
+import '../../services/notification_service.dart';
 import '../../helpers/utility.dart';
-import '../../providers/tasks.dart';
+import '../../providers/task_provider.dart';
 import '../../models/task_address.dart';
-import '../../screens/task/task_detail_screen.dart';
+import '../../screens/task/task_details_screen.dart';
 
 class TaskListItem extends StatelessWidget {
   final String? id;
@@ -37,7 +37,7 @@ class TaskListItem extends StatelessWidget {
     DBHelper.deleteTask(id);
 
     // remove task from UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
   void _markAsDeleted(BuildContext context, String id) {
@@ -45,13 +45,13 @@ class TaskListItem extends StatelessWidget {
     DBHelper.markTaskAsDeleted(id);
 
     //delete all notifications for this task from notification center
-    NotificationHelper.deleteNotification(id);
+    NotificationService.deleteNotification(id);
 
     // delete all notifications for this task form the database
     DBHelper.deleteNotificationsForTask(id);
 
     // remove task from UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
   void _markAsUndeleted(BuildContext context, String id) {
@@ -59,7 +59,7 @@ class TaskListItem extends StatelessWidget {
     DBHelper.markTaskAsUndeleted(id);
 
     // remove task from UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
   void _markTaskAsDone(BuildContext context, String id) {
@@ -67,13 +67,13 @@ class TaskListItem extends StatelessWidget {
     DBHelper.markTaskAsDone(id);
 
     //delete all notifications for this task from notification center
-    NotificationHelper.deleteNotification(id);
+    NotificationService.deleteNotification(id);
 
     // delete all notifications for this task form the database
     DBHelper.deleteNotificationsForTask(id);
 
     // mark task as done in UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
   Row displayPriority() {
@@ -243,7 +243,7 @@ class TaskListItem extends StatelessWidget {
         onTap: () {
           // Navigate to task details screen
           Navigator.of(context)
-              .pushNamed(TaskDetailScreen.routeName, arguments: id);
+              .pushNamed(TaskDetailsScreen.routeName, arguments: id);
         },
         child: Card(
           shape: RoundedRectangleBorder(

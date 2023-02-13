@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../services/auth_service.dart';
 import '../../widgets/auth/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -24,72 +25,17 @@ class _AuthScreenState extends State<AuthScreen> {
         _isLoading = true;
       });
 
-      final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication gAuth = await gUser!.authentication;
-      final credentials = GoogleAuthProvider.credential(
-        accessToken: gAuth.accessToken,
-        idToken: gAuth.idToken,
-      );
-
+      //get the user's credentials then sign in with them
+      OAuthCredential credentials = await AuthService.getUserCredentials();
       UserCredential userCredentials =
           await FirebaseAuth.instance.signInWithCredential(credentials);
 
-      //add the username as extra field
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredentials.user!.uid)
-          .set({'email': userCredentials.user!.email});
-
-      //get the user's categories
-      final categories = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredentials.user!.uid)
-          .collection('categories')
-          .get();
-
-      //check if the user has categories
-      if (categories.docs.isEmpty) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredentials.user!.uid)
-            .collection('categories')
-            .add({'name': 'No category'});
-      } else {
-        //add default category if it doesn't exist
-        for (var element in categories.docs) {
-          if (element.data()['name'] == 'No category') {
-            return;
-          } else {
-            await FirebaseFirestore.instance
-                .collection('users')
-                .doc(userCredentials.user!.uid)
-                .collection('categories')
-                .add({'name': 'No category'});
-          }
-        }
-      }
+      //add the username as extra field in DB, and add default category if it doesn't exist
+      await AuthService.addUserDataInDB(userCredentials);
     } on FirebaseAuthException catch (error) {
-      var message = 'An error occurred, please check your credentials';
-      if (error.message != null) {
-        message = error.message!;
-      }
-
-      //show a snack bar with the error to the user
-      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ));
-      setState(() {
-        _isLoading = false;
-      });
+      displayFirebaseAuthErrors(error, ctx);
     } catch (error) {
-      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-        content: Text(error.toString()),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ));
-      setState(() {
-        _isLoading = false;
-      });
+      displayOtherAuthErrors(ctx, error);
     }
   }
 
@@ -109,34 +55,12 @@ class _AuthScreenState extends State<AuthScreen> {
         userCredential = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
-        //add the username as extra field
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set({'email': email});
-
-        //add 'categories' collection to the user
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .collection('categories')
-            .add({'name': 'No category'});
+        //add the username as extra field in DB, and add default category if it doesn't exist
+        await AuthService.addUserDataInDB(userCredential);
       }
       //handle errors
     } on FirebaseAuthException catch (error) {
-      var message = 'An error occurred, please check your credentials';
-      if (error.message != null) {
-        message = error.message!;
-      }
-
-      //show a snack bar with the error to the user
-      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ));
-      setState(() {
-        _isLoading = false;
-      });
+      displayFirebaseAuthErrors(error, ctx);
     } catch (error) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         content: Text(error.toString()),
@@ -146,6 +70,33 @@ class _AuthScreenState extends State<AuthScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void displayFirebaseAuthErrors(
+      FirebaseAuthException error, BuildContext ctx) {
+    var message = 'An error occurred, please check your credentials';
+    if (error.message != null) {
+      message = error.message!;
+    }
+
+    //show a snack bar with the error to the user
+    ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: Theme.of(context).colorScheme.error,
+    ));
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void displayOtherAuthErrors(BuildContext ctx, Object error) {
+    ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+      content: Text(error.toString()),
+      backgroundColor: Theme.of(context).colorScheme.error,
+    ));
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override

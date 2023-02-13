@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
-import '../models/category.dart';
+import '../models/location_category.dart';
 
-class Categories with ChangeNotifier {
-  List<Category> _categories = [];
+class CategoryProvider with ChangeNotifier {
+  List<LocationCategory> _categories = [];
 
-  List<Category> get categoriesList {
+  List<LocationCategory> get categoriesList {
     return [..._categories];
   }
 
@@ -15,7 +15,7 @@ class Categories with ChangeNotifier {
 
     _categories = categoriesData.map(
       (category) {
-        return Category(
+        return LocationCategory(
           id: category['id'],
           name: category['name'],
         );
@@ -23,7 +23,7 @@ class Categories with ChangeNotifier {
     ).toList();
   }
 
-  Category findByName(String categoryName) {
+  LocationCategory findByName(String categoryName) {
     return _categories.firstWhere((category) => category.name == categoryName);
   }
 }

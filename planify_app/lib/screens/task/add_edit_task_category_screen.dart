@@ -3,22 +3,23 @@ import 'package:planify_app/database/database_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
-import '../../models/category.dart';
-import '../../providers/categories.dart';
+import '../../models/location_category.dart';
+import '../../providers/category_provider.dart';
 import '../agenda/overall_agenda_screen.dart';
 
-class AddEditCategoryScreen extends StatefulWidget {
-  const AddEditCategoryScreen({super.key});
+class AddEditTaskCategoryScreen extends StatefulWidget {
+  const AddEditTaskCategoryScreen({super.key});
 
   static const routeName = '/add-category';
 
   @override
-  State<AddEditCategoryScreen> createState() => _AddEditCategoryScreenState();
+  State<AddEditTaskCategoryScreen> createState() =>
+      _AddEditTaskCategoryScreenState();
 }
 
-class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
+class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
   final _formKey = GlobalKey<FormState>();
-  var _editedCategory = Category(
+  var _editedCategory = LocationCategory(
     id: null,
     name: '',
   );
@@ -36,7 +37,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
           ModalRoute.of(context)!.settings.arguments as String?;
 
       if (categoryName != null) {
-        _editedCategory = Provider.of<Categories>(context, listen: false)
+        _editedCategory = Provider.of<CategoryProvider>(context, listen: false)
             .findByName(categoryName);
         _initValues = {
           'name': _editedCategory.name!,
@@ -141,7 +142,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
                           return null;
                         },
                         onSaved: (value) {
-                          _editedCategory = Category(
+                          _editedCategory = LocationCategory(
                             id: _editedCategory.id,
                             name: value,
                           );

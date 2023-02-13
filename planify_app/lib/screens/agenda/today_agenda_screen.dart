@@ -2,14 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
-import '../../providers/tasks.dart';
+import '../../providers/task_provider.dart';
 import '../../widgets/drawer.dart';
-import '../../widgets/helpers/expandable_fab/action_button.dart';
-import '../../widgets/helpers/expandable_fab/expandable_fab.dart';
-import '../../widgets/helpers/expandable_fab/expandable_floating_action_button.dart';
+import '../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
 import '../../widgets/task/task_list_item.dart';
-import '../task/add_edit_category_screen.dart';
-import '../task/add_edit_task_screen.dart';
 
 class TodayAgendaScreen extends StatefulWidget {
   static const routeName = '/today-agenda';
@@ -26,7 +22,7 @@ class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode) async {
-    await Provider.of<Tasks>(context, listen: false)
+    await Provider.of<TaskProvider>(context, listen: false)
         .fetchTasks(true, null, null, selectedOption, focusMode);
   }
 
@@ -62,7 +58,7 @@ class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
             : RefreshIndicator(
                 onRefresh: () =>
                     _fetchTasks(context, selectedOption, _focusMode),
-                child: Consumer<Tasks>(
+                child: Consumer<TaskProvider>(
                   builder: (context, tasks, ch) => ListView.builder(
                     itemCount: tasks.tasksList.length,
                     itemBuilder: (context, index) => TaskListItem(

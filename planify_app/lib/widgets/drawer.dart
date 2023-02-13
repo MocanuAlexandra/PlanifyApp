@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
-import '../../screens/agenda/category_agenda_screen.dart';
+import '../screens/agenda/task_category_agenda_screen.dart';
 import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
-import '../providers/categories.dart';
+import '../providers/category_provider.dart';
 import '../screens/auth/auth_screen.dart';
 
 class MainDrawer extends StatefulWidget {
@@ -23,7 +23,8 @@ class _MainDrawerState extends State<MainDrawer> {
 
   //auxiliary functions
   Future<void> _fetchCategories(BuildContext context) async {
-    await Provider.of<Categories>(context, listen: false).fetchCategories();
+    await Provider.of<CategoryProvider>(context, listen: false)
+        .fetchCategories();
   }
 
   Widget buildListTile(String title, IconData icon, Function tapHandler) {
@@ -137,7 +138,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
-                    : Consumer<Categories>(
+                    : Consumer<CategoryProvider>(
                         builder: (context, categories, _) => SizedBox(
                           height: 150,
                           child: Scrollbar(
@@ -155,7 +156,7 @@ class _MainDrawerState extends State<MainDrawer> {
                                 ),
                                 onTap: () {
                                   Navigator.of(context).pushReplacementNamed(
-                                      CategoryAgendaScreen.routeName,
+                                      TaskCategoryAgendaScreen.routeName,
                                       arguments: categories
                                           .categoriesList[index].name!);
                                 },

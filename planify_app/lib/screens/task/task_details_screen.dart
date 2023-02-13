@@ -1,25 +1,24 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:planify_app/helpers/notification_helper.dart';
+import 'package:planify_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../database/database_helper.dart';
 import '../../helpers/utility.dart';
-import '../../providers/tasks.dart';
+import '../../providers/task_provider.dart';
 import '../../models/task.dart';
 import 'add_edit_task_screen.dart';
 
-class TaskDetailScreen extends StatefulWidget {
-  const TaskDetailScreen({super.key});
+class TaskDetailsScreen extends StatefulWidget {
+  const TaskDetailsScreen({super.key});
 
   static const String routeName = '/task-detail';
 
   @override
-  State<TaskDetailScreen> createState() => _TaskDetailScreenState();
+  State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
 }
 
-class _TaskDetailScreenState extends State<TaskDetailScreen> {
+class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   bool _isMapLoading = true;
 
   void _markAsDeleted(BuildContext context, Task task) {
@@ -27,13 +26,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     DBHelper.markTaskAsDeleted(task.id!);
 
     //delete all notifications for this task
-    NotificationHelper.deleteNotification(task.id!);
+    NotificationService.deleteNotification(task.id!);
 
     // delete all notifications for this task form the database
     DBHelper.deleteNotificationsForTask(task.id!);
 
     // remove task from UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(task.id!);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(task.id!);
   }
 
   void _deleteTask(BuildContext context, String id) {
@@ -41,7 +40,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     DBHelper.deleteTask(id);
 
     // remove task from UI
-    Provider.of<Tasks>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
   //auxiliary methods
@@ -181,7 +180,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   Widget build(BuildContext context) {
     final taskId = ModalRoute.of(context)!.settings.arguments as String;
     final loadedTask =
-        Provider.of<Tasks>(context, listen: false).findById(taskId);
+        Provider.of<TaskProvider>(context, listen: false).findById(taskId);
 
     return Scaffold(
       appBar: AppBar(

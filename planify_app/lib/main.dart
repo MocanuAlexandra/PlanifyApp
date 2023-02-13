@@ -1,17 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/providers/reminders.dart';
+import 'package:planify_app/providers/task_reminder_provider.dart';
+import 'package:planify_app/services/location_based_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
-import 'providers/categories.dart';
-import 'screens/agenda/category_agenda_screen.dart';
+import 'providers/category_provider.dart';
+import 'screens/agenda/task_category_agenda_screen.dart';
 import 'screens/agenda/deleted_agenda_screen.dart';
-import 'screens/task/add_edit_category_screen.dart';
-import '../../providers/tasks.dart';
-import 'helpers/notification_helper.dart';
-import 'screens/task/task_detail_screen.dart';
+import 'screens/task/add_edit_task_category_screen.dart';
+import 'providers/task_provider.dart';
+import 'services/notification_service.dart';
+import 'screens/task/task_details_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
 import '../../screens/auth/auth_screen.dart';
@@ -21,7 +22,8 @@ import 'screens/task/add_edit_task_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  NotificationHelper.initialize();
+  NotificationService.initialize();
+
   runApp(const MyApp());
 }
 
@@ -35,7 +37,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    NotificationHelper.setListeners(context);
+    NotificationService.setListeners(context);
+
     super.initState();
   }
 
@@ -44,13 +47,13 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(
-            create: (context) => Tasks(),
+            create: (context) => TaskProvider(),
           ),
           ChangeNotifierProvider(
-            create: (context) => Categories(),
+            create: (context) => CategoryProvider(),
           ),
           ChangeNotifierProvider(
-            create: (context) => TaskReminders(),
+            create: (context) => TaskReminderProvider(),
           ),
         ],
         child: MaterialApp(
@@ -74,6 +77,8 @@ class _MyAppState extends State<MyApp> {
                 );
               }
               if (userSnapshot.hasData) {
+                final notificationService = LocationBasedNotificationService();
+                notificationService.initialize(context);
                 return const OverallAgendaScreen();
               }
               return const AuthScreen();
@@ -85,14 +90,14 @@ class _MyAppState extends State<MyApp> {
             TodayAgendaScreen.routeName: (context) => const TodayAgendaScreen(),
             MonthAgendaScreen.routeName: (context) => const MonthAgendaScreen(),
             AddEditTaskScreen.routeName: (context) => const AddEditTaskScreen(),
-            TaskDetailScreen.routeName: (context) => const TaskDetailScreen(),
+            TaskDetailsScreen.routeName: (context) => const TaskDetailsScreen(),
             AuthScreen.routeName: (context) => const AuthScreen(),
             DeletedAgendaScreen.routeName: (context) =>
                 const DeletedAgendaScreen(),
-            CategoryAgendaScreen.routeName: (context) =>
-                const CategoryAgendaScreen(),
-            AddEditCategoryScreen.routeName: (context) =>
-                const AddEditCategoryScreen(),
+            TaskCategoryAgendaScreen.routeName: (context) =>
+                const TaskCategoryAgendaScreen(),
+            AddEditTaskCategoryScreen.routeName: (context) =>
+                const AddEditTaskCategoryScreen(),
           },
         ));
   }

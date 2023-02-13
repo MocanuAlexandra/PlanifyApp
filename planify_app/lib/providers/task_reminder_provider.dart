@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/task_reminder.dart';
 import '../database/database_helper.dart';
 
-class TaskReminders with ChangeNotifier {
+class TaskReminderProvider with ChangeNotifier {
   List<TaskReminder> _reminders = [];
 
   List<TaskReminder> get remindersList {

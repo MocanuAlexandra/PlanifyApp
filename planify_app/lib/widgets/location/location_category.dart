@@ -80,6 +80,7 @@ class _LocationCategoryState extends State<LocationCategory> {
     "lawyer",
     "library",
     "liquor_store",
+    "locality",
     "local_government_office",
     "locksmith",
     "lodging",

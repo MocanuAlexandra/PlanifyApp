@@ -5,7 +5,9 @@ import '../models/task_reminder.dart';
 import '../helpers/utility.dart';
 import '../models/task.dart';
 
-class NotificationHelper {
+class NotificationService {
+  static Map notifiedPlaces = {};
+
   static void initialize() {
     AwesomeNotifications().initialize(
         // set the icon to null if you want to use the default app icon
@@ -25,11 +27,11 @@ class NotificationHelper {
   static void setListeners(BuildContext context) {
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: (ReceivedAction receivedAction) {
-        return NotificationHelper.onActionReceivedMethod(
+        return NotificationService.onActionReceivedMethod(
             context, receivedAction);
       },
       onDismissActionReceivedMethod: (ReceivedAction receivedAction) {
-        return NotificationHelper.onDismissActionReceivedMethod(
+        return NotificationService.onDismissActionReceivedMethod(
             context, receivedAction);
       },
     );
@@ -53,6 +55,29 @@ class NotificationHelper {
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
       BuildContext context, ReceivedAction receivedAction) async {}
+
+  static DateTime createLocationBasedNotification(String taskId,
+      String locationName, String type, DateTime notificationTime) {
+    //create the notification
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: type.hashCode + notificationTime.hashCode,
+        channelKey: 'basic_channel',
+        title: "You are near $locationName ",
+        body: "You have a task you can do in this $type",
+        displayOnBackground: true,
+        displayOnForeground: true,
+        groupKey: taskId,
+      ),
+      schedule: NotificationCalendar(
+        hour: notificationTime.hour,
+        minute: notificationTime.minute,
+        repeats: false,
+      ),
+    );
+
+    return notificationTime;
+  }
 
   static void createNotification(
       Task newTask, String reminder, TaskReminder newReminder, String taskId) {
@@ -98,5 +123,18 @@ class NotificationHelper {
 //delete all notifications for a group key
   static void deleteNotification(String groupKey) {
     AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
+  }
+
+  static checkIfUserWasNotifiedAboutPlaceType(taskId, type, now) {
+    var key = "$taskId-$type";
+    if (notifiedPlaces.containsKey(key)) {
+      var lastNotified = notifiedPlaces[key];
+      var difference = now.difference(lastNotified);
+      if (difference.inMinutes <= 30) {
+        return true;
+      }
+    }
+    notifiedPlaces[key] = now;
+    return false;
   }
 }
