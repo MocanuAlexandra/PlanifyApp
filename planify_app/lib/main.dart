@@ -1,24 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/providers/task_reminder_provider.dart';
-import 'package:planify_app/screens/agenda/settings_screen.dart';
-import 'package:planify_app/services/location_based_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
-import 'providers/category_provider.dart';
-import 'screens/agenda/task_category_agenda_screen.dart';
-import 'screens/agenda/deleted_agenda_screen.dart';
-import 'screens/task/add_edit_task_category_screen.dart';
-import 'providers/task_provider.dart';
-import 'services/notification_service.dart';
-import 'screens/task/task_details_screen.dart';
+import '../../services/notification_service.dart';
+import '../../providers/task_provider.dart';
+import '../../providers/category_provider.dart';
+import '../../providers/task_reminder_provider.dart';
+import '../../screens/settings_screen.dart';
+import '../../screens/task/task_details_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
 import '../../screens/auth/auth_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
-import 'screens/task/add_edit_task_screen.dart';
+import '../../screens/task/add_edit_task_screen.dart';
+import '../../screens/agenda/task_category_agenda_screen.dart';
+import '../../screens/agenda/deleted_agenda_screen.dart';
+import '../../screens/task/add_edit_task_category_screen.dart';
+import '../../services/location_based_notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

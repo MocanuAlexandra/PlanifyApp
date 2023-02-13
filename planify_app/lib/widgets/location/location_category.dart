@@ -28,6 +28,7 @@ class _LocationCategoryState extends State<LocationCategory> {
 
   String? _searchType;
   final _searchController = TextEditingController();
+  //TODO display the list of categories in another way
   final List<String> _locationCategories = [
     "accounting",
     "airport",

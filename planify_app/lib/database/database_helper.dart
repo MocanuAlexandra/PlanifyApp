@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:planify_app/models/location_category.dart';
 
 import '../helpers/location_helper.dart';
 import '../helpers/utility.dart';
 import '../models/task_reminder.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';
+import '../models/location_category.dart';
 
 class DBHelper {
   // function for fetching categories from the database from the connected user

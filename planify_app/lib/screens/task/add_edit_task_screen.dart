@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:planify_app/providers/task_reminder_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/utility.dart';
-import '../../services/notification_service.dart';
-import '../../models/task_reminder.dart';
+import '../../providers/task_reminder_provider.dart';
 import '../../providers/category_provider.dart';
-import '../../models/location_category.dart';
-import '../../widgets/other/check_box.dart';
-import '../agenda/overall_agenda_screen.dart';
-import '../../database/database_helper.dart';
-import '../../models/task.dart';
-import '../../models/task_address.dart';
 import '../../providers/task_provider.dart';
 import '../../widgets/location/location_input.dart';
+import '../../widgets/other/check_box.dart';
+import '../../models/task.dart';
+import '../../models/task_address.dart';
+import '../../models/task_reminder.dart';
+import '../../models/location_category.dart';
+import '../../services/notification_service.dart';
+import '../../helpers/utility.dart';
+import '../agenda/overall_agenda_screen.dart';
+import '../../database/database_helper.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
   const AddEditTaskScreen({super.key});

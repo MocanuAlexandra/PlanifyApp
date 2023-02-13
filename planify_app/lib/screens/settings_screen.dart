@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../services/location_based_notification_service.dart';
-import '../../widgets/drawer.dart';
+import '../services/location_based_notification_service.dart';
+import '../widgets/drawer.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const routeName = '/settings';
