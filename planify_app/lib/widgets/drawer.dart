@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/agenda/settings_screen.dart';
 import '../screens/agenda/task_category_agenda_screen.dart';
 import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
@@ -98,6 +99,11 @@ class _MainDrawerState extends State<MainDrawer> {
               .pushReplacementNamed(DeletedAgendaScreen.routeName);
         }),
         const Divider(),
+         buildListTile('Settings', Icons.settings, () {
+         Navigator.of(context)
+              .pushReplacementNamed(SettingsScreen.routeName);
+        }),
+         const Divider(),
 
         //logout
         buildLogoutTile(context),

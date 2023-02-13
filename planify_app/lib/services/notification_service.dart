@@ -130,7 +130,8 @@ class NotificationService {
     if (notifiedPlaces.containsKey(key)) {
       var lastNotified = notifiedPlaces[key];
       var difference = now.difference(lastNotified);
-      if (difference.inMinutes <= 30) {
+      //TODO modify this time
+      if (difference.inMinutes <= 2) {
         return true;
       }
     }

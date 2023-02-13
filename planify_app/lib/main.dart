@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:planify_app/providers/task_reminder_provider.dart';
+import 'package:planify_app/screens/agenda/settings_screen.dart';
 import 'package:planify_app/services/location_based_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -35,10 +36,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Map<String, bool> _filters = {
+    'locationBasedNotification': false,
+  };
+
   @override
   void initState() {
     NotificationService.setListeners(context);
-
     super.initState();
   }
 
@@ -77,8 +81,6 @@ class _MyAppState extends State<MyApp> {
                 );
               }
               if (userSnapshot.hasData) {
-                final notificationService = LocationBasedNotificationService();
-                notificationService.initialize(context);
                 return const OverallAgendaScreen();
               }
               return const AuthScreen();
@@ -98,7 +100,24 @@ class _MyAppState extends State<MyApp> {
                 const TaskCategoryAgendaScreen(),
             AddEditTaskCategoryScreen.routeName: (context) =>
                 const AddEditTaskCategoryScreen(),
+            SettingsScreen.routeName: (context) => SettingsScreen(
+                  saveFilters: _setFilters,
+                  currentFilters: _filters,
+                ),
           },
         ));
+  }
+
+  void _setFilters(Map<String, bool> filterData) {
+    setState(() {
+      _filters = filterData;
+    });
+
+    //check if location based notification is enabled
+    if (_filters['locationBasedNotification']!) {
+      LocationBasedNotificationService.turnOn(context);
+    } else {
+      LocationBasedNotificationService.turnOff();
+    }
   }
 }
