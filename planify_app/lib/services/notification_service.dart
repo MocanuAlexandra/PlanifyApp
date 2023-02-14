@@ -79,6 +79,7 @@ class NotificationService {
     return notificationTime;
   }
 
+  /// Use this method to create a notification
   static void createNotification(
       Task newTask, String reminder, TaskReminder newReminder, String taskId) {
     //set the date & time of the notification
@@ -120,18 +121,19 @@ class NotificationService {
     );
   }
 
-//delete all notifications for a group key
+  //delete all notifications for a group key
   static void deleteNotification(String groupKey) {
     AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
   }
 
-  static checkIfUserWasNotifiedAboutPlaceType(taskId, type, now) {
+  // Check if the user was notified about a place type in the last interval
+  static checkIfUserWasNotifiedAboutPlaceTypeInLastInterval(
+      taskId, type, now, interval) {
     var key = "$taskId-$type";
     if (notifiedPlaces.containsKey(key)) {
       var lastNotified = notifiedPlaces[key];
       var difference = now.difference(lastNotified);
-      //TODO modify this time
-      if (difference.inMinutes <= 2) {
+      if (difference.inMinutes < interval) {
         return true;
       }
     }

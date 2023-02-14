@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../../../screens/task/add_edit_task_category_screen.dart';
 import '../../../screens/task/add_edit_task_screen.dart';
@@ -18,15 +19,19 @@ class ExpandableFloatingActionButton extends StatelessWidget {
         // action button used for adding a new category
         ActionButton(
           onPressed: () {
-            Navigator.of(context)
-                .pushNamed(AddEditTaskCategoryScreen.routeName);
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context)
+                  .pushNamed(AddEditTaskCategoryScreen.routeName);
+            });
           },
           icon: const Icon(Icons.category_rounded),
         ),
         // action button used for adding a new task
         ActionButton(
           onPressed: () {
-            Navigator.of(context).pushNamed(AddEditTaskScreen.routeName);
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pushNamed(AddEditTaskScreen.routeName);
+            });
           },
           icon: const Icon(Icons.note_add_rounded),
         ),

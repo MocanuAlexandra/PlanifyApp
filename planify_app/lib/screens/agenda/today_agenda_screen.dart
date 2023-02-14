@@ -27,6 +27,12 @@ class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
   }
 
   @override
+  void initState() {
+    _fetchTasks(context, selectedOption, _focusMode);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

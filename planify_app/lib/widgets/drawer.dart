@@ -1,16 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/settings_screen.dart';
-import '../screens/agenda/task_category_agenda_screen.dart';
 import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
 import '../providers/category_provider.dart';
-import '../screens/auth/auth_screen.dart';
+import '../screens/agenda/task_category_agenda_screen.dart';
+import '../screens/settings_screen.dart';
 
 class MainDrawer extends StatefulWidget {
   const MainDrawer({super.key});
@@ -61,7 +61,8 @@ class _MainDrawerState extends State<MainDrawer> {
       onTap: () {
         FirebaseAuth.instance.signOut();
         GoogleSignIn().signOut();
-        Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+        });
       },
     );
   }
@@ -78,32 +79,42 @@ class _MainDrawerState extends State<MainDrawer> {
 
         //drawer items
         buildListTile('Overall', Icons.calendar_view_week, () {
-          Navigator.of(context)
-              .pushReplacementNamed(OverallAgendaScreen.routeName);
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context)
+                .pushReplacementNamed(OverallAgendaScreen.routeName);
+          });
         }),
         const Divider(),
         buildListTile('Today', Icons.calendar_today, () {
-          Navigator.of(context)
-              .pushReplacementNamed(TodayAgendaScreen.routeName);
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context)
+                .pushReplacementNamed(TodayAgendaScreen.routeName);
+          });
         }),
         const Divider(),
         buildListTile('Month', Icons.calendar_month, () {
-          Navigator.of(context)
-              .pushReplacementNamed(MonthAgendaScreen.routeName);
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context)
+                .pushReplacementNamed(MonthAgendaScreen.routeName);
+          });
         }),
         const Divider(),
         buildCategoriesTile(context),
         const Divider(),
         buildListTile('Trash', Icons.delete, () {
-          Navigator.of(context)
-              .pushReplacementNamed(DeletedAgendaScreen.routeName);
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context)
+                .pushReplacementNamed(DeletedAgendaScreen.routeName);
+          });
         }),
         const Divider(),
-         buildListTile('Settings', Icons.settings, () {
-         Navigator.of(context)
-              .pushReplacementNamed(SettingsScreen.routeName);
+        buildListTile('Settings', Icons.settings, () {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context)
+                .pushReplacementNamed(SettingsScreen.routeName);
+          });
         }),
-         const Divider(),
+        const Divider(),
 
         //logout
         buildLogoutTile(context),
@@ -161,10 +172,13 @@ class _MainDrawerState extends State<MainDrawer> {
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 onTap: () {
-                                  Navigator.of(context).pushReplacementNamed(
-                                      TaskCategoryAgendaScreen.routeName,
-                                      arguments: categories
-                                          .categoriesList[index].name!);
+                                  SchedulerBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    Navigator.of(context).pushReplacementNamed(
+                                        TaskCategoryAgendaScreen.routeName,
+                                        arguments: categories
+                                            .categoriesList[index].name!);
+                                  });
                                 },
                               ),
                             ),

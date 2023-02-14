@@ -6,12 +6,17 @@ import '../../providers/task_provider.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/task/task_list_item.dart';
 
-class DeletedAgendaScreen extends StatelessWidget {
+class DeletedAgendaScreen extends StatefulWidget {
   static const routeName = '/deleted-agenda';
 
-  static FilterOptions selectedOption = FilterOptions.deleted;
-
   const DeletedAgendaScreen({super.key});
+
+  @override
+  State<DeletedAgendaScreen> createState() => _DeletedAgendaScreenState();
+}
+
+class _DeletedAgendaScreenState extends State<DeletedAgendaScreen> {
+  FilterOptions selectedOption = FilterOptions.deleted;
 
   Future<void> _fetchTasks(
       BuildContext context, FilterOptions? selectedOption) async {
@@ -20,9 +25,13 @@ class DeletedAgendaScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    selectedOption = FilterOptions.deleted;
+  void initState() {
+    _fetchTasks(context, selectedOption);
+    super.initState();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trash'),

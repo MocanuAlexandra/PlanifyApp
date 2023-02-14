@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../helpers/utility.dart';
 import '../services/location_based_notification_service.dart';
 import '../widgets/drawer.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const routeName = '/settings';
-  final Function(Map<String, bool>)? saveFilters;
-  final Map<String, bool> currentFilters;
+  final Function(Map<String, dynamic>)? saveFilters;
+  final Map<String, dynamic> currentFilters;
 
   const SettingsScreen(
       {super.key, required this.saveFilters, required this.currentFilters});
@@ -18,27 +19,15 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   //filters
   var _locationBasedNotification = false;
+  int? _intervalOfNotification;
 
   @override
   void initState() {
     _locationBasedNotification =
         widget.currentFilters['locationBasedNotification']!;
+    _intervalOfNotification = widget.currentFilters['intervalOfNotification'];
     super.initState();
   }
-
-  // Widget _buildSwitchListTile(String title, String description,
-  //     bool currentValue, Function updateValue) {
-  //   return SwitchListTile(
-  //     title: Text(title),
-  //     value: currentValue,
-  //     subtitle: Text(description),
-  //     onChanged: (newValue) {
-  //       setState(() async {
-  //         await updateValue(newValue);
-  //       });
-  //     },
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +40,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () {
               final selectedFilters = {
                 'locationBasedNotification': _locationBasedNotification,
+                'intervalOfNotification': _intervalOfNotification,
               };
-              widget.saveFilters!(selectedFilters);
+              saveFilters(context, selectedFilters);
             },
           ),
         ],
@@ -67,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // location based notification
                 SwitchListTile(
                   title: const Text('Location based notification',
-                      style: TextStyle(fontSize: 17 )),
+                      style: TextStyle(fontSize: 17)),
                   value: _locationBasedNotification,
                   subtitle: const Text(
                       'Turn on to receive notifications based on your location.'),
@@ -99,11 +89,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     });
                   },
                 ),
+                //user can select the interval of notifications only if location based notification is enabled
+                if (_locationBasedNotification)
+                  DropdownButtonFormField<int>(
+                    icon: const Icon(Icons.arrow_drop_down),
+                    value: _intervalOfNotification,
+                    items: const [
+                      DropdownMenuItem(
+                        value: 0,
+                        child: Text(
+                          'Non-stop',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 10,
+                        child: Text(
+                          'Every 10 minutes',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 30,
+                        child: Text(
+                          'Every 30 minutes',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 60,
+                        child: Text(
+                          'Every 1 hour',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 1440,
+                        child: Text(
+                          'Once a day',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _intervalOfNotification = value!;
+                      });
+                    },
+                    hint: const Text(
+                      'Select interval of notifications',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  void saveFilters(BuildContext context, Map<String, dynamic> selectedFilters) {
+    if (_intervalOfNotification == null) {
+      Utility.displayInformationalDialog(context,
+          'You must select an interval at which you want to receive location-based notifications');
+    } else {
+      widget.saveFilters!(selectedFilters);
+    }
   }
 }

@@ -26,7 +26,6 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   @override
   void initState() {
-    super.initState();
     _open = widget.initialOpen ?? false;
     _controller = AnimationController(
       value: _open ? 1.0 : 0.0,
@@ -38,6 +37,7 @@ class _ExpandableFabState extends State<ExpandableFab>
       reverseCurve: Curves.easeOutQuad,
       parent: _controller,
     );
+    super.initState();
   }
 
   @override

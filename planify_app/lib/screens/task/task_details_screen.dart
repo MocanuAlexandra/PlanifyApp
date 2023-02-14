@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/notification_service.dart';
 import '../../database/database_helper.dart';
 import '../../helpers/utility.dart';
-import '../../providers/task_provider.dart';
 import '../../models/task.dart';
+import '../../providers/task_provider.dart';
+import '../../services/notification_service.dart';
 import 'add_edit_task_screen.dart';
 
 class TaskDetailsScreen extends StatefulWidget {

@@ -2,23 +2,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
 
-import '../../services/notification_service.dart';
-import '../../providers/task_provider.dart';
 import '../../providers/category_provider.dart';
+import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
-import '../../screens/settings_screen.dart';
-import '../../screens/task/task_details_screen.dart';
+import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
+import '../../screens/agenda/overall_agenda_screen.dart';
+import '../../screens/agenda/task_category_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
 import '../../screens/auth/auth_screen.dart';
-import '../../screens/agenda/overall_agenda_screen.dart';
-import '../../screens/task/add_edit_task_screen.dart';
-import '../../screens/agenda/task_category_agenda_screen.dart';
-import '../../screens/agenda/deleted_agenda_screen.dart';
+import '../../screens/settings_screen.dart';
 import '../../screens/task/add_edit_task_category_screen.dart';
+import '../../screens/task/add_edit_task_screen.dart';
+import '../../screens/task/task_details_screen.dart';
 import '../../services/location_based_notification_service.dart';
+import '../../services/notification_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,8 +36,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Map<String, bool> _filters = {
+  Map<String, dynamic> _filters = {
     'locationBasedNotification': false,
+    'intervalOfNotification': null,
   };
 
   @override
@@ -82,8 +83,9 @@ class _MyAppState extends State<MyApp> {
               }
               if (userSnapshot.hasData) {
                 return const OverallAgendaScreen();
+              } else {
+                return const AuthScreen();
               }
-              return const AuthScreen();
             },
           ),
           routes: {
@@ -108,14 +110,17 @@ class _MyAppState extends State<MyApp> {
         ));
   }
 
-  void _setFilters(Map<String, bool> filterData) {
+  void _setFilters(Map<String, dynamic> filterData) {
     setState(() {
       _filters = filterData;
     });
 
     //check if location based notification is enabled
-    if (_filters['locationBasedNotification']!) {
-      LocationBasedNotificationService.turnOn(context);
+    if (_filters['locationBasedNotification']!=false &&
+        _filters['intervalOfNotification'] != null) {
+           LocationBasedNotificationService.turnOff();
+      LocationBasedNotificationService.turnOn(
+          context, _filters['intervalOfNotification']);
     } else {
       LocationBasedNotificationService.turnOff();
     }

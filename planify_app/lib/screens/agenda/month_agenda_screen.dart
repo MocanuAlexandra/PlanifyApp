@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
 import '../../providers/task_provider.dart';
@@ -40,6 +40,12 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
         _selectedDate = picked;
       });
     }
+  }
+
+  @override
+  void initState() {
+    _fetchTasks(context, selectedOption, _focusMode);
+    super.initState();
   }
 
   @override

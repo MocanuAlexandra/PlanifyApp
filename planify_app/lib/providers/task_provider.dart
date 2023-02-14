@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../helpers/utility.dart';
 import '../database/database_helper.dart';
+import '../helpers/utility.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';
 
