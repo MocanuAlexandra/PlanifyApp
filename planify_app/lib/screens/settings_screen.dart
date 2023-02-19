@@ -6,9 +6,8 @@ import '../widgets/drawer.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const routeName = '/settings';
-  final Function(Map<String, dynamic>)? saveFilters;
+  final Function(Map<String, dynamic>, BuildContext context)? saveFilters;
   final Map<String, dynamic> currentFilters;
-
   const SettingsScreen(
       {super.key, required this.saveFilters, required this.currentFilters});
 
@@ -60,7 +59,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: TextStyle(fontSize: 17)),
                   value: _locationBasedNotification,
                   subtitle: const Text(
-                      'Turn on to receive notifications based on your location.'),
+                    """Turn on to receive notifications based on your location.
+Make sure the app is running in the background.""",
+                    softWrap: true,
+                  ),
                   onChanged: (newValue) async {
                     bool updatedFilterValue;
                     bool permissionStatus;
@@ -154,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       Utility.displayInformationalDialog(context,
           'You must select an interval at which you want to receive location-based notifications');
     } else {
-      widget.saveFilters!(selectedFilters);
+      widget.saveFilters!(selectedFilters, context);
     }
   }
 }

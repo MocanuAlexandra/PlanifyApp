@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../helpers/location_helper.dart';
-import '../helpers/utility.dart';
+import 'location_helper.dart';
+import 'utility.dart';
 import '../models/location_category.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../database/database_helper.dart';
+import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../models/location_category.dart';
 import '../../providers/category_provider.dart';

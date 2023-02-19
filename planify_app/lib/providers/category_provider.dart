@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../database/database_helper.dart';
+import '../helpers/database_helper.dart';
 import '../models/location_category.dart';
 
 class CategoryProvider with ChangeNotifier {

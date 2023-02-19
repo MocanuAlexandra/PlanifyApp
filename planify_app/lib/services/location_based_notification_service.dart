@@ -5,6 +5,7 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/location_helper.dart';
+import '../models/task.dart';
 import '../providers/task_provider.dart';
 import 'notification_service.dart';
 
@@ -22,35 +23,53 @@ class LocationBasedNotificationService {
     return _nearbyPlaces!;
   }
 
-  static Future<void> checkForLocations(
-      BuildContext context, int interval) async {
+  static void checkForLocations(BuildContext context, int interval) async {
+    _context = context;
+    var tasks = <Task>[];
+    var notificationTime = DateTime.now();
+
     //get the nearby places
-    var nearbyPlaces = await getListOfNearbyPlaces();
+    await getListOfNearbyPlaces().then((value) => {
+          //get the user tasks
+          tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList,
 
-    //get the user tasks
-    final tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList;
-
-    //check if the user is near a place with a type of any of his tasks location type
-    for (var task in tasks) {
-      if (task.locationCategory != "No location category chosen") {
-        for (var place in nearbyPlaces) {
-          for (var type in place['types']) {
-            if (type == task.locationCategory) {
-              var notificationTime = DateTime.now();
-              //check if the user has already been notified about this location type 'interval' ago
-              if (NotificationService
-                  .checkIfUserWasNotifiedAboutPlaceTypeInLastInterval(
-                      task.id!, type, notificationTime, interval)) {
-                return;
-              } else {
-                NotificationService.createLocationBasedNotification(
-                    task.id!, place['name'], type, notificationTime);
-              }
+          //check if the user is near a place with a type of any of his tasks location type
+          for (var task in tasks)
+            {
+              if (task.locationCategory != "No location category chosen")
+                {
+                  for (var place in value)
+                    {
+                      for (var type in place['types'])
+                        {
+                          if (type == task.locationCategory)
+                            {
+                              notificationTime = DateTime.now(),
+                              //check if the user has already been notified about this location type 'interval' ago
+                              if (NotificationService
+                                  .checkIfUserWasNotifiedAboutPlaceTypeInLastInterval(
+                                      task.id!,
+                                      type,
+                                      notificationTime,
+                                      interval))
+                                {
+                                  //if yes, do nothing
+                                }
+                              else
+                                {
+                                  NotificationService
+                                      .createLocationBasedNotification(
+                                          task.id!,
+                                          place['name'],
+                                          type,
+                                          notificationTime),
+                                }
+                            }
+                        }
+                    }
+                }
             }
-          }
-        }
-      }
-    }
+        });
   }
 
   static Future<bool> checkLocationPermission(BuildContext context) async {
@@ -80,10 +99,9 @@ class LocationBasedNotificationService {
   // turn on the location service
   static void turnOn(BuildContext context, int interval) {
     Location().changeSettings(accuracy: LocationAccuracy.high);
-    _locationSubscription =
-        Location().onLocationChanged.listen((location) async {
+    _locationSubscription = Location().onLocationChanged.listen((location) {
       _currentLocation = location;
-      await checkForLocations(context, interval);
+      checkForLocations(context, interval);
     });
   }
 

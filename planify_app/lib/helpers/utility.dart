@@ -120,7 +120,7 @@ class Utility {
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Information'),
-              content: Text(text),
+              content: Text(text, softWrap: true,),
               actions: [
                 TextButton(
                     onPressed: () {

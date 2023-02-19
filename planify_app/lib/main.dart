@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/category_provider.dart';
 import '../../providers/task_provider.dart';
@@ -41,8 +44,25 @@ class _MyAppState extends State<MyApp> {
     'intervalOfNotification': null,
   };
 
+  void initFilters() async {
+    // get filters from shared preferences
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String? filtersJson = pref.getString('filters');
+    if (filtersJson != null) {
+      setState(() {
+        _filters = json.decode(filtersJson);
+      });
+    }
+  }
+
+  Future<void> saveFiltersInSP(Map<String, dynamic> filterData) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('filters', json.encode(filterData));
+  }
+
   @override
   void initState() {
+    initFilters();
     NotificationService.setListeners(context);
     super.initState();
   }
@@ -110,19 +130,24 @@ class _MyAppState extends State<MyApp> {
         ));
   }
 
-  void _setFilters(Map<String, dynamic> filterData) {
-    setState(() {
-      _filters = filterData;
-    });
-
-    //check if location based notification is enabled
-    if (_filters['locationBasedNotification']!=false &&
-        _filters['intervalOfNotification'] != null) {
-           LocationBasedNotificationService.turnOff();
-      LocationBasedNotificationService.turnOn(
-          context, _filters['intervalOfNotification']);
-    } else {
-      LocationBasedNotificationService.turnOff();
-    }
+  void _setFilters(Map<String, dynamic> filterData, BuildContext context_) {
+    //save filters in shared preferences
+    saveFiltersInSP(filterData).then((value) => {
+          setState(() {
+            _filters = filterData;
+          }),
+          //check if location based notification is enabled
+          if (_filters['locationBasedNotification'] != false &&
+              _filters['intervalOfNotification'] != null)
+            {
+              LocationBasedNotificationService.turnOff(),
+              LocationBasedNotificationService.turnOn(
+                  context_, _filters['intervalOfNotification']),
+            }
+          else
+            {
+              LocationBasedNotificationService.turnOff(),
+            }
+        });
   }
 }

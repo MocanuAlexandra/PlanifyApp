@@ -15,7 +15,7 @@ import '../../models/location_category.dart';
 import '../../services/notification_service.dart';
 import '../../helpers/utility.dart';
 import '../agenda/overall_agenda_screen.dart';
-import '../../database/database_helper.dart';
+import '../../helpers/database_helper.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
   const AddEditTaskScreen({super.key});

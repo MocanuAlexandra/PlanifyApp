@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../database/database_helper.dart';
+import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
@@ -173,6 +173,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   : Text(loadedTask.address!.address!,
                       style: const TextStyle(fontSize: 16)),
             ),
+            IconButton(
+                onPressed: () {
+                  Utility.displayInformationalDialog(
+                    context,
+                    'Tap on the red marker on the map for additional actions.',
+                  );
+                },
+                icon: const Icon(Icons.help)),
           ]);
   }
 

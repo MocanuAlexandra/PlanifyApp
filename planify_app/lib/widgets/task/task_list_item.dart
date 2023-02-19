@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../database/database_helper.dart';
+import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../models/task_address.dart';
 import '../../providers/task_provider.dart';
