@@ -32,44 +32,37 @@ class LocationBasedNotificationService {
     //check if enough time has passed since the last notification
     var difference = DateTime.now().difference(lastNotifiedTime);
     if (difference.inMinutes < interval) {
-      print('not enough time has passed');
       return;
     } else {
-      print('enough time has passed');
-
       // set the last notified time to now
       lastNotifiedTime = DateTime.now();
-      print(lastNotifiedTime.minute);
 
-      print('check for locations...');
-      //get the nearby places
-      await getListOfNearbyPlaces().then((nearbyPlaces) => {
-            print('nearby places found'),
-            //get the user tasks
-            tasks =
-                Provider.of<TaskProvider>(_context!, listen: false).tasksList,
+      //get the user tasks
+      tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList;
 
-            //check if the user is near a place with a type of any of his tasks location type
-            for (var task in tasks)
-              {
-                if (task.locationCategory != "No location category chosen")
+      //iterate through the tasks that are not deleted and not done
+      //and have a location category
+      for (var task in tasks) {
+        if (task.locationCategory != "No location category chosen" &&
+            task.isDeleted == false &&
+            task.isDone == false) {
+          //get the nearby places
+          await getListOfNearbyPlaces().then((nearbyPlaces) => {
+                for (var place in nearbyPlaces)
                   {
-                    for (var place in nearbyPlaces)
+                    for (var type in place['types'])
                       {
-                        for (var type in place['types'])
+                        if (type == task.locationCategory)
                           {
-                            if (type == task.locationCategory)
-                              {
-                                //create the notification
-                                NotificationService
-                                    .createLocationBasedNotification(task.id!,
-                                        place['name'], type, DateTime.now()),
-                              }
+                            //notify the user
+                            NotificationService.createLocationBasedNotification(
+                                task.id!, place['name'], type, DateTime.now()),
                           }
                       }
                   }
-              }
-          });
+              });
+        }
+      }
     }
   }
 

@@ -445,6 +445,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     }
                 });
           }
+
+          // go back to overall agenda screen
+          Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
         }
       }
       // if we didn't get an id, it means that we are adding a new task
@@ -457,9 +460,10 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //add notifications for the task
           await addNotificationsForTask(taskId);
         }
-      }
 
-      Navigator.of(context).pushReplacementNamed(OverallAgendaScreen.routeName);
+        // go back to overall agenda screen
+        Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
+      }
     }
   }
 
@@ -701,7 +705,10 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           return AlertDialog(
             title: const Text("Question"),
             content: const Text(
-                'This task is done. Do you want to move it to "In progress" tasks?'),
+              """This task is done. Do you want to move it to "In progress" tasks?
+You have to set new reminders if you want to be notified about this task.""",
+              softWrap: true,
+            ),
             actions: <Widget>[
               TextButton(
                 child: const Text("Yes"),

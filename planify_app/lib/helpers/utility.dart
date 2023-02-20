@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -300,7 +302,12 @@ class Utility {
   }
 
   static int _getDueTimeInMinutes(Task task) {
+    //check if the task has a due time
     String dueTimeString = Utility.timeOfDayToString(task.time);
+    if (dueTimeString == '--:--') {
+      return 1440; // 24 hours in minutes
+    }
+
     List<String> parts = dueTimeString.split(':');
     int hour = int.parse(parts[0]);
     int minute = int.parse(parts[1]);
