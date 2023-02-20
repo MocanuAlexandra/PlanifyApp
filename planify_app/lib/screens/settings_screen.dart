@@ -83,6 +83,7 @@ Make sure the app is running in the background.""",
                       // if the user wants to disable these notifications, update the filter value
                     } else {
                       updatedFilterValue = false;
+                      _intervalOfNotification = null;
                     }
 
                     // update _locationBasedNotification with the updated filter value
@@ -152,7 +153,7 @@ Make sure the app is running in the background.""",
   }
 
   void saveFilters(BuildContext context, Map<String, dynamic> selectedFilters) {
-    if (_intervalOfNotification == null) {
+    if (_intervalOfNotification == null && _locationBasedNotification) {
       Utility.displayInformationalDialog(context,
           'You must select an interval at which you want to receive location-based notifications');
     } else {

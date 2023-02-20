@@ -6,8 +6,6 @@ import '../models/task.dart';
 import '../models/task_reminder.dart';
 
 class NotificationService {
-  static Map notifiedPlaces = {};
-
   static void initialize() {
     AwesomeNotifications().initialize(
         // set the icon to null if you want to use the default app icon
@@ -56,7 +54,7 @@ class NotificationService {
   static Future<void> onActionReceivedMethod(
       BuildContext context, ReceivedAction receivedAction) async {}
 
-  static DateTime createLocationBasedNotification(String taskId,
+  static void createLocationBasedNotification(String taskId,
       String locationName, String type, DateTime notificationTime) {
     //create the notification
     AwesomeNotifications().createNotification(
@@ -75,8 +73,6 @@ class NotificationService {
         repeats: false,
       ),
     );
-
-    return notificationTime;
   }
 
   /// Use this method to create a notification
@@ -124,20 +120,5 @@ class NotificationService {
   //delete all notifications for a group key
   static void deleteNotification(String groupKey) {
     AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
-  }
-
-  // Check if the user was notified about a place type in the last interval
-  static checkIfUserWasNotifiedAboutPlaceTypeInLastInterval(
-      taskId, type, now, interval) {
-    var key = "$taskId-$type";
-    if (notifiedPlaces.containsKey(key)) {
-      var lastNotified = notifiedPlaces[key];
-      var difference = now.difference(lastNotified);
-      if (difference.inMinutes < interval) {
-        return true;
-      }
-    }
-    notifiedPlaces[key] = now;
-    return false;
   }
 }

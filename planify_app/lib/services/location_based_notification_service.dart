@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+import '../helpers/utility.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/location_helper.dart';
@@ -14,6 +15,7 @@ class LocationBasedNotificationService {
   static List<dynamic>? _nearbyPlaces;
   static StreamSubscription<LocationData>? _locationSubscription;
   static BuildContext? _context;
+  static DateTime lastNotifiedTime = DateTime.now();
 
   static Future<List<dynamic>> getListOfNearbyPlaces() async {
     await LocationHelper.getNearbyPlacesWithType(
@@ -26,50 +28,49 @@ class LocationBasedNotificationService {
   static void checkForLocations(BuildContext context, int interval) async {
     _context = context;
     var tasks = <Task>[];
-    var notificationTime = DateTime.now();
 
-    //get the nearby places
-    await getListOfNearbyPlaces().then((value) => {
-          //get the user tasks
-          tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList,
+    //check if enough time has passed since the last notification
+    var difference = DateTime.now().difference(lastNotifiedTime);
+    if (difference.inMinutes < interval) {
+      print('not enough time has passed');
+      return;
+    } else {
+      print('enough time has passed');
 
-          //check if the user is near a place with a type of any of his tasks location type
-          for (var task in tasks)
-            {
-              if (task.locationCategory != "No location category chosen")
-                {
-                  for (var place in value)
-                    {
-                      for (var type in place['types'])
-                        {
-                          if (type == task.locationCategory)
-                            {
-                              notificationTime = DateTime.now(),
-                              //check if the user has already been notified about this location type 'interval' ago
-                              if (NotificationService
-                                  .checkIfUserWasNotifiedAboutPlaceTypeInLastInterval(
-                                      task.id!,
-                                      type,
-                                      notificationTime,
-                                      interval))
-                                {
-                                  //if yes, do nothing
-                                }
-                              else
-                                {
-                                  NotificationService
-                                      .createLocationBasedNotification(
-                                          task.id!,
-                                          place['name'],
-                                          type,
-                                          notificationTime),
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+      // set the last notified time to now
+      lastNotifiedTime = DateTime.now();
+      print(lastNotifiedTime.minute);
+
+      print('check for locations...');
+      //get the nearby places
+      await getListOfNearbyPlaces().then((nearbyPlaces) => {
+            print('nearby places found'),
+            //get the user tasks
+            tasks =
+                Provider.of<TaskProvider>(_context!, listen: false).tasksList,
+
+            //check if the user is near a place with a type of any of his tasks location type
+            for (var task in tasks)
+              {
+                if (task.locationCategory != "No location category chosen")
+                  {
+                    for (var place in nearbyPlaces)
+                      {
+                        for (var type in place['types'])
+                          {
+                            if (type == task.locationCategory)
+                              {
+                                //create the notification
+                                NotificationService
+                                    .createLocationBasedNotification(task.id!,
+                                        place['name'], type, DateTime.now()),
+                              }
+                          }
+                      }
+                  }
+              }
+          });
+    }
   }
 
   static Future<bool> checkLocationPermission(BuildContext context) async {
@@ -98,15 +99,24 @@ class LocationBasedNotificationService {
 
   // turn on the location service
   static void turnOn(BuildContext context, int interval) {
-    Location().changeSettings(accuracy: LocationAccuracy.high);
+    print('turn on location service');
+
+    // check for location changes
+    Location()
+        .changeSettings(accuracy: LocationAccuracy.high, interval: interval);
     _locationSubscription = Location().onLocationChanged.listen((location) {
+      // update the current location
       _currentLocation = location;
+
+      // check for nearby places
+      print('try to check for nearby places');
       checkForLocations(context, interval);
     });
   }
 
   // turn off the location service
   static void turnOff() async {
+    print('turning off location service');
     await _locationSubscription?.cancel();
   }
 }
