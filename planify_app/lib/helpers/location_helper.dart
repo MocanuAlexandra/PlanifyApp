@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import 'package:planify_app/helpers/utility.dart';
+import '../providers/task_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/task.dart';
@@ -33,9 +36,8 @@ class LocationHelper {
   // function that gets the nearby places of a certain location based on lat and long
   static Future<List<dynamic>> getNearbyPlacesWithType(
       {double? latitude, double? longitude}) async {
-    //TODO modify this radius
     final url =
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=400&key=$GOOGLE_API_KEY';
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=50&key=$GOOGLE_API_KEY';
     final response = await http.get(Uri.parse(url));
     return json.decode(response.body)['results'];
   }
@@ -44,21 +46,21 @@ class LocationHelper {
       List<dynamic> taskList, double currentLat, double currentLng) async {
     String url = 'https://www.google.com/maps/dir/$currentLat,$currentLng/';
 
-    //iterate through the tasks list and get the lat and long of each task
+    // Sort the tasks list by due time in ascending order
+    Utility.sortTaskListByDueTime(taskList);
+
+    // Iterate through the tasks list and get the lat and long of each task
     for (int i = 0; i < taskList.length; i++) {
       Task task = taskList[i];
-
-      //TODO sort the task ascending by due time
-        url += '${task.address!.latitude},${task.address!.longitude}';
-      if (i != taskList.length - 1) {
-        url += '/';
+      if (task.address!.latitude != 0 && task.address!.longitude != 0) {
+        url += '${task.address!.latitude},${task.address!.longitude}/';
       }
     }
 
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } else {
-      throw 'Could not launch $url';
+      throw 'Could not launch Google Maps with URL: $url';
     }
   }
 }

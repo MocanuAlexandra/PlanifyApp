@@ -120,7 +120,10 @@ class Utility {
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Information'),
-              content: Text(text, softWrap: true,),
+              content: Text(
+                text,
+                softWrap: true,
+              ),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -286,5 +289,21 @@ class Utility {
               Due time: ${dueTime.hour}:${dueTime.minute}''';
     }
     return '';
+  }
+
+  static void sortTaskListByDueTime(List<dynamic> taskList) {
+    taskList.sort((task1, task2) {
+      int dueTimeInMinutes1 = _getDueTimeInMinutes(task1);
+      int dueTimeInMinutes2 = _getDueTimeInMinutes(task2);
+      return dueTimeInMinutes1.compareTo(dueTimeInMinutes2);
+    });
+  }
+
+  static int _getDueTimeInMinutes(Task task) {
+    String dueTimeString = Utility.timeOfDayToString(task.time);
+    List<String> parts = dueTimeString.split(':');
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+    return hour * 60 + minute;
   }
 }
