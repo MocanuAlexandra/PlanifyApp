@@ -58,6 +58,7 @@ dependencies:
   month_picker_dialog_2: ^0.6.1+2 # For month picker
   awesome_notifications: ^0.7.4+1 # For notifications
   shared_preferences: ^2.0.17 # For local storage
+  url_launcher: ^6.1.9 # For opening URLs
 
 
 

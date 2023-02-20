@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import '../providers/task_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../models/task.dart';
 
 const GOOGLE_API_KEY = 'AIzaSyBCtWNcI4lD7pMey-ZghzlfRvFjQ2FfLhM';
 
@@ -36,5 +39,27 @@ class LocationHelper {
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=400&key=$GOOGLE_API_KEY';
     final response = await http.get(Uri.parse(url));
     return json.decode(response.body)['results'];
+  }
+
+  static void launchMaps(
+      List<dynamic> taskList, double currentLat, double currentLng) async {
+    String url = 'https://www.google.com/maps/dir/$currentLat,$currentLng/';
+
+    //iterate through the tasks list and get the lat and long of each task
+    for (int i = 0; i < taskList.length; i++) {
+      Task task = taskList[i];
+
+      //TODO sort the task ascending by due time
+        url += '${task.address!.latitude},${task.address!.longitude}';
+      if (i != taskList.length - 1) {
+        url += '/';
+      }
+    }
+
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

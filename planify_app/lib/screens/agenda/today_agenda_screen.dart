@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/location_helper.dart';
 import '../../helpers/utility.dart';
 import '../../providers/task_provider.dart';
 import '../../widgets/drawer.dart';
@@ -19,11 +20,14 @@ class TodayAgendaScreen extends StatefulWidget {
 class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
+  var tasks = [];
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode) async {
     await Provider.of<TaskProvider>(context, listen: false)
         .fetchTasks(true, null, null, selectedOption, focusMode);
+
+    tasks = Provider.of<TaskProvider>(context, listen: false).tasksList;
   }
 
   @override
@@ -38,6 +42,16 @@ class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
       appBar: AppBar(
         title: const Text('Today'),
         actions: [
+          IconButton(
+              onPressed: () async {
+                //get current location of user
+                var locData = await LocationHelper.getCurrentLocation();
+
+                //launch map
+                LocationHelper.launchMaps(
+                    tasks, locData.latitude!, locData.longitude);
+              },
+              icon: const Icon(Icons.directions)),
           displayFilters(context),
         ],
       ),
