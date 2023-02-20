@@ -44,12 +44,22 @@ class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
         actions: [
           IconButton(
               onPressed: () async {
-                //get current location of user
-                var locData = await LocationHelper.getCurrentLocation();
+                //check if at least one task has location chosen
+                if (tasks
+                    .where(
+                        (task) => task.address.address != 'No address chosen')
+                    .toList()
+                    .isEmpty) {
+                  Utility.displayInformationalDialog(
+                      context, 'There is no task with location chosen');
+                } else {
+                  //get current location of user
+                  var locData = await LocationHelper.getCurrentLocation();
 
-                //launch map
-                LocationHelper.launchMaps(
-                    tasks, locData.latitude!, locData.longitude);
+                  //launch map
+                  LocationHelper.launchMaps(
+                      tasks, locData.latitude!, locData.longitude);
+                }
               },
               icon: const Icon(Icons.directions)),
           displayFilters(context),
