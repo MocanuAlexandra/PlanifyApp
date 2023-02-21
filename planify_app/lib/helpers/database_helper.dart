@@ -350,4 +350,21 @@ class DBHelper {
       }
     }
   }
+
+  // function that return a task after getting its id
+  static Future<Task> getTask(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final task = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+    return Task(
+      id: task.id,
+      title: task['title'],
+      dueDate: Utility.stringToDateTime(task['dueDate']),
+      time: Utility.stringToTimeOfDay(task['time']),
+    );
+  }             
 }

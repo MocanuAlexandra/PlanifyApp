@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import '../helpers/database_helper.dart';
 
 import '../helpers/utility.dart';
 import '../models/task.dart';
@@ -52,7 +55,26 @@ class NotificationService {
   /// Use this method to detect when the user taps on a notification or action button
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
-      BuildContext context, ReceivedAction receivedAction) async {}
+      BuildContext context, ReceivedAction receivedAction) async {
+    if (receivedAction.buttonKeyPressed == 'delay') {
+      //create a new notification with the same content but with a new time
+
+      //get the task id
+      var taskId = receivedAction.payload!['groupKey'];
+
+      //get the task
+      var task = await DBHelper.getTask(taskId!);
+
+      //create a new notification with a delay of 5 minutes
+      _createLocalNotification(taskId, task);
+    } else if (receivedAction.buttonKeyPressed == 'done') {
+      //get the task id
+      var taskId = receivedAction.payload!['groupKey'];
+
+      //mark the task as done
+      DBHelper.markTaskAsDone(taskId!);
+    }
+  }
 
   static void createLocationBasedNotification(String taskId,
       String locationName, String type, DateTime notificationTime) {
@@ -66,17 +88,21 @@ class NotificationService {
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,
+        payload: {
+          'groupKey': taskId,
+        },
       ),
       schedule: NotificationCalendar(
         hour: notificationTime.hour,
         minute: notificationTime.minute,
-        repeats: false,
+        repeats: true,
+        preciseAlarm: true,
       ),
     );
   }
 
   /// Use this method to create a notification
-  static void createNotification(
+  static void createNotificationForTask(
       Task newTask, String reminder, TaskReminder newReminder, String taskId) {
     //set the date & time of the notification
     TimeOfDay? notificationTime;
@@ -99,6 +125,9 @@ class NotificationService {
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,
+        payload: {
+          'groupKey': taskId,
+        },
       ),
       schedule: notificationDate != null
           ? NotificationCalendar(
@@ -114,11 +143,42 @@ class NotificationService {
                   repeats: false,
                 )
               : null,
+      actionButtons: [
+        //TODO not bringing up the app when clicked
+        NotificationActionButton(
+          key: 'done',
+          label: 'Mark as Done',
+          autoDismissible: true,
+        ),
+        NotificationActionButton(
+          key: 'delay',
+          label: 'Snooze for 5 minutes',
+          autoDismissible: true,
+        ),
+      ],
     );
   }
 
   //delete all notifications for a group key
   static void deleteNotification(String groupKey) {
     AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
+  }
+
+  static void _createLocalNotification(String taskId, Task task) {
+    AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: Random().nextInt(1000),
+          channelKey: 'basic_channel',
+          title: "Reminder for task: ${task.title}",
+          body: Utility.notificationBodyString(task.dueDate, task.time),
+          displayOnBackground: true,
+          displayOnForeground: true,
+          groupKey: taskId,
+        ),
+        schedule: NotificationCalendar(
+          hour: DateTime.now().hour,
+          minute: DateTime.now().minute + 5,
+          repeats: false,
+        ));
   }
 }

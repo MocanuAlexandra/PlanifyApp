@@ -522,7 +522,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         }
 
         //add the notification to notification center
-        NotificationService.createNotification(
+        NotificationService.createNotificationForTask(
             _editedTask, reminder, newReminder, taskId);
       }
     }
