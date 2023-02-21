@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import '../helpers/utility.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/location_helper.dart';
@@ -92,24 +91,35 @@ class LocationBasedNotificationService {
 
   // turn on the location service
   static void turnOn(BuildContext context, int interval) {
-    print('turn on location service');
-
-    // check for location changes
     Location()
         .changeSettings(accuracy: LocationAccuracy.high, interval: interval);
     _locationSubscription = Location().onLocationChanged.listen((location) {
+      // at first, the current location is null so we need to initialize it
+      // and we will check for the first time for nearby places
+      if (_currentLocation == null) {
+        _currentLocation = location;
+        checkForLocations(context, interval);
+      }
+
+      // then check if the current location is different from the new location
+      // so that the user doesn't get notified for the same location
+      if (_currentLocation!.latitude!.toStringAsFixed(4) ==
+              location.latitude!.toStringAsFixed(4) &&
+          _currentLocation!.longitude!.toStringAsFixed(4) ==
+              location.longitude!.toStringAsFixed(4)) {
+        return;
+      }
+
       // update the current location
       _currentLocation = location;
 
       // check for nearby places
-      print('try to check for nearby places');
       checkForLocations(context, interval);
     });
   }
 
   // turn off the location service
   static void turnOff() async {
-    print('turning off location service');
     await _locationSubscription?.cancel();
   }
 }
