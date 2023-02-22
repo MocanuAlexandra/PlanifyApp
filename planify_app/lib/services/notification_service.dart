@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import '../helpers/database_helper.dart';
 
+import '../helpers/database_helper.dart';
 import '../helpers/utility.dart';
 import '../models/task.dart';
 import '../models/task_reminder.dart';
@@ -98,6 +98,14 @@ class NotificationService {
         repeats: true,
         preciseAlarm: true,
       ),
+      actionButtons: [
+        //TODO not bringing up the app when clicked
+        NotificationActionButton(
+          key: 'done',
+          label: 'MARK AS DONE',
+          autoDismissible: true,
+        ),
+      ],
     );
   }
 
@@ -147,12 +155,12 @@ class NotificationService {
         //TODO not bringing up the app when clicked
         NotificationActionButton(
           key: 'done',
-          label: 'Mark as Done',
+          label: 'MARK AS DONE',
           autoDismissible: true,
         ),
         NotificationActionButton(
           key: 'delay',
-          label: 'Snooze for 5 minutes',
+          label: 'SNOOZE 5 MIN',
           autoDismissible: true,
         ),
       ],
@@ -166,19 +174,33 @@ class NotificationService {
 
   static void _createLocalNotification(String taskId, Task task) {
     AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: Random().nextInt(1000),
-          channelKey: 'basic_channel',
-          title: "Reminder for task: ${task.title}",
-          body: Utility.notificationBodyString(task.dueDate, task.time),
-          displayOnBackground: true,
-          displayOnForeground: true,
-          groupKey: taskId,
+      content: NotificationContent(
+        id: Random().nextInt(1000),
+        channelKey: 'basic_channel',
+        title: "Reminder for task: ${task.title}",
+        body: Utility.notificationBodyString(task.dueDate, task.time),
+        displayOnBackground: true,
+        displayOnForeground: true,
+        groupKey: taskId,
+      ),
+      schedule: NotificationCalendar(
+        hour: DateTime.now().hour,
+        minute: DateTime.now().minute + 5,
+        repeats: false,
+      ),
+      actionButtons: [
+        //TODO not bringing up the app when clicked
+        NotificationActionButton(
+          key: 'done',
+          label: 'MARK AS DONE',
+          autoDismissible: true,
         ),
-        schedule: NotificationCalendar(
-          hour: DateTime.now().hour,
-          minute: DateTime.now().minute + 5,
-          repeats: false,
-        ));
+        NotificationActionButton(
+          key: 'delay',
+          label: 'SNOOZE 5 MIN',
+          autoDismissible: true,
+        ),
+      ],
+    );
   }
 }
