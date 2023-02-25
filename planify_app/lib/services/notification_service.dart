@@ -27,15 +27,9 @@ class NotificationService {
 
   static void setListeners(BuildContext context) {
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: (ReceivedAction receivedAction) {
-        return NotificationService.onActionReceivedMethod(
-            context, receivedAction);
-      },
-      onDismissActionReceivedMethod: (ReceivedAction receivedAction) {
-        return NotificationService.onDismissActionReceivedMethod(
-            context, receivedAction);
-      },
-    );
+        onActionReceivedMethod: NotificationService.onActionReceivedMethod,
+        onDismissActionReceivedMethod:
+            NotificationService.onDismissActionReceivedMethod);
 
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
@@ -50,15 +44,13 @@ class NotificationService {
   /// Use this method to detect if the user dismissed a notification
   @pragma("vm:entry-point")
   static Future<void> onDismissActionReceivedMethod(
-      BuildContext context, ReceivedAction receivedAction) async {}
+      ReceivedAction receivedAction) async {}
 
   /// Use this method to detect when the user taps on a notification or action button
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
-      BuildContext context, ReceivedAction receivedAction) async {
+      ReceivedAction receivedAction) async {
     if (receivedAction.buttonKeyPressed == 'delay') {
-      //create a new notification with the same content but with a new time
-
       //get the task id
       var taskId = receivedAction.payload!['groupKey'];
 
@@ -99,11 +91,11 @@ class NotificationService {
         preciseAlarm: true,
       ),
       actionButtons: [
-        //TODO not bringing up the app when clicked
         NotificationActionButton(
           key: 'done',
           label: 'MARK AS DONE',
           autoDismissible: true,
+          actionType: ActionType.SilentAction,
         ),
       ],
     );
@@ -152,16 +144,17 @@ class NotificationService {
                 )
               : null,
       actionButtons: [
-        //TODO not bringing up the app when clicked
         NotificationActionButton(
           key: 'done',
           label: 'MARK AS DONE',
           autoDismissible: true,
+          actionType: ActionType.SilentAction,
         ),
         NotificationActionButton(
           key: 'delay',
           label: 'SNOOZE 5 MIN',
           autoDismissible: true,
+          actionType: ActionType.SilentAction,
         ),
       ],
     );
@@ -172,7 +165,8 @@ class NotificationService {
     AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
   }
 
-  static void _createLocalNotification(String taskId, Task task) {
+  @pragma("vm:entry-point")
+  static Future<void> _createLocalNotification(String taskId, Task task) async {
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: Random().nextInt(1000),
@@ -182,23 +176,28 @@ class NotificationService {
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,
+        payload: {
+          'groupKey': taskId,
+        },
       ),
-      schedule: NotificationCalendar(
+      schedule:
+       NotificationCalendar(
         hour: DateTime.now().hour,
         minute: DateTime.now().minute + 5,
         repeats: false,
       ),
       actionButtons: [
-        //TODO not bringing up the app when clicked
         NotificationActionButton(
           key: 'done',
           label: 'MARK AS DONE',
           autoDismissible: true,
+          actionType: ActionType.SilentAction,
         ),
         NotificationActionButton(
           key: 'delay',
           label: 'SNOOZE 5 MIN',
           autoDismissible: true,
+          actionType: ActionType.SilentAction,
         ),
       ],
     );

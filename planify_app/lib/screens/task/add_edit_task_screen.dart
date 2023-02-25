@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:googleapis/calendar/v3.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
@@ -415,6 +420,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     );
   }
 
+  void prompt(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch Google Maps with URL: $url';
+    }
+  }
+
   //main method
   Future<void> _addEditTask() async {
     //check for validation of the form
@@ -454,6 +467,34 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       else {
         //add the task in the database
         final taskId = await DBHelper.addTask(_editedTask);
+
+        //TODO try
+
+        // Event event = Event(); // Create object of event
+        // event.summary = 'bla bla '; //Setting summary of object
+
+        // EventDateTime start = EventDateTime(); //Setting start time
+        // start.dateTime = DateTime.now();
+        // start.timeZone = "GMT+05:00";
+        // event.start = start;
+
+        // EventDateTime end = EventDateTime(); //setting end time
+        // end.timeZone = "GMT+05:00";
+        // end.dateTime = DateTime.now();
+        // event.end = end;
+
+        // ClientId? clientID;
+        // const scopes = [CalendarApi.calendarScope];
+        // if (Platform.isAndroid) {
+        //   clientID = ClientId(
+        //       "145527527415-bf9pe99ep90vg118s3ipois81gqppjic.apps.googleusercontent.com");
+        // }
+        // // add the event in the calendar
+        // final authClient =
+        //     await clientViaUserConsent(clientID!, scopes, prompt);
+
+        // final calendar = CalendarApi(authClient);
+        // calendar.events.insert(event, 'primary');
 
         //check if the user selected a due date or time
         if (_editedTask.dueDate != null || _editedTask.time != null) {
