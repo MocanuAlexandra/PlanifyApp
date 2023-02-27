@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
-import '../../models/location_category.dart';
-import '../../providers/category_provider.dart';
+import '../../models/task_category.dart';
+import '../../providers/task_category_provider.dart';
 import '../agenda/overall_agenda_screen.dart';
 
 class AddEditTaskCategoryScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class AddEditTaskCategoryScreen extends StatefulWidget {
 
 class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
   final _formKey = GlobalKey<FormState>();
-  var _editedCategory = LocationCategory(
+  var _editedCategory = TaskCategory(
     id: null,
     name: '',
   );
@@ -37,8 +37,9 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
           ModalRoute.of(context)!.settings.arguments as String?;
 
       if (categoryName != null) {
-        _editedCategory = Provider.of<CategoryProvider>(context, listen: false)
-            .findByName(categoryName);
+        _editedCategory =
+            Provider.of<TaskCategoryProvider>(context, listen: false)
+                .findByName(categoryName);
         _initValues = {
           'name': _editedCategory.name!,
         };
@@ -57,14 +58,14 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
       //check if we got an id
       if (_editedCategory.id != null) {
         //update category
-        DBHelper.updateCategory(_editedCategory.id!, _editedCategory);
+        DBHelper.updateTaskCategory(_editedCategory.id!, _editedCategory);
 
         // go back to overall agenda screen
         Navigator.of(context)
             .pushReplacementNamed(OverallAgendaScreen.routeName);
       } else {
         //add category
-        DBHelper.addCategory(_editedCategory);
+        DBHelper.addTaskCategory(_editedCategory);
 
         // go back to overall agenda screen
         Navigator.of(context)
@@ -92,7 +93,8 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
                     return;
                   } else {
                     //check if the category is used in any task
-                    DBHelper.isCategoryUsed(_editedCategory.id!).then((value) {
+                    DBHelper.isTaskCategoryUsed(_editedCategory.id!)
+                        .then((value) {
                       if (value) {
                         Utility.displayInformationalDialog(context,
                             'You cannot delete this category because it is used in one or more tasks.');
@@ -142,7 +144,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
                           return null;
                         },
                         onSaved: (value) {
-                          _editedCategory = LocationCategory(
+                          _editedCategory = TaskCategory(
                             id: _editedCategory.id,
                             name: value,
                           );

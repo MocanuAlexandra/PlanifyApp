@@ -8,7 +8,7 @@ import '../../screens/agenda/deleted_agenda_screen.dart';
 import '../../screens/agenda/month_agenda_screen.dart';
 import '../../screens/agenda/overall_agenda_screen.dart';
 import '../../screens/agenda/today_agenda_screen.dart';
-import '../providers/category_provider.dart';
+import '../providers/task_category_provider.dart';
 import '../screens/agenda/task_category_agenda_screen.dart';
 import '../screens/settings_screen.dart';
 
@@ -24,7 +24,7 @@ class _MainDrawerState extends State<MainDrawer> {
 
   //auxiliary functions
   Future<void> _fetchCategories(BuildContext context) async {
-    await Provider.of<CategoryProvider>(context, listen: false)
+    await Provider.of<TaskCategoryProvider>(context, listen: false)
         .fetchCategories();
   }
 
@@ -61,8 +61,7 @@ class _MainDrawerState extends State<MainDrawer> {
       onTap: () {
         FirebaseAuth.instance.signOut();
         GoogleSignIn().signOut();
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-        });
+        SchedulerBinding.instance.addPostFrameCallback((_) {});
       },
     );
   }
@@ -155,7 +154,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
-                    : Consumer<CategoryProvider>(
+                    : Consumer<TaskCategoryProvider>(
                         builder: (context, categories, _) => SizedBox(
                           height: 150,
                           child: Scrollbar(

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/database_helper.dart';
-import '../models/location_category.dart';
+import '../models/task_category.dart';
 
-class CategoryProvider with ChangeNotifier {
-  List<LocationCategory> _categories = [];
+class TaskCategoryProvider with ChangeNotifier {
+  List<TaskCategory> _categories = [];
 
-  List<LocationCategory> get categoriesList {
+  List<TaskCategory> get categoriesList {
     return [..._categories];
   }
 
   Future<void> fetchCategories() async {
-    final categoriesData = await DBHelper.fetchCategories();
+    final categoriesData = await DBHelper.fetchTaskCategories();
 
     _categories = categoriesData.map(
       (category) {
-        return LocationCategory(
+        return TaskCategory(
           id: category['id'],
           name: category['name'],
         );
@@ -23,7 +23,7 @@ class CategoryProvider with ChangeNotifier {
     ).toList();
   }
 
-  LocationCategory findByName(String categoryName) {
+  TaskCategory findByName(String categoryName) {
     return _categories.firstWhere((category) => category.name == categoryName);
   }
 }

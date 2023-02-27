@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CheckboxList extends StatefulWidget {
+  final String title;
   final List<String> items;
   final List<String>? selectedItems;
 
   const CheckboxList(
-      {Key? key, required this.items, required this.selectedItems})
+      {Key? key,
+      required this.items,
+      required this.selectedItems,
+      required this.title})
       : super(key: key);
 
   @override
@@ -15,9 +19,11 @@ class CheckboxList extends StatefulWidget {
 class _CheckboxListState extends State<CheckboxList> {
   final ScrollController _controller = ScrollController();
   late List<String> _selectedItems;
+  late String _title;
 
   @override
   void initState() {
+    _title = widget.title;
     if (widget.selectedItems != null) {
       _selectedItems = widget.selectedItems!;
     } else {
@@ -39,9 +45,9 @@ class _CheckboxListState extends State<CheckboxList> {
           children: <Widget>[
             Container(
               margin: const EdgeInsets.all(15.0),
-              child: const Text(
-                'Select reminders',
-                style: TextStyle(
+              child: Text(
+                _title,
+                style: const TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),

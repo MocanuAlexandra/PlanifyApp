@@ -1,25 +1,22 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:googleapis/calendar/v3.dart';
-import 'package:googleapis_auth/auth_io.dart';
+import 'package:planify_app/widgets/other/user_list_search.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
-import '../../models/location_category.dart';
+import '../../models/task_category.dart';
 import '../../models/task.dart';
 import '../../models/task_address.dart';
 import '../../models/task_reminder.dart';
-import '../../providers/category_provider.dart';
+import '../../providers/task_category_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/location/location_input.dart';
-import '../../widgets/other/check_box.dart';
+import '../../widgets/other/check_box_list.dart';
 import '../agenda/overall_agenda_screen.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
@@ -219,71 +216,15 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     );
   }
 
-  Row remindersField() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton.icon(
-          onPressed: _editedTask.time == null && _editedTask.dueDate == null
-              ? () => Utility.displayInformationalDialog(
-                  context, 'Please select due date or due time first!')
-              : _editedTask.time == null && _editedTask.dueDate != null
-                  ? () async {
-                      final result = await showDialog(
-                        context: context,
-                        builder: (context) => _showReminderPicker(false, true),
-                      );
-                      if (result != null) {
-                        setState(() {
-                          _selectedReminders = result;
-                        });
-                      }
-                    }
-                  : _editedTask.time != null && _editedTask.dueDate == null
-                      ? () async {
-                          final result = await showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _showReminderPicker(true, false),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              _selectedReminders = result;
-                            });
-                          }
-                        }
-                      : () async {
-                          final result = await showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _showReminderPicker(true, true),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              _selectedReminders = result;
-                            });
-                          }
-                        },
-          icon: const Icon(Icons.access_alarm),
-          label: const Text(
-            'Set reminder',
-            style: TextStyle(fontSize: 15),
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _showReminderPicker(
       [bool? isDueTimeSelected, bool? isDueDateSelected]) {
     return _editedTask.id != null && _dueTimeDueDateChanged == true
         ? CheckboxList(
             items:
                 Utility.getReminderTypes(isDueTimeSelected, isDueDateSelected),
-            selectedItems: _selectedReminders)
+            selectedItems: _selectedReminders,
+            title: 'Select reminders',
+          )
         : _editedTask.id != null && _dueTimeDueDateChanged == false
             ? FutureBuilder(
                 future: _fetchReminders(context, _editedTask.id!),
@@ -298,13 +239,16 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                               isDueTimeSelected, isDueDateSelected),
                           selectedItems: determineAlreadySelectedReminders(
                               reminders, isDueTimeSelected, isDueDateSelected),
+                          title: 'Select reminders',
                         ),
                       ),
               )
             : CheckboxList(
                 items: Utility.getReminderTypes(
                     isDueTimeSelected, isDueDateSelected),
-                selectedItems: _selectedReminders);
+                selectedItems: _selectedReminders,
+                title: 'Select reminders',
+              );
   }
 
   List<String> determineAlreadySelectedReminders(TaskReminderProvider reminders,
@@ -382,41 +326,113 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   FutureBuilder<void> categoryField(BuildContext context) {
     return FutureBuilder(
       future: _fetchCategories(context),
-      builder: (context, snapshot) => snapshot.connectionState ==
-              ConnectionState.waiting
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : DropdownButtonFormField<String>(
-              value: _editedTask.category,
-              onChanged: (String? value) {
-                setState(() {
-                  _editedTask = Task(
-                    id: _editedTask.id,
-                    title: _editedTask.title,
-                    dueDate: _editedTask.dueDate,
-                    address: _editedTask.address,
-                    time: _editedTask.time,
-                    priority: _editedTask.priority,
-                    isDone: _editedTask.isDone,
-                    category: value,
-                    locationCategory: _editedTask.locationCategory,
-                  );
-                });
-              },
-              items: Provider.of<CategoryProvider>(context)
-                  .categoriesList
-                  .map<DropdownMenuItem<String>>((LocationCategory category) {
-                return DropdownMenuItem<String>(
-                  value: category.name,
-                  child: Text(category.name!),
-                );
-              }).toList(),
-              hint: const Text(
-                'Select category',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
+      builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.waiting
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : DropdownButtonFormField<String>(
+                  value: _editedTask.category,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _editedTask = Task(
+                        id: _editedTask.id,
+                        title: _editedTask.title,
+                        dueDate: _editedTask.dueDate,
+                        address: _editedTask.address,
+                        time: _editedTask.time,
+                        priority: _editedTask.priority,
+                        isDone: _editedTask.isDone,
+                        category: value,
+                        locationCategory: _editedTask.locationCategory,
+                      );
+                    });
+                  },
+                  items: Provider.of<TaskCategoryProvider>(context)
+                      .categoriesList
+                      .map<DropdownMenuItem<String>>((TaskCategory category) {
+                    return DropdownMenuItem<String>(
+                      value: category.name,
+                      child: Text(category.name!),
+                    );
+                  }).toList(),
+                  hint: const Text(
+                    'Select category',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+    );
+  }
+
+  Row reminderAndShareWithField() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton.icon(
+          onPressed: _editedTask.time == null && _editedTask.dueDate == null
+              ? () => Utility.displayInformationalDialog(
+                  context, 'Please select due date or due time first!')
+              : _editedTask.time == null && _editedTask.dueDate != null
+                  ? () async {
+                      final result = await showDialog(
+                        context: context,
+                        builder: (context) => _showReminderPicker(false, true),
+                      );
+                      if (result != null) {
+                        setState(() {
+                          _selectedReminders = result;
+                        });
+                      }
+                    }
+                  : _editedTask.time != null && _editedTask.dueDate == null
+                      ? () async {
+                          final result = await showDialog(
+                            context: context,
+                            builder: (context) =>
+                                _showReminderPicker(true, false),
+                          );
+                          if (result != null) {
+                            setState(() {
+                              _selectedReminders = result;
+                            });
+                          }
+                        }
+                      : () async {
+                          final result = await showDialog(
+                            context: context,
+                            builder: (context) =>
+                                _showReminderPicker(true, true),
+                          );
+                          if (result != null) {
+                            setState(() {
+                              _selectedReminders = result;
+                            });
+                          }
+                        },
+          icon: const Icon(Icons.access_alarm),
+          label: const Text(
+            'Set reminder',
+            style: TextStyle(fontSize: 15),
+          ),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).primaryColor,
+          ),
+        ),
+        TextButton.icon(
+          onPressed: () async {
+            showDialog(
+                context: context, builder: (context) => const UserListSearch());
+          },
+          icon: const Icon(Icons.share),
+          label: const Text(
+            'Share with',
+            style: TextStyle(fontSize: 15),
+          ),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).primaryColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -467,34 +483,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       else {
         //add the task in the database
         final taskId = await DBHelper.addTask(_editedTask);
-
-        //TODO try
-
-        // Event event = Event(); // Create object of event
-        // event.summary = 'bla bla '; //Setting summary of object
-
-        // EventDateTime start = EventDateTime(); //Setting start time
-        // start.dateTime = DateTime.now();
-        // start.timeZone = "GMT+05:00";
-        // event.start = start;
-
-        // EventDateTime end = EventDateTime(); //setting end time
-        // end.timeZone = "GMT+05:00";
-        // end.dateTime = DateTime.now();
-        // event.end = end;
-
-        // ClientId? clientID;
-        // const scopes = [CalendarApi.calendarScope];
-        // if (Platform.isAndroid) {
-        //   clientID = ClientId(
-        //       "145527527415-bf9pe99ep90vg118s3ipois81gqppjic.apps.googleusercontent.com");
-        // }
-        // // add the event in the calendar
-        // final authClient =
-        //     await clientViaUserConsent(clientID!, scopes, prompt);
-
-        // final calendar = CalendarApi(authClient);
-        // calendar.events.insert(event, 'primary');
 
         //check if the user selected a due date or time
         if (_editedTask.dueDate != null || _editedTask.time != null) {
@@ -594,15 +582,16 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       const SizedBox(height: 10),
                       dueDateField(),
                       dueTimeField(),
-                      remindersField(),
                       locationField(),
                       const SizedBox(height: 10),
                       priorityField(),
                       const SizedBox(height: 10),
                       categoryField(context),
                       const SizedBox(height: 10),
+                      reminderAndShareWithField(),
+                      const SizedBox(height: 5),
                       Container(
-                        padding: const EdgeInsets.only(top: 25),
+                        padding: const EdgeInsets.only(top: 30),
                         child: ElevatedButton(
                             onPressed: _addEditTask,
                             style: ElevatedButton.styleFrom(
@@ -632,7 +621,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
   //auxiliary functions
   Future<void> _fetchCategories(BuildContext context) async {
-    await Provider.of<CategoryProvider>(context, listen: false)
+    await Provider.of<TaskCategoryProvider>(context, listen: false)
         .fetchCategories();
   }
 

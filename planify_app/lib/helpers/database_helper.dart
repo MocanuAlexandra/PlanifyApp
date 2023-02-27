@@ -3,14 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'location_helper.dart';
 import 'utility.dart';
-import '../models/location_category.dart';
+import '../models/task_category.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';
 import '../models/task_reminder.dart';
 
 class DBHelper {
   // function for fetching categories from the database from the connected user
-  static Future<List<Map<String, dynamic>>> fetchCategories() async {
+  static Future<List<Map<String, dynamic>>> fetchTaskCategories() async {
     final user = FirebaseAuth.instance.currentUser;
 
     //get the categories from the connected user
@@ -101,6 +101,27 @@ class DBHelper {
     }).toList();
 
     return remindersList;
+  }
+
+  // function for fetching the users from the database
+  static Future<List<Map<String, dynamic>>> fetchUsers() async {
+    //get the users from the database
+    final users = await FirebaseFirestore.instance.collection('users').get();
+
+    //check if there is no users
+    if (users.docs.isEmpty) {
+      return [];
+    }
+
+    //convert the users to a list of maps
+    final usersList = users.docs.map((user) {
+      return {
+        'id': user.id,
+        'email': user['email'],
+      };
+    }).toList();
+
+    return usersList;
   }
 
   // function for adding tasks to the database
@@ -267,7 +288,7 @@ class DBHelper {
         .update({'isDeleted': false});
   }
 
-  static void updateCategory(String id, LocationCategory editedCategory) async {
+  static void updateTaskCategory(String id, TaskCategory editedCategory) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -276,7 +297,7 @@ class DBHelper {
         .update({'name': editedCategory.name});
   }
 
-  static void addCategory(LocationCategory editedCategory) async {
+  static void addTaskCategory(TaskCategory editedCategory) async {
     if (editedCategory.name == null) {
       return;
     }
@@ -302,7 +323,7 @@ class DBHelper {
   }
 
   //check if the category is used in any task
-  static Future<bool> isCategoryUsed(String categoryId) async {
+  static Future<bool> isTaskCategoryUsed(String categoryId) async {
     final user = FirebaseAuth.instance.currentUser;
     final category = await FirebaseFirestore.instance
         .collection('users')
@@ -366,5 +387,5 @@ class DBHelper {
       dueDate: Utility.stringToDateTime(task['dueDate']),
       time: Utility.stringToTimeOfDay(task['time']),
     );
-  }             
+  }
 }

@@ -1,8 +1,8 @@
-class LocationCategory {
+class TaskCategory {
   final String? id;
   final String? name;
 
-  LocationCategory({
+  TaskCategory({
     this.id,
     this.name,
   });

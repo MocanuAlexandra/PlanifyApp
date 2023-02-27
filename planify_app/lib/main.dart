@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:planify_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../providers/category_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
 import '../../screens/agenda/deleted_agenda_screen.dart';
@@ -22,6 +22,7 @@ import '../../screens/task/task_details_screen.dart';
 import '../../services/location_based_notification_service.dart';
 import '../../services/notification_service.dart';
 import 'firebase_options.dart';
+import 'providers/task_category_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,10 +76,13 @@ class _MyAppState extends State<MyApp> {
             create: (context) => TaskProvider(),
           ),
           ChangeNotifierProvider(
-            create: (context) => CategoryProvider(),
+            create: (context) => TaskCategoryProvider(),
           ),
           ChangeNotifierProvider(
             create: (context) => TaskReminderProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => UserProvider(),
           ),
         ],
         child: MaterialApp(
