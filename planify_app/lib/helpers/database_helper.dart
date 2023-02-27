@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'location_helper.dart';
-import 'utility.dart';
-import '../models/task_category.dart';
 import '../models/task.dart';
 import '../models/task_address.dart';
+import '../models/task_category.dart';
 import '../models/task_reminder.dart';
+import '../models/user.dart';
+import 'location_helper.dart';
+import 'utility.dart';
 
 class DBHelper {
   // function for fetching categories from the database from the connected user
@@ -387,5 +388,67 @@ class DBHelper {
       dueDate: Utility.stringToDateTime(task['dueDate']),
       time: Utility.stringToTimeOfDay(task['time']),
     );
+  }
+
+  static String currentUserId() {
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
+
+  static Future<AppUser> getUserByEmail(String email) async {
+    final user = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+    return AppUser(
+      id: user.docs.first.id,
+      email: user.docs.first['email'],
+    );
+  }
+
+  static addUserToTask(String taskId, String email) {
+    // get the current user
+    final user = FirebaseAuth.instance.currentUser;
+
+    // get the user that will be added to the task
+    getUserByEmail(email).then((userSharedWith) {
+      // add the user to the task
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('tasks')
+          .doc(taskId)
+          .collection('sharedWith')
+          .add({
+        'email': userSharedWith.email,
+      });
+    });
+  }
+
+  static Future<List<AppUser>> getSharedWithUsersForTask(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final users = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('sharedWith')
+        .get();
+    return users.docs.map((e) => AppUser(id: e.id, email: e['email'])).toList();
+  }
+
+  static deleteSharedWithUsersForTask(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final sharedWithUsers = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('sharedWith')
+        .get();
+    if (sharedWithUsers.docs.isNotEmpty) {
+      for (var user in sharedWithUsers.docs) {
+        user.reference.delete();
+      }
+    }
   }
 }

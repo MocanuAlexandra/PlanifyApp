@@ -5,7 +5,12 @@ import '../../models/user.dart';
 import '../../providers/user_provider.dart';
 
 class UserListSearch extends StatefulWidget {
-  const UserListSearch({super.key});
+  final List<String> checkedItems;
+
+  const UserListSearch({
+    super.key,
+    required this.checkedItems,
+  });
 
   @override
   State<UserListSearch> createState() => _UserListSearchState();
@@ -13,7 +18,6 @@ class UserListSearch extends StatefulWidget {
 
 class _UserListSearchState extends State<UserListSearch> {
   List<AppUser> _users = [];
-
   List<String> filterItems = [];
   List<String> checkedItems = [];
 
@@ -31,6 +35,7 @@ class _UserListSearchState extends State<UserListSearch> {
 
   @override
   void initState() {
+    checkedItems = widget.checkedItems;
     _fetchUsers(context);
     super.initState();
   }
@@ -72,11 +77,14 @@ class _UserListSearchState extends State<UserListSearch> {
                         title: Text(filterItems[index]),
                         onChanged: (value) {
                           if (isChecked) {
-                            checkedItems.remove(filterItems[index]);
+                            setState(() {
+                              checkedItems.remove(filterItems[index]);
+                            });
                           } else {
-                            checkedItems.add(filterItems[index]);
+                            setState(() {
+                              checkedItems.add(filterItems[index]);
+                            });
                           }
-                          setState(() {});
                         },
                       );
                     }),
@@ -92,7 +100,9 @@ class _UserListSearchState extends State<UserListSearch> {
             child: const Text("Cancel"),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
             child: const Text("Ok"),
           ),
         ],

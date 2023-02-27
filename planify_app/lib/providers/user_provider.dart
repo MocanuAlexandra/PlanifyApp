@@ -22,6 +22,9 @@ class UserProvider with ChangeNotifier {
       },
     ).toList();
 
+    // eliminate the current user from the list
+    _users.removeWhere((user) => user.id == DBHelper.currentUserId());
+
     return _users;
   }
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:planify_app/widgets/other/user_list_search.dart';
+import '../../widgets/other/user_list_search.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
@@ -57,6 +56,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   var _isInit = true;
   List<String> _selectedReminders = [];
   bool _dueTimeDueDateChanged = false;
+  final List<String> _selectedUserEmails = [];
 
   @override
   void didChangeDependencies() async {
@@ -419,10 +419,26 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           ),
         ),
         TextButton.icon(
-          onPressed: () async {
-            showDialog(
-                context: context, builder: (context) => const UserListSearch());
-          },
+          onPressed: _editedTask.id == null
+              // if task is not saved yet, then we don't need to check already selected users emails
+              ? () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => UserListSearch(
+                      checkedItems: _selectedUserEmails,
+                    ),
+                  );
+                }
+              // if task is saved, then we need to check already selected users emails
+              : () {
+                  determineAlreadySelectedUsersEmails();
+                  showDialog(
+                    context: context,
+                    builder: (context) => UserListSearch(
+                      checkedItems: _selectedUserEmails,
+                    ),
+                  );
+                },
           icon: const Icon(Icons.share),
           label: const Text(
             'Share with',
@@ -436,12 +452,19 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     );
   }
 
-  void prompt(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch Google Maps with URL: $url';
+  //function that checks already selected users emails from database and returns a list of them
+  Future<List<String>> determineAlreadySelectedUsersEmails() async {
+    if (_editedTask.id != null) {
+      await DBHelper.getSharedWithUsersForTask(_editedTask.id!)
+          .then((userTasks) => {
+                for (final user in userTasks)
+                  {
+                    _selectedUserEmails.add(user.email!),
+                  }
+              });
     }
+
+    return _selectedUserEmails;
   }
 
   //main method
@@ -474,6 +497,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     }
                 });
           }
+          //delete the users for the task and then add the new ones
+          {
+            await deleteSharedWithUsersForTask(_editedTask.id!)
+                .then((value) => {
+                      addUsersToTask(_editedTask.id!),
+                    });
+          }
 
           // go back to overall agenda screen
           Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
@@ -489,6 +519,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //add notifications for the task
           await addNotificationsForTask(taskId);
         }
+        await addUsersToTask(taskId);
 
         // go back to overall agenda screen
         Navigator.of(context).popAndPushNamed(OverallAgendaScreen.routeName);
@@ -497,12 +528,26 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   //auxiliary methods
+  Future<void> deleteSharedWithUsersForTask(String taskId) async {
+    //delete the users for the task from the database
+    await DBHelper.deleteSharedWithUsersForTask(taskId);
+  }
+
   Future<void> deleteNotificationsForTask(String taskId) async {
     //delete the notifications for the task from the notification center
     await DBHelper.deleteNotificationsForTask(taskId);
 
     //delete the notifications for the task from the database
     NotificationService.deleteNotification(taskId);
+  }
+
+  Future<void> addUsersToTask(String taskId) async {
+    //add the users to the task
+    if (_selectedUserEmails.isNotEmpty) {
+      for (var email in _selectedUserEmails) {
+        await DBHelper.addUserToTask(taskId, email);
+      }
+    }
   }
 
   Future<void> addNotificationsForTask(String taskId) async {
