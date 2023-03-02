@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/utility.dart';
-import '../../providers/task_provider.dart';
-import '../../widgets/drawer.dart';
-import '../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
-import '../../widgets/task/task_list_item.dart';
-import '../task/add_edit_task_category_screen.dart';
+import '../../../helpers/utility.dart';
+import '../../../providers/task_provider.dart';
+import '../../../widgets/drawer.dart';
+import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
+import '../../../widgets/task/task_list_item.dart';
+import '../../task/add_edit_task_category_screen.dart';
 
-class TaskCategoryAgendaScreen extends StatefulWidget {
-  static const routeName = '/category-agenda';
+class CategoryAgendaTab extends StatefulWidget {
+  static const routeName = '/category-agenda-tab';
 
-  const TaskCategoryAgendaScreen({super.key});
+  const CategoryAgendaTab({super.key});
 
   @override
-  State<TaskCategoryAgendaScreen> createState() =>
-      _TaskCategoryAgendaScreenState();
+  State<CategoryAgendaTab> createState() => _CategoryAgendaTabState();
 }
 
-class _TaskCategoryAgendaScreenState extends State<TaskCategoryAgendaScreen> {
+class _CategoryAgendaTabState extends State<CategoryAgendaTab> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
   var _category;

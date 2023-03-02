@@ -5,7 +5,7 @@ import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../models/task_category.dart';
 import '../../providers/task_category_provider.dart';
-import '../agenda/overall_agenda_screen.dart';
+import '../tabs/my_agenda/overall_agenda_tab.dart';
 
 class AddEditTaskCategoryScreen extends StatefulWidget {
   const AddEditTaskCategoryScreen({super.key});
@@ -61,15 +61,13 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
         DBHelper.updateTaskCategory(_editedCategory.id!, _editedCategory);
 
         // go back to overall agenda screen
-        Navigator.of(context)
-            .pushReplacementNamed(OverallAgendaScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(OverallAgendaTab.routeName);
       } else {
         //add category
         DBHelper.addTaskCategory(_editedCategory);
 
         // go back to overall agenda screen
-        Navigator.of(context)
-            .pushReplacementNamed(OverallAgendaScreen.routeName);
+        Navigator.of(context).pushReplacementNamed(OverallAgendaTab.routeName);
       }
     }
   }
@@ -107,7 +105,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
                           if (value!) {
                             _deleteCategory(context, _editedCategory.id!);
                             Navigator.of(context).pushReplacementNamed(
-                                OverallAgendaScreen.routeName);
+                                OverallAgendaTab.routeName);
                           }
                         });
                       }
@@ -189,6 +187,6 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
 
   void _deleteCategory(BuildContext context, String categoryId) {
     DBHelper.deleteCategory(categoryId);
-    Navigator.of(context).pushReplacementNamed(OverallAgendaScreen.routeName);
+    Navigator.of(context).pushReplacementNamed(OverallAgendaTab.routeName);
   }
 }

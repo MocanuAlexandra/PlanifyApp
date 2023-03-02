@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/location_helper.dart';
-import '../../helpers/utility.dart';
-import '../../providers/task_provider.dart';
-import '../../widgets/drawer.dart';
-import '../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
-import '../../widgets/task/task_list_item.dart';
+import '../../../helpers/location_helper.dart';
+import '../../../helpers/utility.dart';
+import '../../../providers/task_provider.dart';
+import '../../../widgets/drawer.dart';
+import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
+import '../../../widgets/task/task_list_item.dart';
 
-class TodayAgendaScreen extends StatefulWidget {
-  static const routeName = '/today-agenda';
+class TodayAgendaTab extends StatefulWidget {
+  static const routeName = '/today-agenda-tab';
 
-  const TodayAgendaScreen({super.key});
+  const TodayAgendaTab({super.key});
 
   @override
-  State<TodayAgendaScreen> createState() => _TodayAgendaScreenState();
+  State<TodayAgendaTab> createState() => _TodayAgendaTabState();
 }
 
-class _TodayAgendaScreenState extends State<TodayAgendaScreen> {
+class _TodayAgendaTabState extends State<TodayAgendaTab> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
   var tasks = [];

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/utility.dart';
-import '../../providers/task_provider.dart';
-import '../../widgets/drawer.dart';
-import '../../widgets/task/task_list_item.dart';
+import '../../../helpers/utility.dart';
+import '../../../providers/task_provider.dart';
+import '../../../widgets/drawer.dart';
+import '../../../widgets/task/task_list_item.dart';
 
-class DeletedAgendaScreen extends StatefulWidget {
-  static const routeName = '/deleted-agenda';
+class DeletedAgendaTab extends StatefulWidget {
+  static const routeName = '/deleted-agenda-tab';
 
-  const DeletedAgendaScreen({super.key});
+  const DeletedAgendaTab({super.key});
 
   @override
-  State<DeletedAgendaScreen> createState() => _DeletedAgendaScreenState();
+  State<DeletedAgendaTab> createState() => _DeletedAgendaTabState();
 }
 
-class _DeletedAgendaScreenState extends State<DeletedAgendaScreen> {
+class _DeletedAgendaTabState extends State<DeletedAgendaTab> {
   FilterOptions selectedOption = FilterOptions.deleted;
 
   Future<void> _fetchTasks(

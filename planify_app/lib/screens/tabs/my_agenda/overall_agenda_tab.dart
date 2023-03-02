@@ -1,45 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/utility.dart';
-import '../../providers/task_provider.dart';
-import '../../widgets/drawer.dart';
-import '../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
-import '../../widgets/task/task_list_item.dart';
+import '../../../helpers/utility.dart';
+import '../../../providers/task_provider.dart';
+import '../../../widgets/drawer.dart';
+import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
+import '../../../widgets/task/task_list_item.dart';
 
-class MonthAgendaScreen extends StatefulWidget {
-  static const routeName = '/month-agenda';
+class OverallAgendaTab extends StatefulWidget {
+  static const routeName = '/overall-agenda-tab';
 
-  const MonthAgendaScreen({super.key});
+  const OverallAgendaTab({super.key});
 
   @override
-  State<MonthAgendaScreen> createState() => _MonthAgendaScreenState();
+  State<OverallAgendaTab> createState() => _OverallAgendaTabState();
 }
 
-class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
+class _OverallAgendaTabState extends State<OverallAgendaTab> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
-  DateTime? _selectedDate = DateTime.now();
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode) async {
     await Provider.of<TaskProvider>(context, listen: false)
-        .fetchTasks(null, true, _selectedDate, selectedOption, focusMode);
-  }
-
-  void _presentMonthPicker() async {
-    final DateTime? picked = await showMonthPicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2023),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
+        .fetchTasks(null, null, null, selectedOption, focusMode);
   }
 
   @override
@@ -52,12 +36,8 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Month'),
+        title: const Text('Overall'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_today),
-            onPressed: _presentMonthPicker,
-          ),
           displayFilters(context),
         ],
       ),
@@ -69,59 +49,6 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
         ],
       ),
       floatingActionButton: const ExpandableFloatingActionButton(),
-    );
-  }
-
-  PopupMenuButton<FilterOptions> displayFilters(BuildContext context) {
-    return PopupMenuButton(
-      icon: const Icon(Icons.more_vert),
-      onSelected: (FilterOptions selectedValue) {
-        setState(() {
-          selectedOption = selectedValue;
-        });
-        _fetchTasks(context, selectedOption, _focusMode);
-      },
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: FilterOptions.all,
-          child: Row(
-            children: const [
-              Icon(
-                Icons.all_inbox,
-                color: Colors.black,
-              ),
-              SizedBox(width: 8),
-              Text('All'),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: FilterOptions.inProgress,
-          child: Row(
-            children: const [
-              Icon(
-                Icons.work,
-                color: Colors.black,
-              ),
-              SizedBox(width: 8),
-              Text('In progress'),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: FilterOptions.done,
-          child: Row(
-            children: const [
-              Icon(
-                Icons.done,
-                color: Colors.black,
-              ),
-              SizedBox(width: 8),
-              Text('Done'),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -179,6 +106,59 @@ class _MonthAgendaScreenState extends State<MonthAgendaScreen> {
               _focusMode = value;
             });
           },
+        ),
+      ],
+    );
+  }
+
+  PopupMenuButton<FilterOptions> displayFilters(BuildContext context) {
+    return PopupMenuButton(
+      icon: const Icon(Icons.more_vert),
+      onSelected: (FilterOptions selectedValue) {
+        setState(() {
+          selectedOption = selectedValue;
+        });
+        _fetchTasks(context, selectedOption, _focusMode);
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: FilterOptions.all,
+          child: Row(
+            children: const [
+              Icon(
+                Icons.all_inbox,
+                color: Colors.black,
+              ),
+              SizedBox(width: 8),
+              Text('All'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: FilterOptions.inProgress,
+          child: Row(
+            children: const [
+              Icon(
+                Icons.work,
+                color: Colors.black,
+              ),
+              SizedBox(width: 8),
+              Text('In progress'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: FilterOptions.done,
+          child: Row(
+            children: const [
+              Icon(
+                Icons.done,
+                color: Colors.black,
+              ),
+              SizedBox(width: 8),
+              Text('Done'),
+            ],
+          ),
         ),
       ],
     );

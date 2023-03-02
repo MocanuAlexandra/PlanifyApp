@@ -1,13 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
-import 'utility.dart';
-import '../providers/task_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/task.dart';
+import 'utility.dart';
 
 const GOOGLE_API_KEY = 'AIzaSyBCtWNcI4lD7pMey-ZghzlfRvFjQ2FfLhM';
 

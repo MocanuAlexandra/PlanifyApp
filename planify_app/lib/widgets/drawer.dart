@@ -2,15 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../screens/pages/month_agenda_page.dart';
+import '../screens/pages/today_agenda_page.dart';
 import 'package:provider/provider.dart';
 
-import '../../screens/agenda/deleted_agenda_screen.dart';
-import '../../screens/agenda/month_agenda_screen.dart';
-import '../../screens/agenda/overall_agenda_screen.dart';
-import '../../screens/agenda/today_agenda_screen.dart';
+import '../screens/pages/deleted_agenda_page.dart';
 import '../providers/task_category_provider.dart';
-import '../screens/agenda/task_category_agenda_screen.dart';
+import '../screens/tabs/my_agenda/category_agenda_tab.dart';
 import '../screens/settings_screen.dart';
+import '../screens/pages/overall_agenda_page.dart';
 
 class MainDrawer extends StatefulWidget {
   const MainDrawer({super.key});
@@ -80,21 +80,21 @@ class _MainDrawerState extends State<MainDrawer> {
         buildListTile('Overall', Icons.calendar_view_week, () {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context)
-                .pushReplacementNamed(OverallAgendaScreen.routeName);
+                .pushReplacementNamed(OverallAgendaPage.routeName);
           });
         }),
         const Divider(),
         buildListTile('Today', Icons.calendar_today, () {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context)
-                .pushReplacementNamed(TodayAgendaScreen.routeName);
+                .pushReplacementNamed(TodayAgendaPage.routeName);
           });
         }),
         const Divider(),
         buildListTile('Month', Icons.calendar_month, () {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context)
-                .pushReplacementNamed(MonthAgendaScreen.routeName);
+                .pushReplacementNamed(MonthAgendaPage.routeName);
           });
         }),
         const Divider(),
@@ -103,7 +103,7 @@ class _MainDrawerState extends State<MainDrawer> {
         buildListTile('Trash', Icons.delete, () {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             Navigator.of(context)
-                .pushReplacementNamed(DeletedAgendaScreen.routeName);
+                .pushReplacementNamed(DeletedAgendaPage.routeName);
           });
         }),
         const Divider(),
@@ -174,7 +174,7 @@ class _MainDrawerState extends State<MainDrawer> {
                                   SchedulerBinding.instance
                                       .addPostFrameCallback((_) {
                                     Navigator.of(context).pushReplacementNamed(
-                                        TaskCategoryAgendaScreen.routeName,
+                                        CategoryAgendaTab.routeName,
                                         arguments: categories
                                             .categoriesList[index].name!);
                                   });
