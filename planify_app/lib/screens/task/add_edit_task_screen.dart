@@ -16,7 +16,7 @@ import '../../providers/task_reminder_provider.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/location/location_input.dart';
 import '../../widgets/other/check_box_list.dart';
-import '../tabs/my_agenda/overall_agenda_tab.dart';
+import '../pages/overall_agenda_page.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
   const AddEditTaskScreen({super.key});
@@ -506,7 +506,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           }
 
           // go back to overall agenda screen
-          Navigator.of(context).popAndPushNamed(OverallAgendaTab.routeName);
+          Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
         }
       }
       // if we didn't get an id, it means that we are adding a new task
@@ -522,7 +522,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         await addUsersToTask(taskId);
 
         // go back to overall agenda screen
-        Navigator.of(context).popAndPushNamed(OverallAgendaTab.routeName);
+        Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
       }
     }
   }
@@ -807,7 +807,7 @@ You have to set new reminders if you want to be notified about this task.""",
 
                   // go back to overall agenda screen
                   Navigator.of(context)
-                      .popAndPushNamed(OverallAgendaTab.routeName);
+                      .popAndPushNamed(OverallAgendaPage.routeName);
                 },
               ),
               TextButton(
@@ -832,7 +832,7 @@ You have to set new reminders if you want to be notified about this task.""",
 
                   // go back to overall agenda screen
                   Navigator.of(context)
-                      .popAndPushNamed(OverallAgendaTab.routeName);
+                      .popAndPushNamed(OverallAgendaPage.routeName);
                 },
               ),
             ],

@@ -405,7 +405,7 @@ class DBHelper {
     );
   }
 
-  static addUserToTask(String taskId, String email) {
+  static addUserToTask(String taskId, String email) async {
     // get the current user
     final user = FirebaseAuth.instance.currentUser;
 
@@ -418,7 +418,8 @@ class DBHelper {
           .collection('tasks')
           .doc(taskId)
           .collection('sharedWith')
-          .add({
+          .doc(userSharedWith.id)
+          .set({
         'email': userSharedWith.email,
       });
     });
