@@ -18,6 +18,7 @@ class TaskListItem extends StatelessWidget {
   final bool? isDone;
   final bool? isDeleted;
   final String? locationCategory;
+  final String? owner;
 
   const TaskListItem({
     super.key,
@@ -30,6 +31,7 @@ class TaskListItem extends StatelessWidget {
     this.isDone,
     this.isDeleted,
     this.locationCategory,
+    this.owner,
   });
 
   void _deleteTask(BuildContext context, String id) {
@@ -153,61 +155,64 @@ class TaskListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          !isDone! && !isDeleted! // if isDone is false, show the check button
-              ? IconButton(
-                  icon: const Icon(
-                    Icons.check,
-                    color: Colors.green,
+          //TODO modify to let the sharer mark the task as done
+          if (owner == DBHelper.currentUserId())
+            !isDone! && !isDeleted! // if isDone is false, show the check button
+                ? IconButton(
+                    icon: const Icon(
+                      Icons.check,
+                      color: Colors.green,
+                    ),
+                    onPressed: () {
+                      _markTaskAsDone(context, id!);
+                    },
+                  )
+                : isDeleted! // if isDeleted is true, show the undo button
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.arrow_circle_left,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          // display alert dialog
+                          Utility.displayQuestionDialog(context,
+                                  'Do you want to move the task back from Trash? You will have to set back the reminders.')
+                              .then((value) {
+                            if (value!) {
+                              _markAsUndeleted(context, id!);
+                            }
+                          });
+                        },
+                      )
+                    : const SizedBox(width: 0),
+          if (owner == DBHelper.currentUserId())
+            !isDeleted! // if isDeleted is false, show the delete button
+                ? IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      // display alert dialog
+                      Utility.displayQuestionDialog(
+                              context, 'Do you want to move the task in Trash?')
+                          .then((value) {
+                        if (value!) {
+                          _markAsDeleted(context, id!);
+                        }
+                      });
+                    },
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.delete_forever, color: Colors.red),
+                    onPressed: () {
+                      // display alert dialog
+                      Utility.displayQuestionDialog(context,
+                              'Do you want to permanently delete the task?')
+                          .then((value) {
+                        if (value!) {
+                          _deleteTask(context, id!);
+                        }
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    _markTaskAsDone(context, id!);
-                  },
-                )
-              : isDeleted! // if isDeleted is true, show the undo button
-                  ? IconButton(
-                      icon: const Icon(
-                        Icons.arrow_circle_left,
-                        color: Colors.green,
-                      ),
-                      onPressed: () {
-                        // display alert dialog
-                        Utility.displayQuestionDialog(context,
-                                'Do you want to move the task back from Trash? You will have to set back the reminders.')
-                            .then((value) {
-                          if (value!) {
-                            _markAsUndeleted(context, id!);
-                          }
-                        });
-                      },
-                    )
-                  : const SizedBox(width: 0),
-          !isDeleted! // if isDeleted is false, show the delete button
-              ? IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    // display alert dialog
-                    Utility.displayQuestionDialog(
-                            context, 'Do you want to move the task in Trash?')
-                        .then((value) {
-                      if (value!) {
-                        _markAsDeleted(context, id!);
-                      }
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: const Icon(Icons.delete_forever, color: Colors.red),
-                  onPressed: () {
-                    // display alert dialog
-                    Utility.displayQuestionDialog(context,
-                            'Do you want to permanently delete the task?')
-                        .then((value) {
-                      if (value!) {
-                        _deleteTask(context, id!);
-                      }
-                    });
-                  },
-                ),
         ],
       ),
     );

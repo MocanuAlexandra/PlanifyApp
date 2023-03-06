@@ -1,46 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../helpers/utility.dart';
-import '../../../providers/task_provider.dart';
-import '../../../widgets/drawer.dart';
-import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
-import '../../../widgets/task/task_list_item.dart';
+import '../../helpers/utility.dart';
+import '../../providers/task_provider.dart';
+import '../../widgets/drawer.dart';
+import '../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
+import '../../widgets/task/task_list_item.dart';
+import '../task/add_edit_task_category_screen.dart';
 
-class OverallAgendaTab extends StatefulWidget {
-  static const routeName = '/overall-agenda-tab';
+class CategoryAgendaPage extends StatefulWidget {
+  static const routeName = '/category-agenda-tab';
 
-  const OverallAgendaTab({super.key});
+  const CategoryAgendaPage({super.key});
 
   @override
-  State<OverallAgendaTab> createState() => _OverallAgendaTabState();
+  State<CategoryAgendaPage> createState() => _CategoryAgendaPageState();
 }
 
-class _OverallAgendaTabState extends State<OverallAgendaTab> {
+class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
-
-  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
-      bool? focusMode) async {
-    await Provider.of<TaskProvider>(context, listen: false)
-        .fetchTasks(null, null, null, selectedOption, focusMode);
-  }
+  var _category;
+  var _isInit = true;
 
   @override
   void initState() {
-    _fetchTasks(context, selectedOption, _focusMode);
+    _fetchTasks(context, selectedOption, _focusMode, _category);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final categoryName =
+          ModalRoute.of(context)!.settings.arguments as String?;
+      if (categoryName != null) _category = categoryName;
+    }
+
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
+      bool? focusMode, String? category) async {
+    await Provider.of<TaskProvider>(context, listen: false)
+        .fetchTasks(null, null, null, selectedOption, focusMode, _category);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Overall'),
-        actions: [
-          displayFilters(context),
-        ],
-      ),
+      appBar: AppBar(title: Text(_category!), actions: [
+        IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            Navigator.of(context).pushNamed(AddEditTaskCategoryScreen.routeName,
+                arguments: _category);
+          },
+        ),
+        displayFilters(context)
+      ]),
       drawer: const MainDrawer(),
       body: Column(
         children: [
@@ -55,7 +74,7 @@ class _OverallAgendaTabState extends State<OverallAgendaTab> {
   Expanded displayTasks(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption, _focusMode),
+        future: _fetchTasks(context, selectedOption, _focusMode, _category),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
             ? const Center(
@@ -63,7 +82,7 @@ class _OverallAgendaTabState extends State<OverallAgendaTab> {
               )
             : RefreshIndicator(
                 onRefresh: () =>
-                    _fetchTasks(context, selectedOption, _focusMode),
+                    _fetchTasks(context, selectedOption, _focusMode, _category),
                 child: Consumer<TaskProvider>(
                   builder: (context, tasks, ch) => ListView.builder(
                     itemCount: tasks.tasksList.length,
@@ -119,7 +138,7 @@ class _OverallAgendaTabState extends State<OverallAgendaTab> {
         setState(() {
           selectedOption = selectedValue;
         });
-        _fetchTasks(context, selectedOption, _focusMode);
+        _fetchTasks(context, selectedOption, _focusMode, _category);
       },
       itemBuilder: (_) => [
         PopupMenuItem(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../tabs/my_agenda/overall_agenda_tab.dart';
+import '../tabs/shared_agenda/shared_overrall_agenda_tab.dart';
 
 class OverallAgendaPage extends StatefulWidget {
   static const routeName = '/overall-agenda-page';
@@ -14,7 +15,7 @@ class _OverallAgendaPageState extends State<OverallAgendaPage> {
   int _selectedIndex = 0;
   final List<Widget> _screens = [
     const OverallAgendaTab(),
-    const Placeholder(),
+    const SharedOverallAgendaTab(),
   ];
 
   void _onTabTapped(int index) {
@@ -26,10 +27,7 @@ class _OverallAgendaPageState extends State<OverallAgendaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: _screens.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

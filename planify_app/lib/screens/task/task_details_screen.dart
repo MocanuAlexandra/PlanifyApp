@@ -6,6 +6,7 @@ import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../services/notification_service.dart';
 import 'add_edit_task_screen.dart';
 
@@ -36,6 +37,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   }
 
   void _deleteTask(BuildContext context, String id) {
+    //TODO delete the task from sharers list
     // delete task from database
     DBHelper.deleteTask(id);
 
@@ -135,6 +137,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
+  Row displayOwner(String ownerEmail) {
+    return Row(
+      children: [
+        const Icon(Icons.person),
+        const SizedBox(width: 10),
+        Text(
+          'Shared by: $ownerEmail',
+          style: const TextStyle(fontSize: 16),
+          softWrap: true,
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+
   Row displayAddressOrLocationCategory(Task loadedTask) {
     return loadedTask.address!.address! == 'No address chosen'
         ? loadedTask.locationCategory == 'No location category chosen'
@@ -189,37 +206,43 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final taskId = ModalRoute.of(context)!.settings.arguments as String;
     final loadedTask =
         Provider.of<TaskProvider>(context, listen: false).findById(taskId);
+    Provider.of<UserProvider>(context, listen: false)
+        .getEmailByUserId(loadedTask.owner!);
+    String ownerEmail = Provider.of<UserProvider>(context, listen: false).email;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white),
-            onPressed: () {
-              loadedTask.isDeleted == false
-                  ?
-                  // display alert dialog
-                  Utility.displayQuestionDialog(
-                          context, 'Do you want to move the task in Trash?')
-                      .then((value) {
-                      if (value!) {
-                        _markAsDeleted(context, loadedTask);
-                        Navigator.of(context).pop();
-                      }
-                    })
-                  :
-                  // display alert dialog
-                  Utility.displayQuestionDialog(context,
-                          'Do you want to permanently delete the task?')
-                      .then((value) {
-                      if (value!) {
-                        _deleteTask(context, loadedTask.id!);
-                        Navigator.of(context).pop();
-                      }
-                    });
-            },
-          ),
+          //shared task can be deleted only by the owner
+          if (loadedTask.owner == DBHelper.currentUserId())
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.white),
+              onPressed: () {
+                // if the task is not deleted, display alert dialog
+                loadedTask.isDeleted == false
+                    ?
+                    // display alert dialog
+                    Utility.displayQuestionDialog(
+                            context, 'Do you want to move the task in Trash?')
+                        .then((value) {
+                        if (value!) {
+                          _markAsDeleted(context, loadedTask);
+                          Navigator.of(context).pop();
+                        }
+                      })
+                    :
+                    // display alert dialog
+                    Utility.displayQuestionDialog(context,
+                            'Do you want to permanently delete the task?')
+                        .then((value) {
+                        if (value!) {
+                          _deleteTask(context, loadedTask.id!);
+                          Navigator.of(context).pop();
+                        }
+                      });
+              },
+            ),
         ],
       ),
       body: Column(
@@ -243,6 +266,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   displayPriority(loadedTask),
                   const SizedBox(height: 10),
                   displayCategory(loadedTask),
+                  const SizedBox(height: 10),
+                  //check fi the owner is the current user, so that the owner is not displayed
+                  if (loadedTask.owner != DBHelper.currentUserId())
+                    //owner
+                    displayOwner(ownerEmail),
                   //address
                   const SizedBox(height: 10),
                   displayAddressOrLocationCategory(loadedTask),
@@ -256,14 +284,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
         ],
       ),
+      //TODO: modify edit in order to let shared tasks be edited by the owner and sharer
       //edit button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context)
-              .pushNamed(AddEditTaskScreen.routeName, arguments: taskId);
-        },
-        child: const Icon(Icons.edit),
-      ),
+      floatingActionButton: loadedTask.owner == DBHelper.currentUserId()
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamed(AddEditTaskScreen.routeName, arguments: taskId);
+              },
+              child: const Icon(Icons.edit),
+            )
+          : null,
     );
   }
 

@@ -20,6 +20,7 @@ class _UserListSearchState extends State<UserListSearch> {
   List<AppUser> _users = [];
   List<String> filterItems = [];
   List<String> checkedItems = [];
+  final FocusNode _focusNode = FocusNode();
 
   late final TextEditingController controller = TextEditingController()
     ..addListener(() {
@@ -65,6 +66,10 @@ class _UserListSearchState extends State<UserListSearch> {
                     Icons.search,
                   ),
                 ),
+                focusNode: _focusNode,
+                onSubmitted: (_) {
+                  _focusNode.unfocus();
+                },
               ),
               Expanded(
                 child: ListView.builder(

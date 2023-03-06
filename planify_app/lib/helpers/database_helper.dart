@@ -68,6 +68,7 @@ class DBHelper {
         'isDeleted': task['isDeleted'],
         'category': task['category'],
         'locationCategory': task['locationCategory'],
+        'owner': task['owner'],
       };
     }).toList();
 
@@ -183,6 +184,7 @@ class DBHelper {
       'isDeleted': false,
       'category': updatedCategory,
       'locationCategory': updatedLocationCategory,
+      'owner': user.uid,
     });
 
     return doc.id;
@@ -253,6 +255,7 @@ class DBHelper {
       'isDeleted': editedTask.isDeleted,
       'category': editedTask.category,
       'locationCategory': updatedLocationCategory,
+      'owner': editedTask.owner,
     });
   }
 
@@ -313,7 +316,7 @@ class DBHelper {
     });
   }
 
-  static void deleteCategory(String categoryId) {
+  static void deleteTaskCategory(String categoryId) {
     final user = FirebaseAuth.instance.currentUser;
     FirebaseFirestore.instance
         .collection('users')
@@ -405,51 +408,153 @@ class DBHelper {
     );
   }
 
-  static addUserToTask(String taskId, String email) async {
+  static Future<String> returnEmailByUserId(String userId) async {
+    final user =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    return user['email'];
+  }
+
+  static Future<void> addShareWithUser(String taskId, String email) async {
     // get the current user
     final user = FirebaseAuth.instance.currentUser;
 
-    // get the user that will be added to the task
-    getUserByEmail(email).then((userSharedWith) {
-      // add the user to the task
-      FirebaseFirestore.instance
+    if (email == 'no users') {
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(user!.uid)
           .collection('tasks')
           .doc(taskId)
-          .collection('sharedWith')
-          .doc(userSharedWith.id)
-          .set({
-        'email': userSharedWith.email,
+          .update({'sharedWith': []});
+      return;
+    }
+
+    // get the user that will be added to the task
+    await getUserByEmail(email).then((userSharedWith) async {
+      // add the user to the task in an array named sharedWith
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('tasks')
+          .doc(taskId)
+          .update({
+        'sharedWith': FieldValue.arrayUnion([userSharedWith.id])
       });
     });
   }
 
-  static Future<List<AppUser>> getSharedWithUsersForTask(String taskId) async {
+  static Future<List<AppUser>> getSharedWithUsers(String taskId) async {
     final user = FirebaseAuth.instance.currentUser;
-    final users = await FirebaseFirestore.instance
+    final task = await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
         .doc(taskId)
-        .collection('sharedWith')
         .get();
-    return users.docs.map((e) => AppUser(id: e.id, email: e['email'])).toList();
+
+    final sharedWithUsersIds = task['sharedWith'];
+
+    //get the users from the ids
+    List<AppUser> sharedWithUsers = [];
+    for (var userId in sharedWithUsersIds) {
+      final user = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      sharedWithUsers.add(AppUser(
+        id: user.id,
+        email: user['email'],
+      ));
+    }
+    return sharedWithUsers;
   }
 
-  static deleteSharedWithUsersForTask(String taskId) async {
+  static Future<void> deleteSharedWithUsers(String taskId) async {
     final user = FirebaseAuth.instance.currentUser;
-    final sharedWithUsers = await FirebaseFirestore.instance
+
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
         .doc(taskId)
-        .collection('sharedWith')
+        .update({'sharedWith': []});
+  }
+
+  static Future<void> addSharedTaskToUser(String taskId, String email) async {
+    final owner = FirebaseAuth.instance.currentUser;
+
+    //get the user by email
+    await getUserByEmail(email).then((userSharedWith) async {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userSharedWith.id)
+          .collection('sharedTasks')
+          .add({
+        'ownerId': owner!.uid,
+        'taskId': taskId,
+      });
+    });
+  }
+
+  static Future<void> deleteSharedTaskFromUser(
+      String taskId, String email) async {
+    final owner = FirebaseAuth.instance.currentUser;
+
+    await getUserByEmail(email).then((user) async {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .collection('sharedTasks')
+          .where('taskId', isEqualTo: taskId)
+          .where('ownerId', isEqualTo: owner!.uid)
+          .get()
+          .then((value) {
+        for (var doc in value.docs) {
+          doc.reference.delete();
+        }
+      });
+    });
+  }
+
+  //function that walks through the shared task of user and retrieve the tasks based on
+  //the owner id and task id
+  static Future<List<Task>> fetchSharedTasks() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the shared tasks
+    final sharedTasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sharedTasks')
         .get();
-    if (sharedWithUsers.docs.isNotEmpty) {
-      for (var user in sharedWithUsers.docs) {
-        user.reference.delete();
-      }
+
+    List<Task> tasks = [];
+    //loop through the shared tasks and get the tasks from the owner
+    for (var sharedTask in sharedTasks.docs) {
+      final task = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(sharedTask['ownerId'])
+          .collection('tasks')
+          .doc(sharedTask['taskId'])
+          .get();
+      tasks.add(Task(
+        id: task.id,
+        title: task['title'],
+        dueDate: Utility.stringToDateTime(task['dueDate']),
+        address: TaskAddress(
+          latitude: task['latitude'],
+          longitude: task['longitude'],
+          address: task['address'],
+        ),
+        time: Utility.stringToTimeOfDay(task['time']),
+        priority: Utility.stringToPriorityEnum(task['priority']),
+        isDone: task['isDone'],
+        isDeleted: task['isDeleted'],
+        category: task['category'],
+        locationCategory: task['locationCategory'],
+        owner: task['owner'],
+      ));
     }
+    return tasks;
   }
 }

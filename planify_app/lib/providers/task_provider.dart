@@ -45,9 +45,102 @@ class TaskProvider with ChangeNotifier {
           isDeleted: task['isDeleted'],
           category: task['category'],
           locationCategory: task['locationCategory'],
+          owner: task['owner'],
         );
       },
     ).toList();
+
+    //check if the user wants to fetch today agenda
+    if (today != null) {
+      _tasks = _tasks
+          .where((task) =>
+              task.dueDate != null && task.dueDate!.day == DateTime.now().day)
+          .toList();
+      //check if the user wants to fetch a certain month agenda
+    } else if (month != null) {
+      _tasks = _tasks
+          .where((task) =>
+              task.dueDate != null &&
+              task.dueDate!.month == selectedDate!.month &&
+              task.dueDate!.year == selectedDate.year)
+          .toList();
+    }
+
+    //check if the user selected a category
+    if (category != null) {
+      _tasks = _tasks.where((task) => task.category == category).toList();
+    }
+
+    //check for filters
+    switch (selectedOption) {
+      case FilterOptions.all:
+        if (focusMode!) {
+          _tasks = _tasks
+              .where((task) =>
+                  (task.isDone == false || task.isDone == true) &&
+                  task.isDeleted == false &&
+                  task.priority == Priority.important)
+              .toList();
+        } else {
+          _tasks = _tasks
+              .where((task) =>
+                  (task.isDone == false || task.isDone == true) &&
+                  task.isDeleted == false)
+              .toList();
+        }
+        break;
+      case FilterOptions.inProgress:
+        if (focusMode!) {
+          _tasks = _tasks
+              .where((task) =>
+                  task.isDone == false &&
+                  task.isDeleted == false &&
+                  task.priority == Priority.important)
+              .toList();
+        } else {
+          _tasks = _tasks
+              .where((task) => task.isDone == false && task.isDeleted == false)
+              .toList();
+        }
+        break;
+      case FilterOptions.done:
+        if (focusMode!) {
+          _tasks = _tasks
+              .where((task) =>
+                  task.isDone == true &&
+                  task.isDeleted == false &&
+                  task.priority == Priority.important)
+              .toList();
+        } else {
+          _tasks = _tasks
+              .where((task) => task.isDone == true && task.isDeleted == false)
+              .toList();
+        }
+        break;
+      case FilterOptions.deleted:
+        _tasks = _tasks.where((task) => task.isDeleted == true).toList();
+        break;
+      default:
+        _tasks = _tasks
+            .where((task) => task.isDone == false || task.isDone == true)
+            .toList();
+        break;
+    }
+
+    //in the end notify listeners in order to update the UI
+    notifyListeners();
+  }
+
+  Future<void> fetchSharedTasks(
+      [bool? today,
+      bool? month,
+      DateTime? selectedDate,
+      FilterOptions? selectedOption,
+      bool? focusMode,
+      String? category]) async {
+    final tasksData = await DBHelper.fetchSharedTasks();
+
+    _tasks = tasksData;
 
     //check if the user wants to fetch today agenda
     if (today != null) {

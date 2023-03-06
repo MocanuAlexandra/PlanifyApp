@@ -15,6 +15,7 @@ class Task {
   bool isDeleted;
   final String? category;
   final String? locationCategory;
+  final String? owner;
 
   Task({
     this.id,
@@ -27,5 +28,6 @@ class Task {
     this.isDeleted = false,
     this.category,
     this.locationCategory,
+    this.owner,
   });
 }

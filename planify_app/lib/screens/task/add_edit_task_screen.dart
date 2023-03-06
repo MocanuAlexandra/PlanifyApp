@@ -40,6 +40,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     isDeleted: false,
     category: null,
     locationCategory: null,
+    owner: null,
   );
   var _initValues = {
     'title': '',
@@ -51,12 +52,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     'isDeleted': false,
     'category': null,
     'locationCategory': null,
+    'owner': null,
   };
 
   var _isInit = true;
   List<String> _selectedReminders = [];
   bool _dueTimeDueDateChanged = false;
-  final List<String> _selectedUserEmails = [];
+  List<String> _selectedUserEmails = [];
 
   @override
   void didChangeDependencies() async {
@@ -76,6 +78,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           'isDeleted': _editedTask.isDeleted,
           'category': _editedTask.category,
           'locationCategory': _editedTask.locationCategory,
+          'owner': _editedTask.owner,
         };
       }
     }
@@ -106,6 +109,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           isDone: _editedTask.isDone,
           category: _editedTask.category,
           locationCategory: _editedTask.locationCategory,
+          owner: _editedTask.owner,
         );
       },
     );
@@ -145,6 +149,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
+                  owner: _editedTask.owner,
                 );
               });
               _dueTimeDueDateChanged = true;
@@ -193,6 +198,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
+                  owner: _editedTask.owner,
                 );
               });
               _dueTimeDueDateChanged = true;
@@ -313,6 +319,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             isDone: _editedTask.isDone,
             category: _editedTask.category,
             locationCategory: _editedTask.locationCategory,
+            owner: _editedTask.owner,
           );
         });
       },
@@ -345,6 +352,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         isDone: _editedTask.isDone,
                         category: value,
                         locationCategory: _editedTask.locationCategory,
+                        owner: _editedTask.owner,
                       );
                     });
                   },
@@ -430,8 +438,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   );
                 }
               // if task is saved, then we need to check already selected users emails
-              : () {
-                  determineAlreadySelectedUsersEmails();
+              : () async {
+                  _selectedUserEmails = await determineAlreadySharedWithUsers();
                   showDialog(
                     context: context,
                     builder: (context) => UserListSearch(
@@ -453,18 +461,17 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   //function that checks already selected users emails from database and returns a list of them
-  Future<List<String>> determineAlreadySelectedUsersEmails() async {
+  Future<List<String>> determineAlreadySharedWithUsers() async {
+    List<String> alreadySelectedUserEmails = [];
     if (_editedTask.id != null) {
-      await DBHelper.getSharedWithUsersForTask(_editedTask.id!)
-          .then((userTasks) => {
-                for (final user in userTasks)
-                  {
-                    _selectedUserEmails.add(user.email!),
-                  }
-              });
+      await DBHelper.getSharedWithUsers(_editedTask.id!).then((userTasks) => {
+            for (final user in userTasks)
+              {
+                alreadySelectedUserEmails.add(user.email!),
+              }
+          });
     }
-
-    return _selectedUserEmails;
+    return alreadySelectedUserEmails;
   }
 
   //main method
@@ -497,13 +504,10 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     }
                 });
           }
-          //delete the users for the task and then add the new ones
-          {
-            await deleteSharedWithUsersForTask(_editedTask.id!)
-                .then((value) => {
-                      addUsersToTask(_editedTask.id!),
-                    });
-          }
+          //remove sharing for task, then update it
+          removeSharingForTask(_editedTask.id!).then((value) async => {
+                await shareTask(_editedTask.id!),
+              });
 
           // go back to overall agenda screen
           Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
@@ -512,14 +516,18 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       // if we didn't get an id, it means that we are adding a new task
       else {
         //add the task in the database
-        final taskId = await DBHelper.addTask(_editedTask);
+        var taskId = await DBHelper.addTask(_editedTask).then(
+          (taskIdValue) async => {
+            //proceed the sharing
+            shareTask(taskIdValue),
+          },
+        );
 
         //check if the user selected a due date or time
         if (_editedTask.dueDate != null || _editedTask.time != null) {
           //add notifications for the task
-          await addNotificationsForTask(taskId);
+          await addNotificationsForTask(taskId as String);
         }
-        await addUsersToTask(taskId);
 
         // go back to overall agenda screen
         Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
@@ -528,9 +536,17 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   //auxiliary methods
-  Future<void> deleteSharedWithUsersForTask(String taskId) async {
+  Future<void> removeSharingForTask(String taskId) async {
+    //delete the task from the users' shared tasks
+    var sharedWithUsers = await determineAlreadySharedWithUsers();
+    if (sharedWithUsers.isNotEmpty) {
+      for (var email in sharedWithUsers) {
+        await DBHelper.deleteSharedTaskFromUser(taskId, email);
+      }
+    }
+
     //delete the users for the task from the database
-    await DBHelper.deleteSharedWithUsersForTask(taskId);
+    await DBHelper.deleteSharedWithUsers(taskId);
   }
 
   Future<void> deleteNotificationsForTask(String taskId) async {
@@ -541,12 +557,20 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     NotificationService.deleteNotification(taskId);
   }
 
-  Future<void> addUsersToTask(String taskId) async {
+  Future<void> shareTask(String taskId) async {
     //add the users to the task
     if (_selectedUserEmails.isNotEmpty) {
       for (var email in _selectedUserEmails) {
-        await DBHelper.addUserToTask(taskId, email);
+        //first we add to task a list containing the id of users to whom we shared the task
+        await DBHelper.addShareWithUser(taskId, email);
+
+        // then we add to each user to whom we shared the task, a collection named 'sharedTask'
+        // in which we add a document containing the owner of task and taskId
+        await DBHelper.addSharedTaskToUser(taskId, email);
       }
+    } else {
+      //if the _selectedUsersEmails is empty, we add an empty list 'sharedWith' in the task
+      await DBHelper.addShareWithUser(taskId, 'no users');
     }
   }
 
@@ -699,6 +723,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDeleted: _editedTask.isDeleted,
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
+                  owner: _editedTask.owner,
                 );
               }),
               _dueTimeDueDateChanged = true,
@@ -731,6 +756,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   isDeleted: _editedTask.isDeleted,
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
+                  owner: _editedTask.owner,
                 );
               }),
               _dueTimeDueDateChanged = true,
@@ -755,6 +781,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       isDeleted: _editedTask.isDeleted,
       category: _editedTask.category,
       locationCategory: null,
+      owner: _editedTask.owner,
     );
   }
 
@@ -770,6 +797,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       isDeleted: _editedTask.isDeleted,
       category: _editedTask.category,
       locationCategory: selectedLocationCategory,
+      owner: _editedTask.owner,
     );
   }
 
@@ -800,6 +828,7 @@ You have to set new reminders if you want to be notified about this task.""",
                     isDeleted: _editedTask.isDeleted,
                     category: _editedTask.category,
                     locationCategory: _editedTask.locationCategory,
+                    owner: _editedTask.owner,
                   );
 
                   //update the task in the database
@@ -825,6 +854,7 @@ You have to set new reminders if you want to be notified about this task.""",
                     isDeleted: _editedTask.isDeleted,
                     category: _editedTask.category,
                     locationCategory: _editedTask.locationCategory,
+                    owner: _editedTask.owner,
                   );
 
                   //update the task in the database

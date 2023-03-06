@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:planify_app/screens/pages/deleted_agenda_page.dart';
 import '../screens/pages/month_agenda_page.dart';
 import '../screens/pages/today_agenda_page.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/pages/deleted_agenda_page.dart';
 import '../providers/task_category_provider.dart';
-import '../screens/tabs/my_agenda/category_agenda_tab.dart';
+import '../screens/pages/category_agenda_page.dart';
 import '../screens/settings_screen.dart';
 import '../screens/pages/overall_agenda_page.dart';
 
@@ -174,7 +174,7 @@ class _MainDrawerState extends State<MainDrawer> {
                                   SchedulerBinding.instance
                                       .addPostFrameCallback((_) {
                                     Navigator.of(context).pushReplacementNamed(
-                                        CategoryAgendaTab.routeName,
+                                        CategoryAgendaPage.routeName,
                                         arguments: categories
                                             .categoriesList[index].name!);
                                   });

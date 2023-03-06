@@ -187,7 +187,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
   }
 
   void _deleteCategory(BuildContext context, String categoryId) {
-    DBHelper.deleteCategory(categoryId);
+    DBHelper.deleteTaskCategory(categoryId);
     Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
   }
 }

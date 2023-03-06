@@ -153,6 +153,7 @@ class _MonthAgendaTabState extends State<MonthAgendaTab> {
                       isDone: tasks.tasksList[index].isDone,
                       isDeleted: tasks.tasksList[index].isDeleted,
                       locationCategory: tasks.tasksList[index].locationCategory,
+                      owner: tasks.tasksList[index].owner,
                     ),
                   ),
                 ),

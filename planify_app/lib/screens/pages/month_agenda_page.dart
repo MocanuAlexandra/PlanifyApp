@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../tabs/my_agenda/month_agenda_tab.dart';
 
 class MonthAgendaPage extends StatefulWidget {
@@ -26,10 +27,7 @@ class _MonthAgendaPageState extends State<MonthAgendaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: _screens.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

@@ -4,62 +4,42 @@ import 'package:provider/provider.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
-import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
 import '../../../widgets/task/task_list_item.dart';
-import '../../task/add_edit_task_category_screen.dart';
 
-class CategoryAgendaTab extends StatefulWidget {
-  static const routeName = '/category-agenda-tab';
+class SharedOverallAgendaTab extends StatefulWidget {
+  static const routeName = '/shared-overall-agenda-tab';
 
-  const CategoryAgendaTab({super.key});
+  const SharedOverallAgendaTab({super.key});
 
   @override
-  State<CategoryAgendaTab> createState() => _CategoryAgendaTabState();
+  State<SharedOverallAgendaTab> createState() => _SharedOverallAgendaTabState();
 }
 
-class _CategoryAgendaTabState extends State<CategoryAgendaTab> {
+class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
-  var _category;
-  var _isInit = true;
+
+  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
+      bool? focusMode) async {
+    await Provider.of<TaskProvider>(context, listen: false)
+        .fetchSharedTasks(null, null, null, selectedOption, focusMode);
+  }
 
   @override
   void initState() {
-    _fetchTasks(context, selectedOption, _focusMode, _category);
+    _fetchTasks(context, selectedOption, _focusMode);
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      final categoryName =
-          ModalRoute.of(context)!.settings.arguments as String?;
-      if (categoryName != null) _category = categoryName;
-    }
-
-    _isInit = false;
-    super.didChangeDependencies();
-  }
-
-  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
-      bool? focusMode, String? category) async {
-    await Provider.of<TaskProvider>(context, listen: false)
-        .fetchTasks(null, null, null, selectedOption, focusMode, _category);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_category!), actions: [
-        IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            Navigator.of(context).pushNamed(AddEditTaskCategoryScreen.routeName,
-                arguments: _category);
-          },
-        ),
-        displayFilters(context)
-      ]),
+      appBar: AppBar(
+        title: const Text('Overall'),
+        actions: [
+          displayFilters(context),
+        ],
+      ),
       drawer: const MainDrawer(),
       body: Column(
         children: [
@@ -67,14 +47,13 @@ class _CategoryAgendaTabState extends State<CategoryAgendaTab> {
           displayTasks(context),
         ],
       ),
-      floatingActionButton: const ExpandableFloatingActionButton(),
     );
   }
 
   Expanded displayTasks(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption, _focusMode, _category),
+        future: _fetchTasks(context, selectedOption, _focusMode),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
             ? const Center(
@@ -82,7 +61,7 @@ class _CategoryAgendaTabState extends State<CategoryAgendaTab> {
               )
             : RefreshIndicator(
                 onRefresh: () =>
-                    _fetchTasks(context, selectedOption, _focusMode, _category),
+                    _fetchTasks(context, selectedOption, _focusMode),
                 child: Consumer<TaskProvider>(
                   builder: (context, tasks, ch) => ListView.builder(
                     itemCount: tasks.tasksList.length,
@@ -99,6 +78,7 @@ class _CategoryAgendaTabState extends State<CategoryAgendaTab> {
                       isDone: tasks.tasksList[index].isDone,
                       isDeleted: tasks.tasksList[index].isDeleted,
                       locationCategory: tasks.tasksList[index].locationCategory,
+                      owner: tasks.tasksList[index].owner,
                     ),
                   ),
                 ),
@@ -137,7 +117,7 @@ class _CategoryAgendaTabState extends State<CategoryAgendaTab> {
         setState(() {
           selectedOption = selectedValue;
         });
-        _fetchTasks(context, selectedOption, _focusMode, _category);
+        _fetchTasks(context, selectedOption, _focusMode);
       },
       itemBuilder: (_) => [
         PopupMenuItem(

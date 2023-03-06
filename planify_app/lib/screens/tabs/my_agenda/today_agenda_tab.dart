@@ -104,6 +104,7 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
                       isDone: tasks.tasksList[index].isDone,
                       isDeleted: tasks.tasksList[index].isDeleted,
                       locationCategory: tasks.tasksList[index].locationCategory,
+                      owner: tasks.tasksList[index].owner,
                     ),
                   ),
                 ),

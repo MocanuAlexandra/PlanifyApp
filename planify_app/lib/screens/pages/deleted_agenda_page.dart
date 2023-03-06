@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import '../tabs/my_agenda/deleted_agenda_tab.dart';
+import 'package:provider/provider.dart';
+
+import '../../helpers/utility.dart';
+import '../../providers/task_provider.dart';
+import '../../widgets/drawer.dart';
+import '../../widgets/task/task_list_item.dart';
 
 class DeletedAgendaPage extends StatefulWidget {
-  static const routeName = '/deleted-agenda-page';
+  static const routeName = '/deleted-agenda-tab';
 
   const DeletedAgendaPage({super.key});
 
@@ -11,42 +16,62 @@ class DeletedAgendaPage extends StatefulWidget {
 }
 
 class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
-  int _selectedIndex = 0;
-  final List<Widget> _screens = [
-    const DeletedAgendaTab(),
-    const Placeholder(),
-  ];
+  FilterOptions selectedOption = FilterOptions.deleted;
 
-  void _onTabTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  Future<void> _fetchTasks(
+      BuildContext context, FilterOptions? selectedOption) async {
+    await Provider.of<TaskProvider>(context, listen: false)
+        .fetchTasks(null, null, null, selectedOption);
+  }
+
+  @override
+  void initState() {
+    _fetchTasks(context, selectedOption);
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
+      appBar: AppBar(
+        title: const Text('Trash'),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2),
-            label: 'My Tasks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Shared Tasks',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.white.withOpacity(0.5),
-        onTap: _onTabTapped,
-      ),
+      drawer: const MainDrawer(),
+      body: displayTasks(context),
+    );
+  }
+
+  FutureBuilder<void> displayTasks(BuildContext context) {
+    return FutureBuilder(
+      future: _fetchTasks(context, FilterOptions.deleted),
+      builder: (context, snapshot) => snapshot.connectionState ==
+              ConnectionState.waiting
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : RefreshIndicator(
+              onRefresh: () => _fetchTasks(context, selectedOption),
+              child: Consumer<TaskProvider>(
+                builder: (context, tasks, ch) => ListView.builder(
+                  itemCount: tasks.tasksList.length,
+                  itemBuilder: (context, index) => TaskListItem(
+                    id: tasks.tasksList[index].id,
+                    title: tasks.tasksList[index].title,
+                    dueDate: Utility.dateTimeToString(
+                        tasks.tasksList[index].dueDate),
+                    address: tasks.tasksList[index].address,
+                    time:
+                        Utility.timeOfDayToString(tasks.tasksList[index].time),
+                    priority: Utility.priorityEnumToString(
+                        tasks.tasksList[index].priority),
+                    isDone: tasks.tasksList[index].isDone,
+                    isDeleted: tasks.tasksList[index].isDeleted,
+                    locationCategory: tasks.tasksList[index].locationCategory,
+                    owner: tasks.tasksList[index].owner,
+                  ),
+                ),
+              ),
+            ),
     );
   }
 }

@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'screens/pages/deleted_agenda_page.dart';
+import 'package:planify_app/screens/tabs/shared_agenda/shared_overrall_agenda_tab.dart';
+
 import 'screens/pages/month_agenda_page.dart';
 import 'screens/pages/overall_agenda_page.dart';
 import 'screens/pages/today_agenda_page.dart';
@@ -13,10 +14,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
-import 'screens/tabs/my_agenda/deleted_agenda_tab.dart';
+import 'screens/pages/deleted_agenda_page.dart';
 import 'screens/tabs/my_agenda/month_agenda_tab.dart';
 import 'screens/tabs/my_agenda/overall_agenda_tab.dart';
-import 'screens/tabs/my_agenda/category_agenda_tab.dart';
+import 'screens/pages/category_agenda_page.dart';
 import 'screens/tabs/my_agenda/today_agenda_tab.dart';
 import '../../screens/auth/auth_screen.dart';
 import '../../screens/settings_screen.dart';
@@ -119,19 +120,15 @@ class _MyAppState extends State<MyApp> {
           routes: {
             OverallAgendaPage.routeName: (context) => const OverallAgendaPage(),
             OverallAgendaTab.routeName: (context) => const OverallAgendaTab(),
-
+            SharedOverallAgendaTab.routeName: (context) =>
+                const SharedOverallAgendaTab(),
             TodayAgendaPage.routeName: (context) => const TodayAgendaPage(),
             TodayAgendaTab.routeName: (context) => const TodayAgendaTab(),
-
             MonthAgendaPage.routeName: (context) => const MonthAgendaPage(),
             MonthAgendaTab.routeName: (context) => const MonthAgendaTab(),
-
             DeletedAgendaPage.routeName: (context) => const DeletedAgendaPage(),
-            DeletedAgendaTab.routeName: (context) => const DeletedAgendaTab(),
-
-            //TODO  CategoryAgendaPage.routeName: (context) => const CategoryAgendaPage(),
-            CategoryAgendaTab.routeName: (context) => const CategoryAgendaTab(),
-
+            CategoryAgendaPage.routeName: (context) =>
+                const CategoryAgendaPage(),
             AddEditTaskScreen.routeName: (context) => const AddEditTaskScreen(),
             TaskDetailsScreen.routeName: (context) => const TaskDetailsScreen(),
             AuthScreen.routeName: (context) => const AuthScreen(),

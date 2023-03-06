@@ -36,7 +36,7 @@ dependencies:
   firebase_core: ^2.7.0 # For Firebase Core
   cloud_firestore: ^4.4.3 # For Cloud Firestore
   firebase_auth: ^4.2.9 # For authentication
-  google_sign_in: ^6.0.1 # For Google Sign In
+  google_sign_in: ^6.0.2 # For Google Sign In
 
   # Validation dependencies
   flutter_form_builder: ^7.8.0 # For form creation
@@ -48,7 +48,7 @@ dependencies:
 
   # Maps dependencies
   location: ^4.4.0 # For location services
-  google_maps_flutter: ^2.2.4 # For Google Maps
+  google_maps_flutter: ^2.2.5 # For Google Maps
   google_maps_flutter_web: ^0.4.0+6 # For Google Maps Web
   google_maps_webservice_ex: ^0.0.1+2 # For Google Maps API
 
