@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tabs/shared_agenda/shared_today_agenda_tab.dart';
 import '../tabs/my_agenda/today_agenda_tab.dart';
 
 class TodayAgendaPage extends StatefulWidget {
@@ -14,7 +15,7 @@ class _TodayAgendaPageState extends State<TodayAgendaPage> {
   int _selectedIndex = 0;
   final List<Widget> _screens = [
     const TodayAgendaTab(),
-    const Placeholder(),
+    const SharedTodayAgendaTab(),
   ];
 
   void _onTabTapped(int index) {

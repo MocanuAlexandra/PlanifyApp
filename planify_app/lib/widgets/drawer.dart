@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:planify_app/screens/pages/deleted_agenda_page.dart';
+import '../screens/pages/deleted_agenda_page.dart';
 import '../screens/pages/month_agenda_page.dart';
 import '../screens/pages/today_agenda_page.dart';
 import 'package:provider/provider.dart';

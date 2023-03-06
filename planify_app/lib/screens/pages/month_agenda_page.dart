@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tabs/shared_agenda/shared_month_agenda_tab.dart';
 
 import '../tabs/my_agenda/month_agenda_tab.dart';
 
@@ -15,7 +16,7 @@ class _MonthAgendaPageState extends State<MonthAgendaPage> {
   int _selectedIndex = 0;
   final List<Widget> _screens = [
     const MonthAgendaTab(),
-    const Placeholder(),
+    const SharedMonthAgendaTab(),
   ];
 
   void _onTabTapped(int index) {

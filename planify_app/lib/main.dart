@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:planify_app/screens/tabs/shared_agenda/shared_overrall_agenda_tab.dart';
+import 'screens/tabs/shared_agenda/shared_month_agenda_tab.dart';
+import 'screens/tabs/shared_agenda/shared_overrall_agenda_tab.dart';
+import 'screens/tabs/shared_agenda/shared_today_agenda_tab.dart';
 
 import 'screens/pages/month_agenda_page.dart';
 import 'screens/pages/overall_agenda_page.dart';
@@ -124,8 +126,12 @@ class _MyAppState extends State<MyApp> {
                 const SharedOverallAgendaTab(),
             TodayAgendaPage.routeName: (context) => const TodayAgendaPage(),
             TodayAgendaTab.routeName: (context) => const TodayAgendaTab(),
+            SharedTodayAgendaTab.routeName: (context) =>
+                const SharedTodayAgendaTab(),
             MonthAgendaPage.routeName: (context) => const MonthAgendaPage(),
             MonthAgendaTab.routeName: (context) => const MonthAgendaTab(),
+            SharedMonthAgendaTab.routeName: (context) =>
+                const SharedMonthAgendaTab(),
             DeletedAgendaPage.routeName: (context) => const DeletedAgendaPage(),
             CategoryAgendaPage.routeName: (context) =>
                 const CategoryAgendaPage(),
