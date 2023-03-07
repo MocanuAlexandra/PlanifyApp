@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../tabs/shared_agenda/shared_month_agenda_tab.dart';
+import '../tabs_in_pages/shared_agenda/shared_month_agenda_tab.dart';
 
-import '../tabs/my_agenda/month_agenda_tab.dart';
+import '../tabs_in_pages/my_agenda/month_agenda_tab.dart';
 
 class MonthAgendaPage extends StatefulWidget {
   static const routeName = '/month-agenda-page';

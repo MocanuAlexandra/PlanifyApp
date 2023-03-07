@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../tabs/shared_agenda/shared_today_agenda_tab.dart';
-import '../tabs/my_agenda/today_agenda_tab.dart';
+import '../tabs_in_pages/shared_agenda/shared_today_agenda_tab.dart';
+import '../tabs_in_pages/my_agenda/today_agenda_tab.dart';
 
 class TodayAgendaPage extends StatefulWidget {
   static const routeName = '/today-agenda-page';

@@ -5,18 +5,19 @@ import '../../../helpers/location_helper.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
+import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
 import '../../../widgets/task/task_list_item.dart';
 
-class SharedTodayAgendaTab extends StatefulWidget {
-  static const routeName = '/shared-today-agenda-tab';
+class TodayAgendaTab extends StatefulWidget {
+  static const routeName = '/today-agenda-tab';
 
-  const SharedTodayAgendaTab({super.key});
+  const TodayAgendaTab({super.key});
 
   @override
-  State<SharedTodayAgendaTab> createState() => _SharedTodayAgendaTabState();
+  State<TodayAgendaTab> createState() => _TodayAgendaTabState();
 }
 
-class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
+class _TodayAgendaTabState extends State<TodayAgendaTab> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
   var tasks = [];
@@ -24,7 +25,7 @@ class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode) async {
     await Provider.of<TaskProvider>(context, listen: false)
-        .fetchSharedTasks(true, null, null, selectedOption, focusMode);
+        .fetchTasks(true, null, null, selectedOption, focusMode);
 
     tasks = Provider.of<TaskProvider>(context, listen: false).tasksList;
   }
@@ -71,6 +72,7 @@ class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
           displayTasks(context),
         ],
       ),
+      floatingActionButton: const ExpandableFloatingActionButton(),
     );
   }
 
@@ -96,7 +98,7 @@ class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
                           tasks.tasksList[index].dueDate),
                       address: tasks.tasksList[index].address,
                       time: Utility.timeOfDayToString(
-                          tasks.tasksList[index].time),
+                          tasks.tasksList[index].dueTime),
                       priority: Utility.priorityEnumToString(
                           tasks.tasksList[index].priority),
                       isDone: tasks.tasksList[index].isDone,

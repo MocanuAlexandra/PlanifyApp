@@ -108,8 +108,8 @@ class NotificationService {
     TimeOfDay? notificationTime;
     DateTime? notificationDate;
 
-    if (newTask.time != null) {
-      notificationTime = Utility.reminderToTime(reminder, newTask.time!);
+    if (newTask.dueTime != null) {
+      notificationTime = Utility.reminderToTime(reminder, newTask.dueTime!);
     }
     if (newTask.dueDate != null) {
       notificationDate = Utility.reminderToDate(reminder, newTask.dueDate!);
@@ -121,7 +121,7 @@ class NotificationService {
         id: newReminder.contentId,
         channelKey: 'basic_channel',
         title: "Reminder for task: ${newTask.title}",
-        body: Utility.notificationBodyString(newTask.dueDate, newTask.time),
+        body: Utility.notificationBodyString(newTask.dueDate, newTask.dueTime),
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,
@@ -172,7 +172,7 @@ class NotificationService {
         id: Random().nextInt(1000),
         channelKey: 'basic_channel',
         title: "Reminder for task: ${task.title}",
-        body: Utility.notificationBodyString(task.dueDate, task.time),
+        body: Utility.notificationBodyString(task.dueDate, task.dueTime),
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,
@@ -180,8 +180,7 @@ class NotificationService {
           'groupKey': taskId,
         },
       ),
-      schedule:
-       NotificationCalendar(
+      schedule: NotificationCalendar(
         hour: DateTime.now().hour,
         minute: DateTime.now().minute + 5,
         repeats: false,

@@ -34,7 +34,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     title: '',
     dueDate: null,
     address: null,
-    time: null,
+    dueTime: null,
     priority: null,
     isDone: false,
     isDeleted: false,
@@ -72,7 +72,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           'title': _editedTask.title,
           'dueDate': _editedTask.dueDate,
           'address': _editedTask.address,
-          'time': _editedTask.time,
+          'time': _editedTask.dueTime,
           'priority': _editedTask.priority,
           'isDone': _editedTask.isDone,
           'isDeleted': _editedTask.isDeleted,
@@ -104,7 +104,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           title: value.toString(),
           dueDate: _editedTask.dueDate,
           address: _editedTask.address,
-          time: _editedTask.time,
+          dueTime: _editedTask.dueTime,
           priority: _editedTask.priority,
           isDone: _editedTask.isDone,
           category: _editedTask.category,
@@ -137,14 +137,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         ),
         //delete selected date
         IconButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() {
                 _editedTask = Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: null,
                   address: _editedTask.address,
-                  time: _editedTask.time,
+                  dueTime: _editedTask.dueTime,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
@@ -153,11 +153,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 );
               });
               _dueTimeDueDateChanged = true;
-              Utility.displayInformationalDialog(context,
-                  'The previous reminders were deleted because the due date was deleted.');
-              setState(() {
-                _selectedReminders = [];
-              });
+
+              if (await DBHelper.checkForReminders(_editedTask.id!)) {
+                Utility.displayInformationalDialog(context,
+                    'The previous reminders were deleted because the due date was deleted.');
+                setState(() {
+                  _selectedReminders = [];
+                });
+              }
             },
             icon: const Icon(Icons.delete))
       ],
@@ -169,7 +172,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       children: [
         Expanded(
           child: Text(
-            _displayTime(_editedTask.time),
+            _displayTime(_editedTask.dueTime),
             style: const TextStyle(fontSize: 16),
           ),
         ),
@@ -186,14 +189,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         ),
         //delete selected time
         IconButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() {
                 _editedTask = Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: _editedTask.dueDate,
                   address: _editedTask.address,
-                  time: null,
+                  dueTime: null,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   category: _editedTask.category,
@@ -202,11 +205,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 );
               });
               _dueTimeDueDateChanged = true;
-              Utility.displayInformationalDialog(context,
-                  'The previous reminders were deleted because the due time was deleted.');
-              setState(() {
-                _selectedReminders = [];
-              });
+
+              if (await DBHelper.checkForReminders(_editedTask.id!)) {
+                Utility.displayInformationalDialog(context,
+                    'The previous reminders were deleted because the due time was deleted.');
+                setState(() {
+                  _selectedReminders = [];
+                });
+              }
             },
             icon: const Icon(Icons.delete))
       ],
@@ -240,7 +246,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         child: CircularProgressIndicator(),
                       )
                     : Consumer<TaskReminderProvider>(
-                        builder: (context, reminders, ch) => CheckboxList(
+                        builder: (context, reminders, _) => CheckboxList(
                           items: Utility.getReminderTypes(
                               isDueTimeSelected, isDueDateSelected),
                           selectedItems: determineAlreadySelectedReminders(
@@ -314,7 +320,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             title: _editedTask.title,
             dueDate: _editedTask.dueDate,
             address: _editedTask.address,
-            time: _editedTask.time,
+            dueTime: _editedTask.dueTime,
             priority: value,
             isDone: _editedTask.isDone,
             category: _editedTask.category,
@@ -347,7 +353,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         title: _editedTask.title,
                         dueDate: _editedTask.dueDate,
                         address: _editedTask.address,
-                        time: _editedTask.time,
+                        dueTime: _editedTask.dueTime,
                         priority: _editedTask.priority,
                         isDone: _editedTask.isDone,
                         category: value,
@@ -377,10 +383,10 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TextButton.icon(
-          onPressed: _editedTask.time == null && _editedTask.dueDate == null
+          onPressed: _editedTask.dueTime == null && _editedTask.dueDate == null
               ? () => Utility.displayInformationalDialog(
                   context, 'Please select due date or due time first!')
-              : _editedTask.time == null && _editedTask.dueDate != null
+              : _editedTask.dueTime == null && _editedTask.dueDate != null
                   ? () async {
                       final result = await showDialog(
                         context: context,
@@ -392,7 +398,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         });
                       }
                     }
-                  : _editedTask.time != null && _editedTask.dueDate == null
+                  : _editedTask.dueTime != null && _editedTask.dueDate == null
                       ? () async {
                           final result = await showDialog(
                             context: context,
@@ -498,7 +504,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           {
             await deleteNotificationsForTask(_editedTask.id!).then((value) => {
                   //check if the user selected a due date or time
-                  if (_editedTask.dueDate != null || _editedTask.time != null)
+                  if (_editedTask.dueDate != null ||
+                      _editedTask.dueTime != null)
                     {
                       addNotificationsForTask(_editedTask.id!),
                     }
@@ -516,17 +523,15 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       // if we didn't get an id, it means that we are adding a new task
       else {
         //add the task in the database
-        var taskId = await DBHelper.addTask(_editedTask).then(
-          (taskIdValue) async => {
-            //proceed the sharing
-            shareTask(taskIdValue),
-          },
-        );
+        String taskId = await DBHelper.addTask(_editedTask);
+
+        //share the task with the selected users
+        await shareTask(taskId);
 
         //check if the user selected a due date or time
-        if (_editedTask.dueDate != null || _editedTask.time != null) {
+        if (_editedTask.dueDate != null || _editedTask.dueTime != null) {
           //add notifications for the task
-          await addNotificationsForTask(taskId as String);
+          await addNotificationsForTask(taskId);
         }
 
         // go back to overall agenda screen
@@ -580,7 +585,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       for (String reminder in _selectedReminders) {
         TaskReminder newReminder;
         //check if the user selected only due date
-        if (_editedTask.dueDate != null && _editedTask.time == null) {
+        if (_editedTask.dueDate != null && _editedTask.dueTime == null) {
           newReminder = TaskReminder(
             contentId: taskId.hashCode +
                 _editedTask.dueDate!.day +
@@ -593,11 +598,11 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           await DBHelper.addReminder(taskId, newReminder);
         }
         //check if the user selected only time
-        else if (_editedTask.dueDate == null && _editedTask.time != null) {
+        else if (_editedTask.dueDate == null && _editedTask.dueTime != null) {
           newReminder = TaskReminder(
             contentId: taskId.hashCode +
-                _editedTask.time!.hour +
-                _editedTask.time!.minute +
+                _editedTask.dueTime!.hour +
+                _editedTask.dueTime!.minute +
                 reminder.hashCode,
             reminder: reminder,
           );
@@ -610,8 +615,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 _editedTask.dueDate!.day +
                 _editedTask.dueDate!.month +
                 _editedTask.dueDate!.year +
-                _editedTask.time!.hour +
-                _editedTask.time!.minute +
+                _editedTask.dueTime!.hour +
+                _editedTask.dueTime!.minute +
                 reminder.hashCode,
             reminder: reminder,
           );
@@ -708,16 +713,28 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       lastDate: DateTime(2100),
       initialDatePickerMode: DatePickerMode.day,
       locale: const Locale('en', 'US'),
-    ).then((pickedDate) => {
+    ).then((pickedDate) async => {
           if (pickedDate != null)
             {
+              //check if the user selected a new date and if there are reminders
+              if (pickedDate != _editedTask.dueDate &&
+                  _editedTask.dueDate != null &&
+                  await DBHelper.checkForReminders(_editedTask.id!))
+                {
+                  _dueTimeDueDateChanged = true,
+                  Utility.displayInformationalDialog(context,
+                      'The previous reminders were deleted because the due date was changed.'),
+                  setState(() {
+                    _selectedReminders = [];
+                  })
+                },
               setState(() {
                 _editedTask = Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: pickedDate,
                   address: _editedTask.address,
-                  time: _editedTask.time,
+                  dueTime: _editedTask.dueTime,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   isDeleted: _editedTask.isDeleted,
@@ -726,12 +743,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   owner: _editedTask.owner,
                 );
               }),
-              _dueTimeDueDateChanged = true,
-              Utility.displayInformationalDialog(context,
-                  'The previous reminders were deleted because the due date was changed.'),
-              setState(() {
-                _selectedReminders = [];
-              })
             }
         });
   }
@@ -740,17 +751,29 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     showTimePicker(
       context: context,
       initialTime:
-          _editedTask.time != null ? _editedTask.time! : TimeOfDay.now(),
-    ).then((pickedTime) => {
+          _editedTask.dueTime != null ? _editedTask.dueTime! : TimeOfDay.now(),
+    ).then((pickedTime) async => {
           if (pickedTime != null)
             {
+              //check if the user selected a new time and has reminders selected
+              if (pickedTime != _editedTask.dueTime &&
+                  _editedTask.dueTime != null &&
+                  await DBHelper.checkForReminders(_editedTask.id!))
+                {
+                  _dueTimeDueDateChanged = true,
+                  Utility.displayInformationalDialog(context,
+                      'The previous reminders were deleted because the due time was changed.'),
+                  setState(() {
+                    _selectedReminders = [];
+                  })
+                },
               setState(() {
                 _editedTask = Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: _editedTask.dueDate,
                   address: _editedTask.address,
-                  time: pickedTime,
+                  dueTime: pickedTime,
                   priority: _editedTask.priority,
                   isDone: _editedTask.isDone,
                   isDeleted: _editedTask.isDeleted,
@@ -759,12 +782,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   owner: _editedTask.owner,
                 );
               }),
-              _dueTimeDueDateChanged = true,
-              Utility.displayInformationalDialog(context,
-                  'The previous reminders were deleted because the due time was changed.'),
-              setState(() {
-                _selectedReminders = [];
-              })
             }
         });
   }
@@ -775,7 +792,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       title: _editedTask.title,
       dueDate: _editedTask.dueDate,
       address: TaskAddress(latitude: lat, longitude: lng),
-      time: _editedTask.time,
+      dueTime: _editedTask.dueTime,
       priority: _editedTask.priority,
       isDone: _editedTask.isDone,
       isDeleted: _editedTask.isDeleted,
@@ -791,7 +808,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       title: _editedTask.title,
       dueDate: _editedTask.dueDate,
       address: null,
-      time: _editedTask.time,
+      dueTime: _editedTask.dueTime,
       priority: _editedTask.priority,
       isDone: _editedTask.isDone,
       isDeleted: _editedTask.isDeleted,
@@ -822,7 +839,7 @@ You have to set new reminders if you want to be notified about this task.""",
                     title: _editedTask.title,
                     dueDate: _editedTask.dueDate,
                     address: _editedTask.address,
-                    time: _editedTask.time,
+                    dueTime: _editedTask.dueTime,
                     priority: _editedTask.priority,
                     isDone: false,
                     isDeleted: _editedTask.isDeleted,
@@ -848,7 +865,7 @@ You have to set new reminders if you want to be notified about this task.""",
                     title: _editedTask.title,
                     dueDate: _editedTask.dueDate,
                     address: _editedTask.address,
-                    time: _editedTask.time,
+                    dueTime: _editedTask.dueTime,
                     priority: _editedTask.priority,
                     isDone: true,
                     isDeleted: _editedTask.isDeleted,
@@ -871,16 +888,16 @@ You have to set new reminders if you want to be notified about this task.""",
   }
 
   String _displayTime(TimeOfDay? selectedTime) {
-    if (_editedTask.time == null) {
+    if (_editedTask.dueTime == null) {
       return 'No due time chosen';
     }
-    String hour = _editedTask.time!.hour < 10
-        ? '0${_editedTask.time!.hour}'
-        : '${_editedTask.time!.hour}';
-    String minute = _editedTask.time!.minute < 10
-        ? '0${_editedTask.time!.minute}'
-        : '${_editedTask.time!.minute}';
-    String period = _editedTask.time!.period == DayPeriod.am ? 'AM' : 'PM';
+    String hour = _editedTask.dueTime!.hour < 10
+        ? '0${_editedTask.dueTime!.hour}'
+        : '${_editedTask.dueTime!.hour}';
+    String minute = _editedTask.dueTime!.minute < 10
+        ? '0${_editedTask.dueTime!.minute}'
+        : '${_editedTask.dueTime!.minute}';
+    String period = _editedTask.dueTime!.period == DayPeriod.am ? 'AM' : 'PM';
     return 'Due time: $hour:$minute $period';
   }
 

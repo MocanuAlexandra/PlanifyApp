@@ -88,12 +88,12 @@ class DBHelper {
         .collection('reminders')
         .get();
 
-    //check if there is no categories
+    //check if there is no reminders
     if (reminders.docs.isEmpty) {
       return [];
     }
 
-    //convert the categories to a list of maps
+    //convert the reminders to a list of maps
     final remindersList = reminders.docs.map((reminder) {
       return {
         'id': reminder.id,
@@ -175,7 +175,7 @@ class DBHelper {
         .add({
       'title': newTask.title,
       'dueDate': updatedDueDate,
-      'time': Utility.timeOfDayToString(newTask.time),
+      'time': Utility.timeOfDayToString(newTask.dueTime),
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,
       'address': updatedLocation.address,
@@ -199,6 +199,22 @@ class DBHelper {
         .collection('tasks')
         .doc(id)
         .delete();
+  }
+
+  //function for deleting all tasks marked as deleted in the database
+  static void deleteAllTasks() {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .where('isDeleted', isEqualTo: true)
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs) {
+        ds.reference.delete();
+      }
+    });
   }
 
   // function for updating tasks in the database
@@ -246,7 +262,7 @@ class DBHelper {
         .update({
       'title': editedTask.title,
       'dueDate': updatedDueDate,
-      'time': Utility.timeOfDayToString(editedTask.time),
+      'time': Utility.timeOfDayToString(editedTask.dueTime),
       'latitude': updatedLocation.latitude,
       'longitude': updatedLocation.longitude,
       'address': updatedLocation.address,
@@ -389,7 +405,7 @@ class DBHelper {
       id: task.id,
       title: task['title'],
       dueDate: Utility.stringToDateTime(task['dueDate']),
-      time: Utility.stringToTimeOfDay(task['time']),
+      dueTime: Utility.stringToTimeOfDay(task['time']),
     );
   }
 
@@ -546,7 +562,7 @@ class DBHelper {
           longitude: task['longitude'],
           address: task['address'],
         ),
-        time: Utility.stringToTimeOfDay(task['time']),
+        dueTime: Utility.stringToTimeOfDay(task['time']),
         priority: Utility.stringToPriorityEnum(task['priority']),
         isDone: task['isDone'],
         isDeleted: task['isDeleted'],
@@ -556,5 +572,42 @@ class DBHelper {
       ));
     }
     return tasks;
+  }
+
+  //function that checks if there are deleted tasks
+  static Future<bool> checkForDeletedTasks() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final deletedTasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .where('isDeleted', isEqualTo: true)
+        .get();
+
+    if (deletedTasks.docs.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //check if a task has reminders
+  static Future<bool> checkForReminders(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final reminders = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('reminders')
+        .get();
+
+    if (reminders.docs.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -39,7 +39,7 @@ class TaskProvider with ChangeNotifier {
             longitude: task['longitude'],
             address: task['address'],
           ),
-          time: task['time'],
+          dueTime: task['time'],
           priority: task['priority'],
           isDone: task['isDone'],
           isDeleted: task['isDeleted'],
@@ -225,6 +225,11 @@ class TaskProvider with ChangeNotifier {
 
   void deleteTask(String id) {
     _tasks.removeWhere((task) => task.id == id);
+    notifyListeners();
+  }
+
+  void deleteAllTasks() {
+    _tasks.clear();
     notifyListeners();
   }
 

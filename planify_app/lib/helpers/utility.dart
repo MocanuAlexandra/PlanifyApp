@@ -303,7 +303,7 @@ class Utility {
 
   static int _getDueTimeInMinutes(Task task) {
     //check if the task has a due time
-    String dueTimeString = Utility.timeOfDayToString(task.time);
+    String dueTimeString = Utility.timeOfDayToString(task.dueTime);
     if (dueTimeString == '--:--') {
       return 1440; // 24 hours in minutes
     }

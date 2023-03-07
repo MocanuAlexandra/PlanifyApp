@@ -8,7 +8,7 @@ class Task {
   final String? id;
   final String? title;
   final DateTime? dueDate;
-  final TimeOfDay? time;
+  final TimeOfDay? dueTime;
   final TaskAddress? address;
   final Priority? priority;
   bool isDone;
@@ -21,7 +21,7 @@ class Task {
     this.id,
     this.title,
     this.dueDate,
-    this.time,
+    this.dueTime,
     this.address,
     this.priority,
     this.isDone = false,

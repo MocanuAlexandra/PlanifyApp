@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../tabs/my_agenda/overall_agenda_tab.dart';
-import '../tabs/shared_agenda/shared_overrall_agenda_tab.dart';
+import '../tabs_in_pages/my_agenda/overall_agenda_tab.dart';
+import '../tabs_in_pages/shared_agenda/shared_overrall_agenda_tab.dart';
 
 class OverallAgendaPage extends StatefulWidget {
   static const routeName = '/overall-agenda-page';

@@ -72,7 +72,7 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
                           tasks.tasksList[index].dueDate),
                       address: tasks.tasksList[index].address,
                       time: Utility.timeOfDayToString(
-                          tasks.tasksList[index].time),
+                          tasks.tasksList[index].dueTime),
                       priority: Utility.priorityEnumToString(
                           tasks.tasksList[index].priority),
                       isDone: tasks.tasksList[index].isDone,

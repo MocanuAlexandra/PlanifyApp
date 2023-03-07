@@ -1,33 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 import 'package:provider/provider.dart';
 
-import '../../../helpers/location_helper.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
-import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
 import '../../../widgets/task/task_list_item.dart';
 
-class TodayAgendaTab extends StatefulWidget {
-  static const routeName = '/today-agenda-tab';
+class SharedMonthAgendaTab extends StatefulWidget {
+  static const routeName = '/-shared-month-agenda-tab';
 
-  const TodayAgendaTab({super.key});
+  const SharedMonthAgendaTab({super.key});
 
   @override
-  State<TodayAgendaTab> createState() => _TodayAgendaTabState();
+  State<SharedMonthAgendaTab> createState() => _SharedMonthAgendaTabState();
 }
 
-class _TodayAgendaTabState extends State<TodayAgendaTab> {
+class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
-  var tasks = [];
+  DateTime? _selectedDate = DateTime.now();
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode) async {
     await Provider.of<TaskProvider>(context, listen: false)
-        .fetchTasks(true, null, null, selectedOption, focusMode);
+        .fetchSharedTasks(null, true, _selectedDate, selectedOption, focusMode);
+  }
 
-    tasks = Provider.of<TaskProvider>(context, listen: false).tasksList;
+  void _presentMonthPicker() async {
+    final DateTime? picked = await showMonthPicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 
   @override
@@ -40,28 +51,12 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Today'),
+        title: const Text('Month'),
         actions: [
           IconButton(
-              onPressed: () async {
-                //check if at least one task has location chosen
-                if (tasks
-                    .where(
-                        (task) => task.address.address != 'No address chosen')
-                    .toList()
-                    .isEmpty) {
-                  Utility.displayInformationalDialog(
-                      context, 'There is no task with location chosen');
-                } else {
-                  //get current location of user
-                  var locData = await LocationHelper.getCurrentLocation();
-
-                  //launch map
-                  LocationHelper.launchMaps(
-                      tasks, locData.latitude!, locData.longitude);
-                }
-              },
-              icon: const Icon(Icons.directions)),
+            icon: const Icon(Icons.calendar_today),
+            onPressed: _presentMonthPicker,
+          ),
           displayFilters(context),
         ],
       ),
@@ -72,67 +67,6 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
           displayTasks(context),
         ],
       ),
-      floatingActionButton: const ExpandableFloatingActionButton(),
-    );
-  }
-
-  Expanded displayTasks(BuildContext context) {
-    return Expanded(
-      child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption, _focusMode),
-        builder: (context, snapshot) => snapshot.connectionState ==
-                ConnectionState.waiting
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : RefreshIndicator(
-                onRefresh: () =>
-                    _fetchTasks(context, selectedOption, _focusMode),
-                child: Consumer<TaskProvider>(
-                  builder: (context, tasks, ch) => ListView.builder(
-                    itemCount: tasks.tasksList.length,
-                    itemBuilder: (context, index) => TaskListItem(
-                      id: tasks.tasksList[index].id,
-                      title: tasks.tasksList[index].title,
-                      dueDate: Utility.dateTimeToString(
-                          tasks.tasksList[index].dueDate),
-                      address: tasks.tasksList[index].address,
-                      time: Utility.timeOfDayToString(
-                          tasks.tasksList[index].time),
-                      priority: Utility.priorityEnumToString(
-                          tasks.tasksList[index].priority),
-                      isDone: tasks.tasksList[index].isDone,
-                      isDeleted: tasks.tasksList[index].isDeleted,
-                      locationCategory: tasks.tasksList[index].locationCategory,
-                      owner: tasks.tasksList[index].owner,
-                    ),
-                  ),
-                ),
-              ),
-      ),
-    );
-  }
-
-  Row changeFocusMode(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          'Focus Mode',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        Switch.adaptive(
-          activeColor: Theme.of(context).colorScheme.secondary,
-          value: _focusMode,
-          onChanged: (bool value) {
-            setState(() {
-              _focusMode = value;
-            });
-          },
-        ),
-      ],
     );
   }
 
@@ -184,6 +118,66 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
               Text('Done'),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Expanded displayTasks(BuildContext context) {
+    return Expanded(
+      child: FutureBuilder(
+        future: _fetchTasks(context, selectedOption, _focusMode),
+        builder: (context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh: () =>
+                    _fetchTasks(context, selectedOption, _focusMode),
+                child: Consumer<TaskProvider>(
+                  builder: (context, tasks, ch) => ListView.builder(
+                    itemCount: tasks.tasksList.length,
+                    itemBuilder: (context, index) => TaskListItem(
+                      id: tasks.tasksList[index].id,
+                      title: tasks.tasksList[index].title,
+                      dueDate: Utility.dateTimeToString(
+                          tasks.tasksList[index].dueDate),
+                      address: tasks.tasksList[index].address,
+                      time: Utility.timeOfDayToString(
+                          tasks.tasksList[index].dueTime),
+                      priority: Utility.priorityEnumToString(
+                          tasks.tasksList[index].priority),
+                      isDone: tasks.tasksList[index].isDone,
+                      isDeleted: tasks.tasksList[index].isDeleted,
+                      locationCategory: tasks.tasksList[index].locationCategory,
+                      owner: tasks.tasksList[index].owner,
+                    ),
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Row changeFocusMode(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Text(
+          'Focus Mode',
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+        Switch.adaptive(
+          activeColor: Theme.of(context).colorScheme.secondary,
+          value: _focusMode,
+          onChanged: (bool value) {
+            setState(() {
+              _focusMode = value;
+            });
+          },
         ),
       ],
     );

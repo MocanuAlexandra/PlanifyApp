@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:planify_app/helpers/database_helper.dart';
+import 'package:planify_app/screens/pages/overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';
@@ -35,9 +37,62 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trash'),
+        actions: [
+          clearTrash(context),
+        ],
       ),
       drawer: const MainDrawer(),
       body: displayTasks(context),
+    );
+  }
+
+  FutureBuilder<dynamic> clearTrash(BuildContext context) {
+    return FutureBuilder(
+      future: _existDeletedTasks(),
+      builder: (context, snapshot) => snapshot.connectionState ==
+              ConnectionState.waiting
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : snapshot.data == true
+              ? IconButton(
+                  icon: const Icon(Icons.delete_forever_outlined),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Question'),
+                        content: const Text(
+                            'Are you sure you want to permanently delete all tasks?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              //delete tasks from DB
+                              DBHelper.deleteAllTasks();
+
+                              // remove task from UI
+                              Provider.of<TaskProvider>(context, listen: false)
+                                  .deleteAllTasks();
+
+                              //close dialog
+                              Navigator.of(context).pushReplacementNamed(
+                                OverallAgendaPage.routeName,
+                              );
+                            },
+                            child: const Text('Yes'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('No'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                )
+              : const SizedBox(),
     );
   }
 
@@ -60,8 +115,8 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
                     dueDate: Utility.dateTimeToString(
                         tasks.tasksList[index].dueDate),
                     address: tasks.tasksList[index].address,
-                    time:
-                        Utility.timeOfDayToString(tasks.tasksList[index].time),
+                    time: Utility.timeOfDayToString(
+                        tasks.tasksList[index].dueTime),
                     priority: Utility.priorityEnumToString(
                         tasks.tasksList[index].priority),
                     isDone: tasks.tasksList[index].isDone,
@@ -73,5 +128,11 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
               ),
             ),
     );
+  }
+
+  //Auxiliary function
+  //check if there are any deleted tasks in the database
+  Future<bool> _existDeletedTasks() async {
+    return await DBHelper.checkForDeletedTasks();
   }
 }

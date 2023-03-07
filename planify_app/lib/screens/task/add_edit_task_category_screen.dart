@@ -6,7 +6,7 @@ import '../../helpers/utility.dart';
 import '../../models/task_category.dart';
 import '../../providers/task_category_provider.dart';
 import '../pages/overall_agenda_page.dart';
-import '../tabs/my_agenda/overall_agenda_tab.dart';
+import '../tabs_in_pages/my_agenda/overall_agenda_tab.dart';
 
 class AddEditTaskCategoryScreen extends StatefulWidget {
   const AddEditTaskCategoryScreen({super.key});

@@ -119,7 +119,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       children: [
         const Icon(Icons.access_time),
         const SizedBox(width: 10),
-        Text(Utility.timeOfDayToString(loadedTask.time),
+        Text(Utility.timeOfDayToString(loadedTask.dueTime),
             style: const TextStyle(fontSize: 16)),
       ],
     );
