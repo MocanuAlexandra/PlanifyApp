@@ -6,7 +6,6 @@ import '../../helpers/utility.dart';
 import '../../models/task_category.dart';
 import '../../providers/task_category_provider.dart';
 import '../pages/overall_agenda_page.dart';
-import '../tabs_in_pages/my_agenda/overall_agenda_tab.dart';
 
 class AddEditTaskCategoryScreen extends StatefulWidget {
   const AddEditTaskCategoryScreen({super.key});
@@ -75,6 +74,9 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final buttonHeight = screenHeight * 0.08;
+
     return Scaffold(
       appBar: AppBar(
         title: _editedCategory.id == null
@@ -155,30 +157,25 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
               ),
             ),
           ),
-          Expanded(
-            child: Align(
-              alignment: FractionalOffset.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 70),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                      onPressed: _addEditCategory,
-                      style: ElevatedButton.styleFrom(
-                        elevation: 5,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0),
-                        ),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                      ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(fontSize: 18),
-                      )),
-                ),
-              ),
+          SizedBox(
+            height: buttonHeight,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 15),
+              child: ElevatedButton(
+                  onPressed: _addEditCategory,
+                  style: ElevatedButton.styleFrom(
+                    elevation: 5,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(fontSize: 18),
+                  )),
             ),
           ),
         ],

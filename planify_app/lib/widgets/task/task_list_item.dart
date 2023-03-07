@@ -81,6 +81,18 @@ class TaskListItem extends StatelessWidget {
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
+  void _markSharedTaskAsDone(BuildContext context, String id, String owner) {
+    // mark task as done in database
+    DBHelper.markSharedTaskAsDone(id, owner);
+
+    //TODO delete all notifications for this task from notification center
+
+    //TODO  delete all notifications for this task form the database
+
+    // mark task as done in UI
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+  }
+
   Row displayPriority() {
     return Row(children: [
       Icon(_priorityIcon(priority!), color: _priorityIconColor(priority!)),
@@ -158,36 +170,36 @@ class TaskListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          //TODO modify to let the sharer mark the task as done
-          if (owner == DBHelper.currentUserId())
-            !isDone! && !isDeleted! // if isDone is false, show the check button
-                ? IconButton(
-                    icon: const Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ),
-                    onPressed: () {
-                      _markTaskAsDone(context, id!);
-                    },
-                  )
-                : isDeleted! // if isDeleted is true, show the undo button
-                    ? IconButton(
-                        icon: const Icon(
-                          Icons.arrow_circle_left,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {
-                          // display alert dialog
-                          Utility.displayQuestionDialog(context,
-                                  'Do you want to move the task back from Trash? You will have to set back the reminders and the persons you shared the task with.')
-                              .then((value) {
-                            if (value!) {
-                              _markAsUndeleted(context, id!);
-                            }
-                          });
-                        },
-                      )
-                    : const SizedBox(width: 0),
+          !isDone! && !isDeleted! // if isDone is false, show the check button
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.check,
+                    color: Colors.green,
+                  ),
+                  onPressed: () {
+                    owner == DBHelper.currentUserId()
+                        ? _markTaskAsDone(context, id!)
+                        : _markSharedTaskAsDone(context, id!, owner!);
+                  },
+                )
+              : isDeleted! // if isDeleted is true, show the undo button
+                  ? IconButton(
+                      icon: const Icon(
+                        Icons.arrow_circle_left,
+                        color: Colors.green,
+                      ),
+                      onPressed: () {
+                        // display alert dialog
+                        Utility.displayQuestionDialog(context,
+                                'Do you want to move the task back from Trash? You will have to set back the reminders and the persons you shared the task with.')
+                            .then((value) {
+                          if (value!) {
+                            _markAsUndeleted(context, id!);
+                          }
+                        });
+                      },
+                    )
+                  : const SizedBox(width: 0),
           if (owner == DBHelper.currentUserId())
             !isDeleted! // if isDeleted is false, show the delete button
                 ? IconButton(

@@ -382,88 +382,95 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TextButton.icon(
-          onPressed: _editedTask.dueTime == null && _editedTask.dueDate == null
-              ? () => Utility.displayInformationalDialog(
-                  context, 'Please select due date or due time first!')
-              : _editedTask.dueTime == null && _editedTask.dueDate != null
-                  ? () async {
-                      final result = await showDialog(
-                        context: context,
-                        builder: (context) => _showReminderPicker(false, true),
-                      );
-                      if (result != null) {
-                        setState(() {
-                          _selectedReminders = result;
-                        });
-                      }
-                    }
-                  : _editedTask.dueTime != null && _editedTask.dueDate == null
-                      ? () async {
-                          final result = await showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _showReminderPicker(true, false),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              _selectedReminders = result;
-                            });
-                          }
+        //TODO fix the reminders to be for each user and not for the task
+        if (_editedTask.owner == DBHelper.currentUserId() ||
+            _editedTask.owner == null)
+          TextButton.icon(
+            onPressed: _editedTask.dueTime == null &&
+                    _editedTask.dueDate == null
+                ? () => Utility.displayInformationalDialog(
+                    context, 'Please select due date or due time first!')
+                : _editedTask.dueTime == null && _editedTask.dueDate != null
+                    ? () async {
+                        final result = await showDialog(
+                          context: context,
+                          builder: (context) =>
+                              _showReminderPicker(false, true),
+                        );
+                        if (result != null) {
+                          setState(() {
+                            _selectedReminders = result;
+                          });
                         }
-                      : () async {
-                          final result = await showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _showReminderPicker(true, true),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              _selectedReminders = result;
-                            });
+                      }
+                    : _editedTask.dueTime != null && _editedTask.dueDate == null
+                        ? () async {
+                            final result = await showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _showReminderPicker(true, false),
+                            );
+                            if (result != null) {
+                              setState(() {
+                                _selectedReminders = result;
+                              });
+                            }
                           }
-                        },
-          icon: const Icon(Icons.access_alarm),
-          label: const Text(
-            'Set reminder',
-            style: TextStyle(fontSize: 15),
+                        : () async {
+                            final result = await showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _showReminderPicker(true, true),
+                            );
+                            if (result != null) {
+                              setState(() {
+                                _selectedReminders = result;
+                              });
+                            }
+                          },
+            icon: const Icon(Icons.access_alarm),
+            label: const Text(
+              'Set reminder',
+              style: TextStyle(fontSize: 15),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).primaryColor,
+            ),
           ),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
+        if (_editedTask.owner == DBHelper.currentUserId() ||
+            _editedTask.owner == null)
+          TextButton.icon(
+            onPressed: _editedTask.id == null
+                // if task is not saved yet, then we don't need to check already selected users emails
+                ? () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => UserListSearch(
+                        checkedItems: _selectedUserEmails,
+                      ),
+                    );
+                  }
+                // if task is saved, then we need to check already selected users emails
+                : () async {
+                    _selectedUserEmails =
+                        await Utility.determineAlreadySharedWithUsers(
+                            _editedTask.id);
+                    showDialog(
+                      context: context,
+                      builder: (context) => UserListSearch(
+                        checkedItems: _selectedUserEmails,
+                      ),
+                    );
+                  },
+            icon: const Icon(Icons.share),
+            label: const Text(
+              'Share with',
+              style: TextStyle(fontSize: 15),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).primaryColor,
+            ),
           ),
-        ),
-        TextButton.icon(
-          onPressed: _editedTask.id == null
-              // if task is not saved yet, then we don't need to check already selected users emails
-              ? () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => UserListSearch(
-                      checkedItems: _selectedUserEmails,
-                    ),
-                  );
-                }
-              // if task is saved, then we need to check already selected users emails
-              : () async {
-                  _selectedUserEmails =
-                      await Utility.determineAlreadySharedWithUsers(
-                          _editedTask.id);
-                  showDialog(
-                    context: context,
-                    builder: (context) => UserListSearch(
-                      checkedItems: _selectedUserEmails,
-                    ),
-                  );
-                },
-          icon: const Icon(Icons.share),
-          label: const Text(
-            'Share with',
-            style: TextStyle(fontSize: 15),
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
-          ),
-        ),
       ],
     );
   }
@@ -485,24 +492,34 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //and we update the task in the database accordingly
           _displayDialogForDoneTask();
         } else {
-          //update the task in the database
-          await DBHelper.updateTask(_editedTask.id!, _editedTask);
+          //check if the logged in user is the owner of the task in order to update the task accordingly
+          if (_editedTask.owner == DBHelper.currentUserId() ||
+              _editedTask.owner == null) {
+            await DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-          //delete the notifications for the task and then add the new ones
-          {
-            await deleteNotificationsForTask(_editedTask.id!).then((value) => {
-                  //check if the user selected a due date or time
-                  if (_editedTask.dueDate != null ||
-                      _editedTask.dueTime != null)
-                    {
-                      addNotificationsForTask(_editedTask.id!),
-                    }
-                });
+            //TODO move this after modifiy the way you handle the reminders pls
+            //delete the notifications for the task and then add the new ones
+            {
+              await deleteNotificationsForTask(_editedTask.id!)
+                  .then((value) => {
+                        //check if the user selected a due date or time
+                        if (_editedTask.dueDate != null ||
+                            _editedTask.dueTime != null)
+                          {
+                            addNotificationsForTask(_editedTask.id!),
+                          }
+                      });
+            }
+
+            //this is ok here
+            //remove sharing for task, then update it
+            Utility.removeSharingForTask(_editedTask.id!)
+                .then((value) async => {
+                      await shareTask(_editedTask.id!),
+                    });
+          } else {
+            await DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
           }
-          //remove sharing for task, then update it
-          Utility.removeSharingForTask(_editedTask.id!).then((value) async => {
-                await shareTask(_editedTask.id!),
-              });
 
           // go back to overall agenda screen
           Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
@@ -607,6 +624,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final buttonHeight = screenHeight * 0.08;
+
     return Scaffold(
       appBar: AppBar(
         title: _editedTask.id == null
@@ -638,30 +658,33 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       const SizedBox(height: 10),
                       reminderAndShareWithField(),
                       const SizedBox(height: 5),
-                      Container(
-                        padding: const EdgeInsets.only(top: 30),
-                        child: ElevatedButton(
-                            onPressed: _addEditTask,
-                            style: ElevatedButton.styleFrom(
-                              elevation: 5,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(0),
-                              ),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                            ),
-                            child: const Text(
-                              'Submit',
-                              style: TextStyle(fontSize: 18),
-                            )),
-                      ),
                     ],
                   ),
                 ),
               ),
             ),
-          )
+          ),
+          SizedBox(
+            height: buttonHeight,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 15),
+              child: ElevatedButton(
+                  onPressed: _addEditTask,
+                  style: ElevatedButton.styleFrom(
+                    elevation: 5,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(fontSize: 18),
+                  )),
+            ),
+          ),
         ],
       ),
     );

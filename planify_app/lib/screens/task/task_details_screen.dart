@@ -215,91 +215,87 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     String ownerEmail = Provider.of<UserProvider>(context, listen: false).email;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Details'),
-        actions: [
-          //shared task can be deleted only by the owner
-          if (loadedTask.owner == DBHelper.currentUserId())
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.white),
-              onPressed: () {
-                // if the task is not deleted, display alert dialog
-                loadedTask.isDeleted == false
-                    ?
-                    // display alert dialog
-                    Utility.displayQuestionDialog(
-                            context, 'Do you want to move the task in Trash?')
-                        .then((value) {
-                        if (value!) {
-                          _markAsDeleted(context, loadedTask);
-                          Navigator.of(context).pop();
-                        }
-                      })
-                    :
-                    // display alert dialog
-                    Utility.displayQuestionDialog(context,
-                            'Do you want to permanently delete the task?')
-                        .then((value) {
-                        if (value!) {
-                          _deleteTask(context, loadedTask.id!);
-                          Navigator.of(context).pop();
-                        }
-                      });
-              },
-            ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  //title
-                  displayTitle(loadedTask),
-                  const SizedBox(height: 20),
-                  //due date
-                  displayDueDate(loadedTask),
-                  const SizedBox(height: 10),
-                  //due time
-                  displayDueTime(loadedTask),
-                  //priority
-                  const SizedBox(height: 10),
-                  displayPriority(loadedTask),
-                  const SizedBox(height: 10),
-                  displayCategory(loadedTask),
-                  const SizedBox(height: 10),
-                  //check fi the owner is the current user, so that the owner is not displayed
-                  if (loadedTask.owner != DBHelper.currentUserId())
-                    //owner
-                    displayOwner(ownerEmail),
-                  //address
-                  const SizedBox(height: 10),
-                  displayAddressOrLocationCategory(loadedTask),
-                  const SizedBox(height: 10),
-                  //show map
-                  displayMap(loadedTask),
-                  const SizedBox(height: 10),
-                ]),
+        appBar: AppBar(
+          title: const Text('Details'),
+          actions: [
+            //shared task can be deleted only by the owner
+            if (loadedTask.owner == DBHelper.currentUserId())
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.white),
+                onPressed: () {
+                  // if the task is not deleted, display alert dialog
+                  loadedTask.isDeleted == false
+                      ?
+                      // display alert dialog
+                      Utility.displayQuestionDialog(
+                              context, 'Do you want to move the task in Trash?')
+                          .then((value) {
+                          if (value!) {
+                            _markAsDeleted(context, loadedTask);
+                            Navigator.of(context).pop();
+                          }
+                        })
+                      :
+                      // display alert dialog
+                      Utility.displayQuestionDialog(context,
+                              'Do you want to permanently delete the task?')
+                          .then((value) {
+                          if (value!) {
+                            _deleteTask(context, loadedTask.id!);
+                            Navigator.of(context).pop();
+                          }
+                        });
+                },
+              ),
+          ],
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(children: [
+                    //title
+                    displayTitle(loadedTask),
+                    const SizedBox(height: 20),
+                    //due date
+                    displayDueDate(loadedTask),
+                    const SizedBox(height: 10),
+                    //due time
+                    displayDueTime(loadedTask),
+                    //priority
+                    const SizedBox(height: 10),
+                    displayPriority(loadedTask),
+                    const SizedBox(height: 10),
+                    displayCategory(loadedTask),
+                    const SizedBox(height: 10),
+                    //check fi the owner is the current user, so that the owner is not displayed
+                    if (loadedTask.owner != DBHelper.currentUserId())
+                      //owner
+                      displayOwner(ownerEmail),
+                    //address
+                    const SizedBox(height: 10),
+                    displayAddressOrLocationCategory(loadedTask),
+                    const SizedBox(height: 10),
+                    //show map
+                    displayMap(loadedTask),
+                    const SizedBox(height: 10),
+                  ]),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      //TODO: modify edit in order to let shared tasks be edited by the owner and sharer
-      //edit button
-      floatingActionButton: loadedTask.owner == DBHelper.currentUserId()
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(AddEditTaskScreen.routeName, arguments: taskId);
-              },
-              child: const Icon(Icons.edit),
-            )
-          : null,
-    );
+          ],
+        ),
+        //edit button
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context)
+                .pushNamed(AddEditTaskScreen.routeName, arguments: taskId);
+          },
+          child: const Icon(Icons.edit),
+        ));
   }
 
   IconData _priorityIcon(Priority? priority) {

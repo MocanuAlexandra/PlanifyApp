@@ -610,4 +610,69 @@ class DBHelper {
       return false;
     }
   }
+
+  static void markSharedTaskAsDone(String id, String owner) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(owner)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDone': true});
+  }
+
+  static Future<void> updateSharedTask(
+      String editedTaskId, Task editedTask) async {
+    var updatedLocation = const TaskAddress(
+        latitude: 0.0, longitude: 0.0, address: 'No address chosen');
+    //check if the user picked an address
+    if ((editedTask.address != null &&
+                editedTask.address!.latitude != null &&
+                editedTask.address!.longitude !=
+                    null) // if the user picked an address, so the values are not default ones
+            &&
+            (editedTask.address!.latitude != 0.0 &&
+                editedTask.address!.longitude != 0.0 &&
+                editedTask.address!.address !=
+                    'No address chosen') // if the user previously deleted the address, so the task has default address
+        ) {
+      // get the address of the picked location
+      final address = await LocationHelper.getPlaceAddress(
+          editedTask.address!.latitude!, editedTask.address!.longitude!);
+      // create a new task address with the address
+      updatedLocation = TaskAddress(
+          latitude: editedTask.address!.latitude,
+          longitude: editedTask.address!.longitude,
+          address: address);
+    }
+
+    String updatedDueDate = '--/--/----';
+    if (editedTask.dueDate != null) {
+      updatedDueDate = editedTask.dueDate!.toIso8601String();
+    }
+
+    String updatedLocationCategory = 'No location category chosen';
+    if (editedTask.locationCategory != null) {
+      updatedLocationCategory = editedTask.locationCategory!;
+    }
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(editedTask.owner)
+        .collection('tasks')
+        .doc(editedTaskId)
+        .update({
+      'title': editedTask.title,
+      'dueDate': updatedDueDate,
+      'time': Utility.timeOfDayToString(editedTask.dueTime),
+      'latitude': updatedLocation.latitude,
+      'longitude': updatedLocation.longitude,
+      'address': updatedLocation.address,
+      'priority': Utility.priorityEnumToString(editedTask.priority),
+      'isDone': editedTask.isDone,
+      'isDeleted': editedTask.isDeleted,
+      'category': editedTask.category,
+      'locationCategory': updatedLocationCategory,
+      'owner': editedTask.owner,
+    });
+  }
 }
