@@ -445,7 +445,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 }
               // if task is saved, then we need to check already selected users emails
               : () async {
-                  _selectedUserEmails = await determineAlreadySharedWithUsers();
+                  _selectedUserEmails =
+                      await Utility.determineAlreadySharedWithUsers(
+                          _editedTask.id);
                   showDialog(
                     context: context,
                     builder: (context) => UserListSearch(
@@ -464,20 +466,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         ),
       ],
     );
-  }
-
-  //function that checks already selected users emails from database and returns a list of them
-  Future<List<String>> determineAlreadySharedWithUsers() async {
-    List<String> alreadySelectedUserEmails = [];
-    if (_editedTask.id != null) {
-      await DBHelper.getSharedWithUsers(_editedTask.id!).then((userTasks) => {
-            for (final user in userTasks)
-              {
-                alreadySelectedUserEmails.add(user.email!),
-              }
-          });
-    }
-    return alreadySelectedUserEmails;
   }
 
   //main method
@@ -512,7 +500,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 });
           }
           //remove sharing for task, then update it
-          removeSharingForTask(_editedTask.id!).then((value) async => {
+          Utility.removeSharingForTask(_editedTask.id!).then((value) async => {
                 await shareTask(_editedTask.id!),
               });
 
@@ -538,20 +526,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
       }
     }
-  }
-
-  //auxiliary methods
-  Future<void> removeSharingForTask(String taskId) async {
-    //delete the task from the users' shared tasks
-    var sharedWithUsers = await determineAlreadySharedWithUsers();
-    if (sharedWithUsers.isNotEmpty) {
-      for (var email in sharedWithUsers) {
-        await DBHelper.deleteSharedTaskFromUser(taskId, email);
-      }
-    }
-
-    //delete the users for the task from the database
-    await DBHelper.deleteSharedWithUsers(taskId);
   }
 
   Future<void> deleteNotificationsForTask(String taskId) async {

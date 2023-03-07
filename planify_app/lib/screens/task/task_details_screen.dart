@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:planify_app/screens/pages/overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/database_helper.dart';
@@ -22,7 +23,7 @@ class TaskDetailsScreen extends StatefulWidget {
 class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   bool _isMapLoading = true;
 
-  void _markAsDeleted(BuildContext context, Task task) {
+  Future<void> _markAsDeleted(BuildContext context, Task task) async {
     // mark task as deleted in database
     DBHelper.markTaskAsDeleted(task.id!);
 
@@ -32,12 +33,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     // delete all notifications for this task form the database
     DBHelper.deleteNotificationsForTask(task.id!);
 
-    // remove task from UI
+    // remove sharing for this task
+    Utility.removeSharingForTask(task.id!);
+
+    // go to overall page and remove task from UI
+    Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
     Provider.of<TaskProvider>(context, listen: false).deleteTask(task.id!);
   }
 
   void _deleteTask(BuildContext context, String id) {
-    //TODO delete the task from sharers list
     // delete task from database
     DBHelper.deleteTask(id);
 

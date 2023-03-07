@@ -52,6 +52,9 @@ class TaskListItem extends StatelessWidget {
     // delete all notifications for this task form the database
     DBHelper.deleteNotificationsForTask(id);
 
+    // remove sharing for this task
+    Utility.removeSharingForTask(id);
+
     // remove task from UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
@@ -176,7 +179,7 @@ class TaskListItem extends StatelessWidget {
                         onPressed: () {
                           // display alert dialog
                           Utility.displayQuestionDialog(context,
-                                  'Do you want to move the task back from Trash? You will have to set back the reminders.')
+                                  'Do you want to move the task back from Trash? You will have to set back the reminders and the persons you shared the task with.')
                               .then((value) {
                             if (value!) {
                               _markAsUndeleted(context, id!);
