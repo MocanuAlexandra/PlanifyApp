@@ -7,6 +7,9 @@ import '../../helpers/location_helper.dart';
 import '../../models/task_address.dart';
 
 class MapScreen extends StatefulWidget {
+  final TaskAddress initialAddress;
+  final bool isSelecting;
+  final double zoom;
   const MapScreen(
       {super.key,
       this.initialAddress = const TaskAddress(
@@ -15,9 +18,6 @@ class MapScreen extends StatefulWidget {
       ),
       this.isSelecting = false,
       required this.zoom});
-  final TaskAddress initialAddress;
-  final bool isSelecting;
-  final double zoom;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -164,14 +164,6 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  // This is called when the map is created
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      mapController = controller;
-      _isMapLoading = false;
-    });
-  }
-
   // This is called when the search button is pressed
   void _handleSearch() async {
     // Get the search text
@@ -189,6 +181,14 @@ class _MapScreenState extends State<MapScreen> {
 
     // Set the search address as the picked location
     _selectLocation(_searchCoords!, null, searchResponse.results[0].name);
+  }
+
+  // This is called when the map is created
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() {
+      mapController = controller;
+      _isMapLoading = false;
+    });
   }
 
   void _selectLocation(LatLng position,

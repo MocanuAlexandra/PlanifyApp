@@ -8,9 +8,9 @@ import '../../providers/task_category_provider.dart';
 import '../pages/overall_agenda_page.dart';
 
 class AddEditTaskCategoryScreen extends StatefulWidget {
-  const AddEditTaskCategoryScreen({super.key});
-
   static const routeName = '/add-category';
+
+  const AddEditTaskCategoryScreen({super.key});
 
   @override
   State<AddEditTaskCategoryScreen> createState() =>
@@ -29,48 +29,6 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
   };
 
   var _isInit = true;
-
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      final categoryName =
-          ModalRoute.of(context)!.settings.arguments as String?;
-
-      if (categoryName != null) {
-        _editedCategory =
-            Provider.of<TaskCategoryProvider>(context, listen: false)
-                .findByName(categoryName);
-        _initValues = {
-          'name': _editedCategory.name!,
-        };
-      }
-    }
-    _isInit = false;
-    super.didChangeDependencies();
-  }
-
-  void _addEditCategory() {
-    //check if form is valid
-    final isValid = _formKey.currentState!.validate();
-    if (isValid) {
-      _formKey.currentState!.save();
-
-      //check if we got an id
-      if (_editedCategory.id != null) {
-        //update category
-        DBHelper.updateTaskCategory(_editedCategory.id!, _editedCategory);
-
-        // go back to overall agenda screen
-        Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
-      } else {
-        //add category
-        DBHelper.addTaskCategory(_editedCategory);
-
-        // go back to overall agenda screen
-        Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,6 +139,48 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final categoryName =
+          ModalRoute.of(context)!.settings.arguments as String?;
+
+      if (categoryName != null) {
+        _editedCategory =
+            Provider.of<TaskCategoryProvider>(context, listen: false)
+                .findByName(categoryName);
+        _initValues = {
+          'name': _editedCategory.name!,
+        };
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  void _addEditCategory() {
+    //check if form is valid
+    final isValid = _formKey.currentState!.validate();
+    if (isValid) {
+      _formKey.currentState!.save();
+
+      //check if we got an id
+      if (_editedCategory.id != null) {
+        //update category
+        DBHelper.updateTaskCategory(_editedCategory.id!, _editedCategory);
+
+        // go back to overall agenda screen
+        Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
+      } else {
+        //add category
+        DBHelper.addTaskCategory(_editedCategory);
+
+        // go back to overall agenda screen
+        Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
+      }
+    }
   }
 
   void _deleteCategory(BuildContext context, String categoryId) {

@@ -21,14 +21,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int? _intervalOfNotification;
 
   @override
-  void initState() {
-    _locationBasedNotification =
-        widget.currentFilters['locationBasedNotification']!;
-    _intervalOfNotification = widget.currentFilters['intervalOfNotification'];
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -150,6 +142,14 @@ Make sure the app is running in the background.""",
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    _locationBasedNotification =
+        widget.currentFilters['locationBasedNotification']!;
+    _intervalOfNotification = widget.currentFilters['intervalOfNotification'];
+    super.initState();
   }
 
   void saveFilters(BuildContext context, Map<String, dynamic> selectedFilters) {
