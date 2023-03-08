@@ -50,7 +50,7 @@ class TaskListItem extends StatelessWidget {
     NotificationService.deleteNotification(id);
 
     // delete all notifications for this task form the database
-    DBHelper.deleteNotificationsForTask(id);
+    DBHelper.deleteRemindersForTask(id);
 
     // remove sharing for this task
     Utility.removeSharingForTask(id);
@@ -75,7 +75,7 @@ class TaskListItem extends StatelessWidget {
     NotificationService.deleteNotification(id);
 
     // delete all notifications for this task form the database
-    DBHelper.deleteNotificationsForTask(id);
+    DBHelper.deleteRemindersForTask(id);
 
     // mark task as done in UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
@@ -85,9 +85,11 @@ class TaskListItem extends StatelessWidget {
     // mark task as done in database
     DBHelper.markSharedTaskAsDone(id, owner);
 
-    //TODO delete all notifications for this task from notification center
+    //delete all notifications for this task from notification center
+    NotificationService.deleteNotification(id);
 
-    //TODO  delete all notifications for this task form the database
+    //delete all notifications for this task form the database
+    DBHelper.deleteNotificationsForSharedTask(id);
 
     // mark task as done in UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);

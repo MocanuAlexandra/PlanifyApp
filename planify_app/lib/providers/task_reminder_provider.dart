@@ -23,4 +23,19 @@ class TaskReminderProvider with ChangeNotifier {
       },
     ).toList();
   }
+
+  Future<void> fetchRemindersForSharedTask(String taskId) async {
+    final notificationsData =
+        await DBHelper.fetchRemindersForSharedTask(taskId);
+
+    _reminders = notificationsData.map(
+      (reminder) {
+        return TaskReminder(
+          id: reminder['id'],
+          contentId: reminder['contentId'],
+          reminder: reminder['reminder'],
+        );
+      },
+    ).toList();
+  }
 }

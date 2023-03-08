@@ -31,7 +31,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     NotificationService.deleteNotification(task.id!);
 
     // delete all notifications for this task form the database
-    DBHelper.deleteNotificationsForTask(task.id!);
+    DBHelper.deleteRemindersForTask(task.id!);
 
     // remove sharing for this task
     Utility.removeSharingForTask(task.id!);

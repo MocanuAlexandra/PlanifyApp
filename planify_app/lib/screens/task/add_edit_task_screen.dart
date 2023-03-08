@@ -239,7 +239,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           )
         : _editedTask.id != null && _dueTimeDueDateChanged == false
             ? FutureBuilder(
-                future: _fetchReminders(context, _editedTask.id!),
+                future:
+                    //fetch the reminders accordingly to logged user
+                    _editedTask.owner == DBHelper.currentUserId()
+                        ? _fetchReminders(context, _editedTask.id!)
+                        : _fetchRemindersForSharedTasks(
+                            context, _editedTask.id!),
                 builder: (context, snapshot) => snapshot.connectionState ==
                         ConnectionState.waiting
                     ? const Center(
@@ -382,61 +387,57 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        //TODO fix the reminders to be for each user and not for the task
-        if (_editedTask.owner == DBHelper.currentUserId() ||
-            _editedTask.owner == null)
-          TextButton.icon(
-            onPressed: _editedTask.dueTime == null &&
-                    _editedTask.dueDate == null
-                ? () => Utility.displayInformationalDialog(
-                    context, 'Please select due date or due time first!')
-                : _editedTask.dueTime == null && _editedTask.dueDate != null
-                    ? () async {
-                        final result = await showDialog(
-                          context: context,
-                          builder: (context) =>
-                              _showReminderPicker(false, true),
-                        );
-                        if (result != null) {
-                          setState(() {
-                            _selectedReminders = result;
-                          });
-                        }
+        TextButton.icon(
+          onPressed: _editedTask.dueTime == null && _editedTask.dueDate == null
+              ? () => Utility.displayInformationalDialog(
+                  context, 'Please select due date or due time first!')
+              : _editedTask.dueTime == null && _editedTask.dueDate != null
+                  ? () async {
+                      final result = await showDialog(
+                        context: context,
+                        builder: (context) => _showReminderPicker(false, true),
+                      );
+                      if (result != null) {
+                        setState(() {
+                          _selectedReminders = result;
+                        });
                       }
-                    : _editedTask.dueTime != null && _editedTask.dueDate == null
-                        ? () async {
-                            final result = await showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  _showReminderPicker(true, false),
-                            );
-                            if (result != null) {
-                              setState(() {
-                                _selectedReminders = result;
-                              });
-                            }
+                    }
+                  : _editedTask.dueTime != null && _editedTask.dueDate == null
+                      ? () async {
+                          final result = await showDialog(
+                            context: context,
+                            builder: (context) =>
+                                _showReminderPicker(true, false),
+                          );
+                          if (result != null) {
+                            setState(() {
+                              _selectedReminders = result;
+                            });
                           }
-                        : () async {
-                            final result = await showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  _showReminderPicker(true, true),
-                            );
-                            if (result != null) {
-                              setState(() {
-                                _selectedReminders = result;
-                              });
-                            }
-                          },
-            icon: const Icon(Icons.access_alarm),
-            label: const Text(
-              'Set reminder',
-              style: TextStyle(fontSize: 15),
-            ),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).primaryColor,
-            ),
+                        }
+                      : () async {
+                          final result = await showDialog(
+                            context: context,
+                            builder: (context) =>
+                                _showReminderPicker(true, true),
+                          );
+                          if (result != null) {
+                            setState(() {
+                              _selectedReminders = result;
+                            });
+                          }
+                        },
+          icon: const Icon(Icons.access_alarm),
+          label: const Text(
+            'Set reminder',
+            style: TextStyle(fontSize: 15),
           ),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).primaryColor,
+          ),
+        ),
+        //only owner can share the task
         if (_editedTask.owner == DBHelper.currentUserId() ||
             _editedTask.owner == null)
           TextButton.icon(
@@ -497,7 +498,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
               _editedTask.owner == null) {
             await DBHelper.updateTask(_editedTask.id!, _editedTask);
 
-            //TODO move this after modifiy the way you handle the reminders pls
             //delete the notifications for the task and then add the new ones
             {
               await deleteNotificationsForTask(_editedTask.id!)
@@ -511,7 +511,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       });
             }
 
-            //this is ok here
             //remove sharing for task, then update it
             Utility.removeSharingForTask(_editedTask.id!)
                 .then((value) async => {
@@ -519,6 +518,19 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     });
           } else {
             await DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
+
+            //delete the notifications for the task and then add the new ones
+            {
+              await deleteNotificationsForSharedTask(_editedTask.id!)
+                  .then((value) => {
+                        //check if the user selected a due date or time
+                        if (_editedTask.dueDate != null ||
+                            _editedTask.dueTime != null)
+                          {
+                            addNotificationsForTask(_editedTask.id!),
+                          }
+                      });
+            }
           }
 
           // go back to overall agenda screen
@@ -546,10 +558,18 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   Future<void> deleteNotificationsForTask(String taskId) async {
-    //delete the notifications for the task from the notification center
-    await DBHelper.deleteNotificationsForTask(taskId);
-
     //delete the notifications for the task from the database
+    await DBHelper.deleteRemindersForTask(taskId);
+
+    //delete the notifications for the task from the notification center
+    NotificationService.deleteNotification(taskId);
+  }
+
+  Future<void> deleteNotificationsForSharedTask(String taskId) async {
+    //delete the notifications for the task from the database
+    await DBHelper.deleteNotificationsForSharedTask(taskId);
+
+    //delete the notifications for the task from the notification center
     NotificationService.deleteNotification(taskId);
   }
 
@@ -586,7 +606,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             reminder: reminder,
           );
           //add the notification to database
-          await DBHelper.addReminder(taskId, newReminder);
+          await DBHelper.addReminderForTask(taskId, newReminder);
         }
         //check if the user selected only time
         else if (_editedTask.dueDate == null && _editedTask.dueTime != null) {
@@ -597,8 +617,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 reminder.hashCode,
             reminder: reminder,
           );
-          //add the notification to database
-          await DBHelper.addReminder(taskId, newReminder);
+          //add the notification to database according to the logged in user
+          if (_editedTask.owner == DBHelper.currentUserId() ||
+              _editedTask.owner == null) {
+            await DBHelper.addReminderForTask(taskId, newReminder);
+          } else {
+            await DBHelper.addReminderForSharedTask(taskId, newReminder);
+          }
           //else it means that the user selected both due date and time
         } else {
           newReminder = TaskReminder(
@@ -611,8 +636,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 reminder.hashCode,
             reminder: reminder,
           );
-          //add the notification to database
-          await DBHelper.addReminder(taskId, newReminder);
+          //add the notification to database according to the logged in user
+          if (_editedTask.owner == DBHelper.currentUserId() ||
+              _editedTask.owner == null) {
+            await DBHelper.addReminderForTask(taskId, newReminder);
+          } else {
+            await DBHelper.addReminderForSharedTask(taskId, newReminder);
+          }
         }
 
         //add the notification to notification center
@@ -699,6 +729,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   Future<void> _fetchReminders(BuildContext context, String taskId) async {
     await Provider.of<TaskReminderProvider>(context, listen: false)
         .fetchReminders(taskId);
+  }
+
+  Future<void> _fetchRemindersForSharedTasks(
+      BuildContext context, String taskId) async {
+    await Provider.of<TaskReminderProvider>(context, listen: false)
+        .fetchRemindersForSharedTask(taskId);
   }
 
   void _presentDatePicker() {

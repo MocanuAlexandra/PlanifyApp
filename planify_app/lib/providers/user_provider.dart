@@ -34,7 +34,7 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> getEmailByUserId(String userId) async {
-    var userEmail = await DBHelper.returnEmailByUserId(userId);
+    var userEmail = await DBHelper.getEmailByUserId(userId);
     _email = userEmail;
   }
 }

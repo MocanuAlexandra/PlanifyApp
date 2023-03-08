@@ -10,6 +10,8 @@ import 'location_helper.dart';
 import 'utility.dart';
 
 class DBHelper {
+  ///////////////////////////FETCH FUNCTIONS////////////////////////////
+  // ********** FETCHING FUNCTIONS **********
   // function for fetching categories from the database from the connected user
   static Future<List<Map<String, dynamic>>> fetchTaskCategories() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -75,6 +77,7 @@ class DBHelper {
     return tasksList;
   }
 
+  // function for fetching the reminders if logged user is the owner of the task
   static Future<List<Map<String, dynamic>>> fetchReminders(
       String taskId) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -105,6 +108,51 @@ class DBHelper {
     return remindersList;
   }
 
+  // function for fetching the reminders if logged user is not the owner of the task
+  static Future<List<Map<String, dynamic>>> fetchRemindersForSharedTask(
+      String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get shared tasks and check if the taskId is equal to the one passed as argument
+    //then get the reminders for that task and delete them
+    final sharedTask = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sharedTasks')
+        .where('taskId', isEqualTo: taskId)
+        .get();
+
+    //get the reminders for sharedTask
+    if (sharedTask.docs.isNotEmpty) {
+      final sharedTaskId = sharedTask.docs[0].id;
+      final reminders = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('sharedTasks')
+          .doc(sharedTaskId)
+          .collection('reminders')
+          .get();
+
+      //check if there is no reminders
+      if (reminders.docs.isEmpty) {
+        return [];
+      }
+
+      //convert the reminders to a list of maps
+      final remindersList = reminders.docs.map((reminder) {
+        return {
+          'id': reminder.id,
+          'contentId': reminder['contentId'],
+          'reminder': reminder['reminder'],
+        };
+      }).toList();
+
+      return remindersList;
+    }
+
+    return [];
+  }
+
   // function for fetching the users from the database
   static Future<List<Map<String, dynamic>>> fetchUsers() async {
     //get the users from the database
@@ -126,6 +174,50 @@ class DBHelper {
     return usersList;
   }
 
+  //function that walks through the shared task of user and retrieve the tasks based on
+  //the owner id and task id
+  static Future<List<Task>> fetchSharedTasks() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the shared tasks
+    final sharedTasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sharedTasks')
+        .get();
+
+    List<Task> tasks = [];
+    //loop through the shared tasks and get the tasks from the owner
+    for (var sharedTask in sharedTasks.docs) {
+      final task = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(sharedTask['ownerId'])
+          .collection('tasks')
+          .doc(sharedTask['taskId'])
+          .get();
+      tasks.add(Task(
+        id: task.id,
+        title: task['title'],
+        dueDate: Utility.stringToDateTime(task['dueDate']),
+        address: TaskAddress(
+          latitude: task['latitude'],
+          longitude: task['longitude'],
+          address: task['address'],
+        ),
+        dueTime: Utility.stringToTimeOfDay(task['time']),
+        priority: Utility.stringToPriorityEnum(task['priority']),
+        isDone: task['isDone'],
+        isDeleted: task['isDeleted'],
+        category: task['category'],
+        locationCategory: task['locationCategory'],
+        owner: task['owner'],
+      ));
+    }
+    return tasks;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // ********** TASK CRUD FUNCTIONS **********
   // function for adding tasks to the database
   static Future<String> addTask(Task newTask) async {
     if (newTask.title == null) {
@@ -201,7 +293,7 @@ class DBHelper {
         .delete();
   }
 
-  //function for deleting all tasks marked as deleted in the database
+  // function for deleting all tasks marked as deleted in the database
   static void deleteAllTasks() {
     final user = FirebaseAuth.instance.currentUser;
     FirebaseFirestore.instance
@@ -275,351 +367,7 @@ class DBHelper {
     });
   }
 
-  // function for marking a task as done in the database
-  static void markTaskAsDone(String id) {
-    final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(id)
-        .update({'isDone': true});
-  }
-
-  // function for marking a task as deleted
-  static void markTaskAsDeleted(String id) {
-    final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(id)
-        .update({'isDeleted': true});
-  }
-
-  // function for marking a task as undeleted
-  static void markTaskAsUndeleted(String id) {
-    final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(id)
-        .update({'isDeleted': false});
-  }
-
-  static void updateTaskCategory(String id, TaskCategory editedCategory) async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('categories')
-        .doc(id)
-        .update({'name': editedCategory.name});
-  }
-
-  static void addTaskCategory(TaskCategory editedCategory) async {
-    if (editedCategory.name == null) {
-      return;
-    }
-
-    final user = FirebaseAuth.instance.currentUser;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('categories')
-        .add({
-      'name': editedCategory.name,
-    });
-  }
-
-  static void deleteTaskCategory(String categoryId) {
-    final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('categories')
-        .doc(categoryId)
-        .delete();
-  }
-
-  //check if the category is used in any task
-  static Future<bool> isTaskCategoryUsed(String categoryId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    final category = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('categories')
-        .doc(categoryId)
-        .get();
-    final tasks = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('tasks')
-        .where('category', isEqualTo: category['name'])
-        .get();
-    return tasks.docs.isNotEmpty;
-  }
-
-  //function that adds a new notification for a certain task
-  static Future<void> addReminder(String taskId, TaskReminder reminder) async {
-    final user = FirebaseAuth.instance.currentUser;
-    //add the notification to the database
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .collection('reminders')
-        .add({
-      'contentId': reminder.contentId,
-      'reminder': reminder.reminder,
-    });
-  }
-
-  static Future<void> deleteNotificationsForTask(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    final reminders = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .collection('reminders')
-        .get();
-    if (reminders.docs.isNotEmpty) {
-      for (var reminder in reminders.docs) {
-        reminder.reference.delete();
-      }
-    }
-  }
-
-  // function that return a task after getting its id
-  static Future<Task> getTask(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    final task = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .get();
-    return Task(
-      id: task.id,
-      title: task['title'],
-      dueDate: Utility.stringToDateTime(task['dueDate']),
-      dueTime: Utility.stringToTimeOfDay(task['time']),
-    );
-  }
-
-  static String currentUserId() {
-    return FirebaseAuth.instance.currentUser!.uid;
-  }
-
-  static Future<AppUser> getUserByEmail(String email) async {
-    final user = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .get();
-    return AppUser(
-      id: user.docs.first.id,
-      email: user.docs.first['email'],
-    );
-  }
-
-  static Future<String> returnEmailByUserId(String userId) async {
-    final user =
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
-
-    return user['email'];
-  }
-
-  static Future<void> addShareWithUser(String taskId, String email) async {
-    // get the current user
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (email == 'no users') {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .collection('tasks')
-          .doc(taskId)
-          .update({'sharedWith': []});
-      return;
-    }
-
-    // get the user that will be added to the task
-    await getUserByEmail(email).then((userSharedWith) async {
-      // add the user to the task in an array named sharedWith
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .collection('tasks')
-          .doc(taskId)
-          .update({
-        'sharedWith': FieldValue.arrayUnion([userSharedWith.id])
-      });
-    });
-  }
-
-  static Future<List<AppUser>> getSharedWithUsers(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    final task = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .get();
-
-    final sharedWithUsersIds = task['sharedWith'];
-
-    //get the users from the ids
-    List<AppUser> sharedWithUsers = [];
-    for (var userId in sharedWithUsersIds) {
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-      sharedWithUsers.add(AppUser(
-        id: user.id,
-        email: user['email'],
-      ));
-    }
-    return sharedWithUsers;
-  }
-
-  static Future<void> deleteSharedWithUsers(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .update({'sharedWith': []});
-  }
-
-  static Future<void> addSharedTaskToUser(String taskId, String email) async {
-    final owner = FirebaseAuth.instance.currentUser;
-
-    //get the user by email
-    await getUserByEmail(email).then((userSharedWith) async {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userSharedWith.id)
-          .collection('sharedTasks')
-          .add({
-        'ownerId': owner!.uid,
-        'taskId': taskId,
-      });
-    });
-  }
-
-  static Future<void> deleteSharedTaskFromUser(
-      String taskId, String email) async {
-    final owner = FirebaseAuth.instance.currentUser;
-
-    await getUserByEmail(email).then((user) async {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.id)
-          .collection('sharedTasks')
-          .where('taskId', isEqualTo: taskId)
-          .where('ownerId', isEqualTo: owner!.uid)
-          .get()
-          .then((value) {
-        for (var doc in value.docs) {
-          doc.reference.delete();
-        }
-      });
-    });
-  }
-
-  //function that walks through the shared task of user and retrieve the tasks based on
-  //the owner id and task id
-  static Future<List<Task>> fetchSharedTasks() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    //get the shared tasks
-    final sharedTasks = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('sharedTasks')
-        .get();
-
-    List<Task> tasks = [];
-    //loop through the shared tasks and get the tasks from the owner
-    for (var sharedTask in sharedTasks.docs) {
-      final task = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(sharedTask['ownerId'])
-          .collection('tasks')
-          .doc(sharedTask['taskId'])
-          .get();
-      tasks.add(Task(
-        id: task.id,
-        title: task['title'],
-        dueDate: Utility.stringToDateTime(task['dueDate']),
-        address: TaskAddress(
-          latitude: task['latitude'],
-          longitude: task['longitude'],
-          address: task['address'],
-        ),
-        dueTime: Utility.stringToTimeOfDay(task['time']),
-        priority: Utility.stringToPriorityEnum(task['priority']),
-        isDone: task['isDone'],
-        isDeleted: task['isDeleted'],
-        category: task['category'],
-        locationCategory: task['locationCategory'],
-        owner: task['owner'],
-      ));
-    }
-    return tasks;
-  }
-
-  //function that checks if there are deleted tasks
-  static Future<bool> checkForDeletedTasks() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    final deletedTasks = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .where('isDeleted', isEqualTo: true)
-        .get();
-
-    if (deletedTasks.docs.isNotEmpty) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  //check if a task has reminders
-  static Future<bool> checkForReminders(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    final reminders = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .collection('reminders')
-        .get();
-
-    if (reminders.docs.isNotEmpty) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  static void markSharedTaskAsDone(String id, String owner) {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(owner)
-        .collection('tasks')
-        .doc(id)
-        .update({'isDone': true});
-  }
-
+  // sharer can update the task
   static Future<void> updateSharedTask(
       String editedTaskId, Task editedTask) async {
     var updatedLocation = const TaskAddress(
@@ -674,5 +422,392 @@ class DBHelper {
       'locationCategory': updatedLocationCategory,
       'owner': editedTask.owner,
     });
+  }
+
+  // function for marking a task as done in the database
+  static void markTaskAsDone(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDone': true});
+  }
+
+  // function for marking a task as deleted
+  static void markTaskAsDeleted(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDeleted': true});
+  }
+
+  // function for marking a task as undeleted
+  static void markTaskAsUndeleted(String id) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDeleted': false});
+  }
+
+  // function for marking a shared task as done in the database
+  static void markSharedTaskAsDone(String id, String owner) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(owner)
+        .collection('tasks')
+        .doc(id)
+        .update({'isDone': true});
+  }
+
+  ///////////////////////////////////////////////////////////////////////
+  // ********** TASK CATEGORY CRUD FUNCTIONS **********
+  //function for updating a task category
+  static void updateTaskCategory(String id, TaskCategory editedCategory) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('categories')
+        .doc(id)
+        .update({'name': editedCategory.name});
+  }
+
+  // function for adding a task category
+  static void addTaskCategory(TaskCategory editedCategory) async {
+    if (editedCategory.name == null) {
+      return;
+    }
+
+    final user = FirebaseAuth.instance.currentUser;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .add({
+      'name': editedCategory.name,
+    });
+  }
+
+  // function for deleting a task category
+  static void deleteTaskCategory(String categoryId) {
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .doc(categoryId)
+        .delete();
+  }
+
+  //check if the category is used in any task
+  static Future<bool> isTaskCategoryUsed(String categoryId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final category = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .doc(categoryId)
+        .get();
+    final tasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('tasks')
+        .where('category', isEqualTo: category['name'])
+        .get();
+    return tasks.docs.isNotEmpty;
+  }
+
+  /////////////////////////////////////////////////////////////////////
+  // ********** SHARED TASKS **********
+  // function that adds a user to the sharedWith array of a task
+  static Future<void> addShareWithUser(String taskId, String email) async {
+    // get the current user
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (email == 'no users') {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('tasks')
+          .doc(taskId)
+          .update({'sharedWith': []});
+      return;
+    }
+
+    // get the user that will be added to the task
+    await getUserByEmail(email).then((userSharedWith) async {
+      // add the user to the task in an array named sharedWith
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('tasks')
+          .doc(taskId)
+          .update({
+        'sharedWith': FieldValue.arrayUnion([userSharedWith.id])
+      });
+    });
+  }
+
+  // function that returns the users that a task is shared with
+  static Future<List<AppUser>> getSharedWithUsers(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final task = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+
+    final sharedWithUsersIds = task['sharedWith'];
+
+    //get the users from the ids
+    List<AppUser> sharedWithUsers = [];
+    for (var userId in sharedWithUsersIds) {
+      final user = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      sharedWithUsers.add(AppUser(
+        id: user.id,
+        email: user['email'],
+      ));
+    }
+    return sharedWithUsers;
+  }
+
+  // function that deletes a user from the sharedWith array of a task
+  static Future<void> deleteSharedWithUsers(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .update({'sharedWith': []});
+  }
+
+  //function that adds a shared task to a user
+  static Future<void> addSharedTaskToUser(String taskId, String email) async {
+    final owner = FirebaseAuth.instance.currentUser;
+
+    //get the user by email
+    await getUserByEmail(email).then((userSharedWith) async {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userSharedWith.id)
+          .collection('sharedTasks')
+          .add({
+        'ownerId': owner!.uid,
+        'taskId': taskId,
+      });
+    });
+  }
+
+  //function that deletes a shared task from a user
+  static Future<void> deleteSharedTaskFromUser(
+      String taskId, String email) async {
+    final owner = FirebaseAuth.instance.currentUser;
+
+    await getUserByEmail(email).then((user) async {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .collection('sharedTasks')
+          .where('taskId', isEqualTo: taskId)
+          .where('ownerId', isEqualTo: owner!.uid)
+          .get()
+          .then((value) {
+        for (var doc in value.docs) {
+          doc.reference.delete();
+        }
+      });
+    });
+  }
+
+  /////////////////////////////////////////////////////////////////////
+  //*********** REMINDERS **********
+  //function that adds a new notification for a certain task
+  static Future<void> addReminderForTask(
+      String taskId, TaskReminder reminder) async {
+    final user = FirebaseAuth.instance.currentUser;
+    //add the notification to the database
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('reminders')
+        .add({
+      'contentId': reminder.contentId,
+      'reminder': reminder.reminder,
+    });
+  }
+
+  // function that deletes all the reminders for a certain task
+  static Future<void> deleteRemindersForTask(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final reminders = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('reminders')
+        .get();
+    if (reminders.docs.isNotEmpty) {
+      for (var reminder in reminders.docs) {
+        reminder.reference.delete();
+      }
+    }
+  }
+
+  //check if a task has reminders
+  static Future<bool> checkForReminders(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final reminders = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .collection('reminders')
+        .get();
+
+    if (reminders.docs.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // function that deletes the reminders for a task from a sharer
+  static Future<void> deleteNotificationsForSharedTask(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get shared tasks and check if the taskId is equal to the one passed as argument
+    //then get the reminders for that task and delete them
+    final sharedTask = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sharedTasks')
+        .where('taskId', isEqualTo: taskId)
+        .get();
+
+    //get the reminders for sharedTask
+    if (sharedTask.docs.isNotEmpty) {
+      final sharedTaskId = sharedTask.docs[0].id;
+      final reminders = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('sharedTasks')
+          .doc(sharedTaskId)
+          .collection('reminders')
+          .get();
+
+      //  delete the reminders
+      if (reminders.docs.isNotEmpty) {
+        for (var reminder in reminders.docs) {
+          reminder.reference.delete();
+        }
+      }
+    }
+  }
+
+  // function that adds a reminder for a shared task from a sharer
+  static Future<void> addReminderForSharedTask(
+      String taskId, TaskReminder newReminder) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final sharedTask = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sharedTasks')
+        .where('taskId', isEqualTo: taskId)
+        .get();
+
+    if (sharedTask.docs.isNotEmpty) {
+      final sharedTaskId = sharedTask.docs[0].id;
+
+      //add the reminder
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('sharedTasks')
+          .doc(sharedTaskId)
+          .collection('reminders')
+          .add({
+        'contentId': newReminder.contentId,
+        'reminder': newReminder.reminder,
+      });
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  //*********** AUX FUNCTIONS **********
+  //function that checks if there are deleted tasks
+  static Future<bool> checkForDeletedTasks() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final deletedTasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .where('isDeleted', isEqualTo: true)
+        .get();
+
+    if (deletedTasks.docs.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // function that return a task after getting its id
+  static Future<Task> getTask(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final task = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+    return Task(
+      id: task.id,
+      title: task['title'],
+      dueDate: Utility.stringToDateTime(task['dueDate']),
+      dueTime: Utility.stringToTimeOfDay(task['time']),
+    );
+  }
+
+  // get the logged in userId
+  static String currentUserId() {
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
+
+  // return the user by email
+  static Future<AppUser> getUserByEmail(String email) async {
+    final user = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+    return AppUser(
+      id: user.docs.first.id,
+      email: user.docs.first['email'],
+    );
+  }
+
+  // return the user email by id
+  static Future<String> getEmailByUserId(String userId) async {
+    final user =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+    return user['email'];
   }
 }
