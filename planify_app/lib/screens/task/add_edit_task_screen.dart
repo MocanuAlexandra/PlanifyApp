@@ -881,8 +881,14 @@ You have to set new reminders if you want to be notified about this task.""",
                     owner: _editedTask.owner,
                   );
 
-                  //update the task in the database
-                  DBHelper.updateTask(_editedTask.id!, _editedTask);
+                  // check if the logged in user is the owner of the task
+                  if (_editedTask.owner == DBHelper.currentUserId() ||
+                      _editedTask.owner == null) {
+                    //update the task in the database
+                    DBHelper.updateTask(_editedTask.id!, _editedTask);
+                  } else {
+                    DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
+                  }
 
                   // go back to overall agenda screen
                   Navigator.of(context)
@@ -907,8 +913,14 @@ You have to set new reminders if you want to be notified about this task.""",
                     owner: _editedTask.owner,
                   );
 
-                  //update the task in the database
-                  DBHelper.updateTask(_editedTask.id!, _editedTask);
+                  // check if the logged in user is the owner of the task
+                  if (_editedTask.owner == DBHelper.currentUserId() ||
+                      _editedTask.owner == null) {
+                    //update the task in the database
+                    DBHelper.updateTask(_editedTask.id!, _editedTask);
+                  } else {
+                    DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
+                  }
 
                   // go back to overall agenda screen
                   Navigator.of(context)
