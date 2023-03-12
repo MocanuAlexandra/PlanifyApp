@@ -8,7 +8,7 @@ import '../../providers/task_provider.dart';
 import '../../screens/task/task_details_screen.dart';
 import '../../services/notification_service.dart';
 
-class TaskListItem extends StatelessWidget {
+class TaskListItem extends StatefulWidget {
   final String? id;
   final String? title;
   final String? dueDate;
@@ -33,6 +33,14 @@ class TaskListItem extends StatelessWidget {
     this.locationCategory,
     this.owner,
   });
+
+  @override
+  State<TaskListItem> createState() => _TaskListItemState();
+}
+
+class _TaskListItemState extends State<TaskListItem> {
+  bool dueDatePassed = false;
+  bool dueTimePassed = false;
 
   void _deleteTask(BuildContext context, String id) {
     // delete task from database
@@ -97,45 +105,131 @@ class TaskListItem extends StatelessWidget {
 
   Row displayPriority() {
     return Row(children: [
-      Icon(_priorityIcon(priority!), color: _priorityIconColor(priority!)),
+      Icon(_priorityIcon(widget.priority!),
+          color: _priorityIconColor(widget.priority!)),
       const SizedBox(
         width: 6,
       ),
-      Text(priority!)
+      Text(widget.priority!)
     ]);
   }
 
   Row displayTime() {
+    //check if the time is not null
+    if (widget.time != '--:--') {
+      TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(widget.time!)!;
+
+      // check if the due time has passed
+      if (dueTime.hour <= DateTime.now().hour &&
+          dueTime.minute <= DateTime.now().minute &&
+          dueDatePassed) {
+        dueTimePassed = true;
+      }
+
+      return Row(children: [
+        Icon(Icons.access_time,
+            color: dueTimePassed ? Colors.red : Colors.black),
+        const SizedBox(
+          width: 6,
+        ),
+        Text(widget.time!,
+            style: dueTimePassed
+                ? const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  )
+                : null)
+      ]);
+    }
+
     return Row(children: [
-      const Icon(Icons.access_time),
+      const Icon(
+        Icons.access_time,
+        color: Colors.black,
+      ),
       const SizedBox(
         width: 6,
       ),
-      Text(time!)
+      Text(widget.time!),
     ]);
   }
 
   Row displayDueDate() {
+    //check if the dueDate is not null
+    if (widget.dueDate != '--/--/----') {
+      DateTime dueDate = Utility.badStringFormatToDateTime(widget.dueDate!)!;
+
+      //check if dueTime is not null
+      if (widget.time != '--:--') {
+        TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(widget.time!)!;
+
+        //check if the due date has passed
+        if (dueDate.isBefore(DateTime.now()) &&
+            dueTime.hour <= DateTime.now().hour &&
+            dueTime.minute <= DateTime.now().minute) {
+          dueDatePassed = true;
+        }
+
+        return Row(children: [
+          Icon(Icons.calendar_month,
+              color: dueDatePassed ? Colors.red : Colors.black),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(widget.dueDate!,
+              style: dueDatePassed
+                  ? const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    )
+                  : null)
+        ]);
+      } else {
+        //check if the due date has passed
+        if (dueDate.isBefore(DateTime.now())) {
+          dueDatePassed = true;
+        }
+
+        return Row(children: [
+          Icon(Icons.calendar_month,
+              color: dueDatePassed ? Colors.red : Colors.black),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(widget.dueDate!,
+              style: dueDatePassed
+                  ? const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    )
+                  : null)
+        ]);
+      }
+    }
+
     return Row(children: [
-      const Icon(Icons.calendar_month),
+      const Icon(
+        Icons.calendar_month,
+        color: Colors.black,
+      ),
       const SizedBox(
         width: 6,
       ),
-      Text(dueDate!),
+      Text(widget.dueDate!),
     ]);
   }
 
   ListTile displayTitleAndDoneDeleteIconButtons(BuildContext context) {
     return ListTile(
       title: Text(
-        title!,
+        widget.title!,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
       ),
       //address or location category
-      subtitle: address!.address! == 'No address chosen'
-          ? locationCategory == 'No location category chosen'
+      subtitle: widget.address!.address! == 'No address chosen'
+          ? widget.locationCategory == 'No location category chosen'
               ? Row(children: const [
                   Icon(Icons.location_off_sharp),
                   SizedBox(width: 6),
@@ -152,7 +246,7 @@ class TaskListItem extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Location category: ${locationCategory!}',
+                      'Location category: ${widget.locationCategory!}',
                       softWrap: true,
                       maxLines: 3,
                     ),
@@ -163,7 +257,7 @@ class TaskListItem extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  address!.address!,
+                  widget.address!.address!,
                   softWrap: true,
                   maxLines: 3,
                 ),
@@ -172,19 +266,22 @@ class TaskListItem extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          !isDone! && !isDeleted! // if isDone is false, show the check button
+          !widget.isDone! &&
+                  !widget
+                      .isDeleted! // if isDone is false, show the check button
               ? IconButton(
                   icon: const Icon(
                     Icons.check,
                     color: Colors.green,
                   ),
                   onPressed: () {
-                    owner == DBHelper.currentUserId()
-                        ? _markTaskAsDone(context, id!)
-                        : _markSharedTaskAsDone(context, id!, owner!);
+                    widget.owner == DBHelper.currentUserId()
+                        ? _markTaskAsDone(context, widget.id!)
+                        : _markSharedTaskAsDone(
+                            context, widget.id!, widget.owner!);
                   },
                 )
-              : isDeleted! // if isDeleted is true, show the undo button
+              : widget.isDeleted! // if isDeleted is true, show the undo button
                   ? IconButton(
                       icon: const Icon(
                         Icons.arrow_circle_left,
@@ -196,14 +293,14 @@ class TaskListItem extends StatelessWidget {
                                 'Do you want to move the task back from Trash? You will have to set back the reminders and the persons you shared the task with.')
                             .then((value) {
                           if (value!) {
-                            _markAsUndeleted(context, id!);
+                            _markAsUndeleted(context, widget.id!);
                           }
                         });
                       },
                     )
                   : const SizedBox(width: 0),
-          if (owner == DBHelper.currentUserId())
-            !isDeleted! // if isDeleted is false, show the delete button
+          if (widget.owner == DBHelper.currentUserId())
+            !widget.isDeleted! // if isDeleted is false, show the delete button
                 ? IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
@@ -212,7 +309,7 @@ class TaskListItem extends StatelessWidget {
                               context, 'Do you want to move the task in Trash?')
                           .then((value) {
                         if (value!) {
-                          _markAsDeleted(context, id!);
+                          _markAsDeleted(context, widget.id!);
                         }
                       });
                     },
@@ -225,7 +322,7 @@ class TaskListItem extends StatelessWidget {
                               'Do you want to permanently delete the task?')
                           .then((value) {
                         if (value!) {
-                          _deleteTask(context, id!);
+                          _deleteTask(context, widget.id!);
                         }
                       });
                     },
@@ -238,7 +335,7 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey(id),
+      key: ValueKey(widget.id),
       background: Container(
         color: Theme.of(context).colorScheme.error,
         alignment: Alignment.centerRight,
@@ -252,28 +349,29 @@ class TaskListItem extends StatelessWidget {
           size: 40.0,
         ),
       ),
-      direction:
-          isDeleted! ? DismissDirection.none : DismissDirection.endToStart,
+      direction: widget.isDeleted!
+          ? DismissDirection.none
+          : DismissDirection.endToStart,
       confirmDismiss: (direction) {
         return Utility.displayQuestionDialog(
             context, 'Do you want to move the task in Trash?');
       },
       onDismissed: ((direction) => {
-            _markAsDeleted(context, id!),
+            _markAsDeleted(context, widget.id!),
           }),
       child: InkWell(
         onTap: () {
           // Navigate to task details screen
           Navigator.of(context)
-              .pushNamed(TaskDetailsScreen.routeName, arguments: id);
+              .pushNamed(TaskDetailsScreen.routeName, arguments: widget.id);
         },
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          color: isDeleted!
+          color: widget.isDeleted!
               ? const Color.fromARGB(255, 255, 219, 219)
-              : isDone!
+              : widget.isDone!
                   ? const Color.fromARGB(255, 231, 254, 225)
                   : const Color.fromARGB(255, 255, 252, 219),
           elevation: 4,

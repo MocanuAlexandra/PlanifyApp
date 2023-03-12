@@ -341,4 +341,25 @@ class Utility {
     //delete the users for the task from the database
     await DBHelper.deleteSharedWithUsers(taskId);
   }
+
+  static DateTime timeOfDayToDateTime(TimeOfDay timeOfDay) {
+    final now = DateTime.now();
+    return DateTime(
+        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
+  }
+
+  static badStringFormatToDateTime(String s) {
+    List<String> parts = s.split('/');
+    int day = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
+    int year = int.parse(parts[2]);
+    return DateTime(year, month, day);
+  }
+
+  static badStringFormatToTimeOfDay(String s) {
+    List<String> parts = s.split(':');
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
+  }
 }
