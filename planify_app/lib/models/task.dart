@@ -16,6 +16,7 @@ class Task {
   final String? category;
   final String? locationCategory;
   final String? owner;
+  String? imageUrl;
 
   Task({
     this.id,
@@ -29,5 +30,6 @@ class Task {
     this.category,
     this.locationCategory,
     this.owner,
+    this.imageUrl,
   });
 }

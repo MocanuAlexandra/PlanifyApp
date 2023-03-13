@@ -3,24 +3,11 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'screens/tabs_in_pages/shared_agenda/shared_month_agenda_tab.dart';
-import 'screens/tabs_in_pages/shared_agenda/shared_overrall_agenda_tab.dart';
-import 'screens/tabs_in_pages/shared_agenda/shared_today_agenda_tab.dart';
-
-import 'screens/pages/month_agenda_page.dart';
-import 'screens/pages/overall_agenda_page.dart';
-import 'screens/pages/today_agenda_page.dart';
-import 'providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
-import 'screens/pages/deleted_agenda_page.dart';
-import 'screens/tabs_in_pages/my_agenda/month_agenda_tab.dart';
-import 'screens/tabs_in_pages/my_agenda/overall_agenda_tab.dart';
-import 'screens/pages/category_agenda_page.dart';
-import 'screens/tabs_in_pages/my_agenda/today_agenda_tab.dart';
 import '../../screens/auth/auth_screen.dart';
 import '../../screens/settings_screen.dart';
 import '../../screens/task/add_edit_task_category_screen.dart';
@@ -30,6 +17,18 @@ import '../../services/location_based_notification_service.dart';
 import '../../services/notification_service.dart';
 import 'firebase_options.dart';
 import 'providers/task_category_provider.dart';
+import 'providers/user_provider.dart';
+import 'screens/pages/category_agenda_page.dart';
+import 'screens/pages/deleted_agenda_page.dart';
+import 'screens/pages/month_agenda_page.dart';
+import 'screens/pages/overall_agenda_page.dart';
+import 'screens/pages/today_agenda_page.dart';
+import 'screens/tabs_in_pages/my_agenda/month_agenda_tab.dart';
+import 'screens/tabs_in_pages/my_agenda/overall_agenda_tab.dart';
+import 'screens/tabs_in_pages/my_agenda/today_agenda_tab.dart';
+import 'screens/tabs_in_pages/shared_agenda/shared_month_agenda_tab.dart';
+import 'screens/tabs_in_pages/shared_agenda/shared_overrall_agenda_tab.dart';
+import 'screens/tabs_in_pages/shared_agenda/shared_today_agenda_tab.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

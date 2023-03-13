@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/helpers/database_helper.dart';
-import 'package:planify_app/screens/pages/overall_agenda_page.dart';
+import '../../helpers/database_helper.dart';
+import 'overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/utility.dart';

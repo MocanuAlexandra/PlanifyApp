@@ -46,6 +46,7 @@ class TaskProvider with ChangeNotifier {
           category: task['category'],
           locationCategory: task['locationCategory'],
           owner: task['owner'],
+          imageUrl: task['imageUrl'],
         );
       },
     ).toList();

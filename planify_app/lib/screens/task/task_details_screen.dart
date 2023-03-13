@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:planify_app/screens/pages/overall_agenda_page.dart';
+import '../pages/overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/database_helper.dart';
@@ -21,6 +21,8 @@ class TaskDetailsScreen extends StatefulWidget {
 
 class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   bool _isMapLoading = true;
+  //TODO add imaye in this page
+  //TODO handle delete task for image storage
 
   @override
   Widget build(BuildContext context) {

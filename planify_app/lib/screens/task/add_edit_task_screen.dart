@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import '../../models/task.dart';
+import '../../widgets/other/image/user_image_picker.dart';
 import '../../widgets/other/user_list_search.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/database_helper.dart';
 import '../../helpers/utility.dart';
 import '../../models/task_category.dart';
-import '../../models/task.dart';
+import '../../models/task.dart' as task_model;
 import '../../models/task_address.dart';
 import '../../models/task_reminder.dart';
 import '../../providers/task_category_provider.dart';
@@ -29,7 +33,7 @@ class AddEditTaskScreen extends StatefulWidget {
 
 class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   final _formKey = GlobalKey<FormState>();
-  var _editedTask = Task(
+  var _editedTask = task_model.Task(
     id: null,
     title: '',
     dueDate: null,
@@ -41,6 +45,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     category: null,
     locationCategory: null,
     owner: null,
+    imageUrl: null,
   );
   var _initValues = {
     'title': '',
@@ -53,12 +58,19 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     'category': null,
     'locationCategory': null,
     'owner': null,
+    'imageUrl': null,
   };
 
   var _isInit = true;
+  bool _isLoading = false;
   List<String> _selectedReminders = [];
   bool _dueTimeDueDateChanged = false;
   List<String> _selectedUserEmails = [];
+  File? _pickedImageFile;
+
+  void _pickedImage(File? image) {
+    _pickedImageFile = image;
+  }
 
   @override
   void didChangeDependencies() async {
@@ -79,6 +91,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           'category': _editedTask.category,
           'locationCategory': _editedTask.locationCategory,
           'owner': _editedTask.owner,
+          'imageUrl': _editedTask.imageUrl,
         };
       }
     }
@@ -99,7 +112,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       ),
       validator: FormBuilderValidators.required(errorText: 'Required'),
       onSaved: (value) {
-        _editedTask = Task(
+        _editedTask = task_model.Task(
           id: _editedTask.id,
           title: value.toString(),
           dueDate: _editedTask.dueDate,
@@ -110,6 +123,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           category: _editedTask.category,
           locationCategory: _editedTask.locationCategory,
           owner: _editedTask.owner,
+          imageUrl: _editedTask.imageUrl,
         );
       },
     );
@@ -139,7 +153,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         IconButton(
             onPressed: () async {
               setState(() {
-                _editedTask = Task(
+                _editedTask = task_model.Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: null,
@@ -150,6 +164,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
                   owner: _editedTask.owner,
+                  imageUrl: _editedTask.imageUrl,
                 );
               });
               _dueTimeDueDateChanged = true;
@@ -191,7 +206,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         IconButton(
             onPressed: () async {
               setState(() {
-                _editedTask = Task(
+                _editedTask = task_model.Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: _editedTask.dueDate,
@@ -202,6 +217,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
                   owner: _editedTask.owner,
+                  imageUrl: _editedTask.imageUrl,
                 );
               });
               _dueTimeDueDateChanged = true;
@@ -320,7 +336,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       ],
       onChanged: (value) {
         setState(() {
-          _editedTask = Task(
+          _editedTask = task_model.Task(
             id: _editedTask.id,
             title: _editedTask.title,
             dueDate: _editedTask.dueDate,
@@ -331,6 +347,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             category: _editedTask.category,
             locationCategory: _editedTask.locationCategory,
             owner: _editedTask.owner,
+            imageUrl: _editedTask.imageUrl,
           );
         });
       },
@@ -353,7 +370,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   value: _editedTask.category,
                   onChanged: (String? value) {
                     setState(() {
-                      _editedTask = Task(
+                      _editedTask = task_model.Task(
                         id: _editedTask.id,
                         title: _editedTask.title,
                         dueDate: _editedTask.dueDate,
@@ -364,6 +381,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         category: value,
                         locationCategory: _editedTask.locationCategory,
                         owner: _editedTask.owner,
+                        imageUrl: _editedTask.imageUrl,
                       );
                     });
                   },
@@ -481,8 +499,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     //check for validation of the form
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
+    NavigatorState navigator = Navigator.of(context);
 
     if (isValid) {
+      setState(() {
+        _isLoading = true; // set the loading state to true
+      });
+
       _formKey.currentState!.save();
 
       // if we got an id, it means that we are editing a task
@@ -496,51 +519,65 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //check if the logged in user is the owner of the task in order to update the task accordingly
           if (_editedTask.owner == DBHelper.currentUserId() ||
               _editedTask.owner == null) {
+            //update the task in the database
             await DBHelper.updateTask(_editedTask.id!, _editedTask);
 
             //delete the notifications for the task and then add the new ones
             {
               await deleteNotificationsForTask(_editedTask.id!)
-                  .then((value) => {
+                  .then((value) async => {
                         //check if the user selected a due date or time
                         if (_editedTask.dueDate != null ||
                             _editedTask.dueTime != null)
                           {
-                            addNotificationsForTask(_editedTask.id!),
+                            await addNotificationsForTask(_editedTask.id!),
                           }
                       });
             }
 
             //remove sharing for task, then update it
-            Utility.removeSharingForTask(_editedTask.id!)
+            await Utility.removeSharingForTask(_editedTask.id!)
                 .then((value) async => {
                       await shareTask(_editedTask.id!),
                     });
+
+            await DBHelper.updateImageForTask(
+                _pickedImageFile, _editedTask.id!);
           } else {
+            //update the task in the database
             await DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
 
             //delete the notifications for the task and then add the new ones
             {
               await deleteNotificationsForSharedTask(_editedTask.id!)
-                  .then((value) => {
+                  .then((value) async => {
                         //check if the user selected a due date or time
                         if (_editedTask.dueDate != null ||
                             _editedTask.dueTime != null)
                           {
-                            addNotificationsForTask(_editedTask.id!),
+                            await addNotificationsForTask(_editedTask.id!),
                           }
                       });
+            }
+
+            //update the image in the database storage
+            {
+              await DBHelper.updateImageForSharedTask(
+                  _pickedImageFile, _editedTask.id!, _editedTask.owner!);
             }
           }
 
           // go back to overall agenda screen
-          Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
+          navigator.popAndPushNamed(OverallAgendaPage.routeName);
         }
       }
       // if we didn't get an id, it means that we are adding a new task
       else {
         //add the task in the database
         String taskId = await DBHelper.addTask(_editedTask);
+
+        //add the image in the database storage
+        await DBHelper.updateImageForTask(_pickedImageFile, taskId);
 
         //share the task with the selected users
         await shareTask(taskId);
@@ -552,7 +589,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         }
 
         // go back to overall agenda screen
-        Navigator.of(context).popAndPushNamed(OverallAgendaPage.routeName);
+        navigator.popAndPushNamed(OverallAgendaPage.routeName);
       }
     }
   }
@@ -653,7 +690,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final buttonHeight = screenHeight * 0.08;
 
@@ -680,6 +717,11 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       const SizedBox(height: 10),
                       dueDateField(),
                       dueTimeField(),
+                      UserImagePicker(
+                        imagePickFn: _pickedImage,
+                        previousImageUrl: _editedTask.imageUrl,
+                      ),
+                      const SizedBox(height: 3),
                       locationField(),
                       const SizedBox(height: 10),
                       priorityField(),
@@ -709,10 +751,18 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     ),
                     backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(fontSize: 18),
-                  )),
+                  child: (_isLoading)
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 1.7,
+                          ))
+                      : const Text(
+                          'Submit',
+                          style: TextStyle(fontSize: 18),
+                        )),
             ),
           ),
         ],
@@ -762,7 +812,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   })
                 },
               setState(() {
-                _editedTask = Task(
+                _editedTask = task_model.Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: pickedDate,
@@ -774,6 +824,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
                   owner: _editedTask.owner,
+                  imageUrl: _editedTask.imageUrl,
                 );
               }),
             }
@@ -801,7 +852,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   })
                 },
               setState(() {
-                _editedTask = Task(
+                _editedTask = task_model.Task(
                   id: _editedTask.id,
                   title: _editedTask.title,
                   dueDate: _editedTask.dueDate,
@@ -813,6 +864,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   category: _editedTask.category,
                   locationCategory: _editedTask.locationCategory,
                   owner: _editedTask.owner,
+                  imageUrl: _editedTask.imageUrl,
                 );
               }),
             }
@@ -820,7 +872,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   void _selectPlace(double? lat, double? lng) {
-    _editedTask = Task(
+    _editedTask = task_model.Task(
       id: _editedTask.id,
       title: _editedTask.title,
       dueDate: _editedTask.dueDate,
@@ -832,11 +884,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       category: _editedTask.category,
       locationCategory: null,
       owner: _editedTask.owner,
+      imageUrl: _editedTask.imageUrl,
     );
   }
 
   void _selectCategory(String? selectedLocationCategory) {
-    _editedTask = Task(
+    _editedTask = task_model.Task(
       id: _editedTask.id,
       title: _editedTask.title,
       dueDate: _editedTask.dueDate,
@@ -848,6 +901,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       category: _editedTask.category,
       locationCategory: selectedLocationCategory,
       owner: _editedTask.owner,
+      imageUrl: _editedTask.imageUrl,
     );
   }
 
@@ -867,7 +921,7 @@ You have to set new reminders if you want to be notified about this task.""",
                 child: const Text("Yes"),
                 onPressed: () {
                   // change the task to not done
-                  _editedTask = Task(
+                  _editedTask = task_model.Task(
                     id: _editedTask.id,
                     title: _editedTask.title,
                     dueDate: _editedTask.dueDate,
@@ -879,6 +933,7 @@ You have to set new reminders if you want to be notified about this task.""",
                     category: _editedTask.category,
                     locationCategory: _editedTask.locationCategory,
                     owner: _editedTask.owner,
+                    imageUrl: _editedTask.imageUrl,
                   );
 
                   // check if the logged in user is the owner of the task
@@ -899,7 +954,7 @@ You have to set new reminders if you want to be notified about this task.""",
                 child: const Text("No"),
                 onPressed: () {
                   // change the task to done
-                  _editedTask = Task(
+                  _editedTask = task_model.Task(
                     id: _editedTask.id,
                     title: _editedTask.title,
                     dueDate: _editedTask.dueDate,
@@ -911,6 +966,7 @@ You have to set new reminders if you want to be notified about this task.""",
                     category: _editedTask.category,
                     locationCategory: _editedTask.locationCategory,
                     owner: _editedTask.owner,
+                    imageUrl: _editedTask.imageUrl,
                   );
 
                   // check if the logged in user is the owner of the task

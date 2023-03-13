@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-import '../models/task.dart';
+import '../models/task.dart' as task_model;
 import '../models/task_address.dart';
 import '../models/task_category.dart';
 import '../models/task_reminder.dart';
@@ -71,6 +74,7 @@ class DBHelper {
         'category': task['category'],
         'locationCategory': task['locationCategory'],
         'owner': task['owner'],
+        'imageUrl': task['imageUrl'],
       };
     }).toList();
 
@@ -176,7 +180,7 @@ class DBHelper {
 
   //function that walks through the shared task of user and retrieve the tasks based on
   //the owner id and task id
-  static Future<List<Task>> fetchSharedTasks() async {
+  static Future<List<task_model.Task>> fetchSharedTasks() async {
     final user = FirebaseAuth.instance.currentUser;
 
     //get the shared tasks
@@ -186,7 +190,7 @@ class DBHelper {
         .collection('sharedTasks')
         .get();
 
-    List<Task> tasks = [];
+    List<task_model.Task> tasks = [];
     //loop through the shared tasks and get the tasks from the owner
     for (var sharedTask in sharedTasks.docs) {
       final task = await FirebaseFirestore.instance
@@ -195,7 +199,7 @@ class DBHelper {
           .collection('tasks')
           .doc(sharedTask['taskId'])
           .get();
-      tasks.add(Task(
+      tasks.add(task_model.Task(
         id: task.id,
         title: task['title'],
         dueDate: Utility.stringToDateTime(task['dueDate']),
@@ -211,6 +215,7 @@ class DBHelper {
         category: task['category'],
         locationCategory: task['locationCategory'],
         owner: task['owner'],
+        imageUrl: task['imageUrl'],
       ));
     }
     return tasks;
@@ -219,7 +224,7 @@ class DBHelper {
   ///////////////////////////////////////////////////////////////////////////////
   // ********** TASK CRUD FUNCTIONS **********
   // function for adding tasks to the database
-  static Future<String> addTask(Task newTask) async {
+  static Future<String> addTask(task_model.Task newTask) async {
     if (newTask.title == null) {
       return '';
     }
@@ -277,6 +282,7 @@ class DBHelper {
       'category': updatedCategory,
       'locationCategory': updatedLocationCategory,
       'owner': user.uid,
+      'imageUrl': newTask.imageUrl,
     });
 
     return doc.id;
@@ -310,7 +316,8 @@ class DBHelper {
   }
 
   // function for updating tasks in the database
-  static Future<void> updateTask(String editedTaskId, Task editedTask) async {
+  static Future<void> updateTask(
+      String editedTaskId, task_model.Task editedTask) async {
     final user = FirebaseAuth.instance.currentUser;
 
     var updatedLocation = const TaskAddress(
@@ -364,12 +371,13 @@ class DBHelper {
       'category': editedTask.category,
       'locationCategory': updatedLocationCategory,
       'owner': editedTask.owner,
+      'imageUrl': editedTask.imageUrl,
     });
   }
 
   // sharer can update the task
   static Future<void> updateSharedTask(
-      String editedTaskId, Task editedTask) async {
+      String editedTaskId, task_model.Task editedTask) async {
     var updatedLocation = const TaskAddress(
         latitude: 0.0, longitude: 0.0, address: 'No address chosen');
     //check if the user picked an address
@@ -421,6 +429,7 @@ class DBHelper {
       'category': editedTask.category,
       'locationCategory': updatedLocationCategory,
       'owner': editedTask.owner,
+      'imageUrl': editedTask.imageUrl,
     });
   }
 
@@ -770,7 +779,7 @@ class DBHelper {
   }
 
   // function that return a task after getting its id
-  static Future<Task> getTask(String taskId) async {
+  static Future<task_model.Task> getTask(String taskId) async {
     final user = FirebaseAuth.instance.currentUser;
     final task = await FirebaseFirestore.instance
         .collection('users')
@@ -778,7 +787,7 @@ class DBHelper {
         .collection('tasks')
         .doc(taskId)
         .get();
-    return Task(
+    return task_model.Task(
       id: task.id,
       title: task['title'],
       dueDate: Utility.stringToDateTime(task['dueDate']),
@@ -810,4 +819,123 @@ class DBHelper {
 
     return user['email'];
   }
+
+////////////////////////////////////////////////////////////////////////
+  //*********** IMAGE FUNCTIONS **********
+  static Future<String> uploadImage(
+      File? pickedImageFile, String taskId) async {
+    var returnedUrl = '';
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('users_tasks_images')
+        .child(DBHelper.currentUserId())
+        .child(taskId);
+
+    await ref.putFile(pickedImageFile!).whenComplete(
+        () => ref.getDownloadURL().then((value) => returnedUrl = value));
+
+    return returnedUrl;
+  }
+
+  static Future<String> uploadSharedImage(
+      File? pickedImageFile, String taskId, String owner) async {
+    var returnedUrl = '';
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('users_tasks_images')
+        .child(owner)
+        .child(taskId);
+
+    await ref.putFile(pickedImageFile!).whenComplete(
+        () => ref.getDownloadURL().then((value) => returnedUrl = value));
+
+    return returnedUrl;
+  }
+
+  // function that deletes the image from the storage
+  static Future<void> deleteImage(String taskId) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('users_tasks_images')
+        .child(DBHelper.currentUserId())
+        .child(taskId);
+
+    //check if the image exists
+    ref.getDownloadURL().then((url) {
+      ref.delete();
+    }).catchError((error) {
+      //do nothing
+    });
+  }
+
+  static Future<void> deleteSharedImage(String taskId, String owner) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('users_tasks_images')
+        .child(owner)
+        .child(taskId);
+
+    //check if the image exists
+    ref.getDownloadURL().then((url) {
+      ref.delete();
+    }).catchError((error) {
+      //do nothing
+    });
+  }
+
+  //function that updates the image for a task
+  static Future<void> updateImageForTask(
+      File? pickedImageFile, String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final task = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+
+    //delete the old image from the storage
+    await DBHelper.deleteImage(taskId);
+
+    String? imageUrl = '';
+    if (pickedImageFile != null) {
+      //upload the new image to the storage
+      imageUrl = await DBHelper.uploadImage(pickedImageFile, taskId);
+    } else {
+      imageUrl = null;
+    }
+
+    //update the task with the new image in the database
+    await task.reference.update({'imageUrl': imageUrl});
+  }
+
+  //function that updates the image for a shared task
+  static Future<void> updateImageForSharedTask(
+      File? pickedImageFile, String taskId, String ownerId) async {
+    final task = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(ownerId)
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+
+    //delete the old image from the storage
+    await DBHelper.deleteSharedImage(taskId, ownerId);
+
+    String? imageUrl = '';
+    if (pickedImageFile != null) {
+      //upload the new image to the storage
+      imageUrl =
+          await DBHelper.uploadSharedImage(pickedImageFile, taskId, ownerId);
+    } else {
+      imageUrl = null;
+    }
+
+    //update the task with the new image in the database
+    await task.reference.update({'imageUrl': imageUrl});
+  }
+  ///////////////////////////////////////////////////////////////////////////
 }
