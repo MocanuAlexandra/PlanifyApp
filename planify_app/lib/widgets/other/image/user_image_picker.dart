@@ -7,7 +7,7 @@ import 'image_preview.dart';
 
 class UserImagePicker extends StatefulWidget {
   final String? previousImageUrl;
-  final Function(File? pickedImage) imagePickFn;
+  final Function(File? pickedImage, bool isDeleted) imagePickFn;
   const UserImagePicker({
     super.key,
     required this.imagePickFn,
@@ -21,6 +21,7 @@ class UserImagePicker extends StatefulWidget {
 class _UserImagePickerState extends State<UserImagePicker> {
   File? _pickedImage;
   String? _previewImageUrl;
+  bool isDeleted = false;
 
   @override
   void initState() {
@@ -77,15 +78,17 @@ class _UserImagePickerState extends State<UserImagePicker> {
     setState(() {
       _pickedImage = null;
       _previewImageUrl = null;
+      isDeleted = true;
     });
+    widget.imagePickFn(_pickedImage, isDeleted);
   }
 
   void _pickImage() async {
-    final pickedImageFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    final pickedImageFile = await ImagePicker()
+        .pickImage(source: ImageSource.camera, imageQuality: 50);
     setState(() {
       _pickedImage = File(pickedImageFile!.path);
     });
-    widget.imagePickFn(_pickedImage);
+    widget.imagePickFn(_pickedImage, isDeleted);
   }
 }

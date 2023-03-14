@@ -67,9 +67,11 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   bool _dueTimeDueDateChanged = false;
   List<String> _selectedUserEmails = [];
   File? _pickedImageFile;
+  bool deleted = false;
 
-  void _pickedImage(File? image) {
+  void _pickedImage(File? image, bool isDeleted) {
     _pickedImageFile = image;
+    deleted = isDeleted;
   }
 
   @override
@@ -541,8 +543,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       await shareTask(_editedTask.id!),
                     });
 
-            await DBHelper.updateImageForTask(
-                _pickedImageFile, _editedTask.id!);
+            await DBHelper.updateImageForTask(_pickedImageFile, _editedTask.id!,
+                _editedTask.imageUrl, deleted);
           } else {
             //update the task in the database
             await DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
@@ -577,7 +579,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         String taskId = await DBHelper.addTask(_editedTask);
 
         //add the image in the database storage
-        await DBHelper.updateImageForTask(_pickedImageFile, taskId);
+        await DBHelper.updateImageForTask(
+            _pickedImageFile, taskId, _editedTask.imageUrl, deleted);
 
         //share the task with the selected users
         await shareTask(taskId);

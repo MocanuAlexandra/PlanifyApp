@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:planify_app/widgets/other/image/image_preview.dart';
 import '../pages/overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   bool dueDatePassed = false;
   bool dueTimePassed = false;
   bool _isMapLoading = true;
-  //TODO add imaye in this page
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +81,29 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       //title
                       displayTitle(loadedTask),
                       const SizedBox(height: 20),
-                      //due date
-                      displayDueDate(loadedTask),
-                      const SizedBox(height: 10),
-                      //due time
-                      displayDueTime(loadedTask),
-                      //priority
-                      const SizedBox(height: 10),
-                      displayPriority(loadedTask),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //due date
+                              displayDueDate(loadedTask),
+                              const SizedBox(height: 10),
+                              //due time
+                              displayDueTime(loadedTask),
+                              //priority
+                              const SizedBox(height: 10),
+                              displayPriority(loadedTask),
+                            ],
+                          ),
+                          const SizedBox(height: 150),
+                          Container(
+                            child: displayImage(loadedTask),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 10),
                       displayCategory(loadedTask),
                       const SizedBox(height: 10),
@@ -120,6 +135,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         );
       },
     );
+  }
+
+  ImagePreview displayImage(Task loadedTask) {
+    //check if the task has an image
+    return loadedTask.imageUrl == null
+        ? const ImagePreview(
+            imageUrl: 'assets/images/noimage.jpg',
+            isUrl: false,
+            isDefaultImage: true)
+        : ImagePreview(
+            imageUrl: loadedTask.imageUrl!, isUrl: true, isDefaultImage: false);
   }
 
   Row displayAddressOrLocationCategory(Task loadedTask) {
@@ -204,15 +230,19 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           Icon(Icons.calendar_month,
               color: dueDatePassed ? Colors.red : Colors.black),
           const SizedBox(
-            width: 6,
+            width: 10,
           ),
           Text(date,
               style: dueDatePassed
                   ? const TextStyle(
                       color: Colors.red,
                       fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     )
-                  : null)
+                  : const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                    ))
         ]);
       } else {
         //check if the due date has passed
@@ -224,15 +254,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           Icon(Icons.calendar_month,
               color: dueDatePassed ? Colors.red : Colors.black),
           const SizedBox(
-            width: 6,
+            width: 10,
           ),
-          Text(date,
-              style: dueDatePassed
-                  ? const TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    )
-                  : null)
+          Text(
+            date,
+            style: dueDatePassed
+                ? const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  )
+                : const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+          )
         ]);
       }
     }
@@ -243,9 +279,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         color: Colors.black,
       ),
       const SizedBox(
-        width: 6,
+        width: 10,
       ),
-      Text(date),
+      Text(
+        date,
+        style: !dueDatePassed
+            ? const TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              )
+            : null,
+      ),
     ]);
   }
 
@@ -266,15 +310,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         Icon(Icons.access_time,
             color: dueTimePassed ? Colors.red : Colors.black),
         const SizedBox(
-          width: 6,
+          width: 10,
         ),
-        Text(time,
-            style: dueTimePassed
-                ? const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  )
-                : null)
+        Text(
+          time,
+          style: dueTimePassed
+              ? const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                )
+              : const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+        )
       ]);
     }
 
@@ -284,9 +334,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         color: Colors.black,
       ),
       const SizedBox(
-        width: 6,
+        width: 10,
       ),
-      Text(time),
+      Text(
+        time,
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+        ),
+      ),
     ]);
   }
 
