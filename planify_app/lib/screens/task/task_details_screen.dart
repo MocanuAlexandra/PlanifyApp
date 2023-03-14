@@ -20,9 +20,10 @@ class TaskDetailsScreen extends StatefulWidget {
 }
 
 class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
+  bool dueDatePassed = false;
+  bool dueTimePassed = false;
   bool _isMapLoading = true;
   //TODO add imaye in this page
-  //TODO handle delete task for image storage
 
   @override
   Widget build(BuildContext context) {
@@ -181,25 +182,112 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   }
 
   Row displayDueDate(Task loadedTask) {
-    return Row(
-      children: [
-        const Icon(Icons.calendar_month),
-        const SizedBox(width: 10),
-        Text(Utility.dateTimeToString(loadedTask.dueDate),
-            style: const TextStyle(fontSize: 16)),
-      ],
-    );
+    var date = Utility.dateTimeToString(loadedTask.dueDate);
+
+    //check if the dueDate is not null
+    if (date != '--/--/----') {
+      DateTime dueDate = Utility.badStringFormatToDateTime(date)!;
+
+      var time = Utility.timeOfDayToString(loadedTask.dueTime);
+      //check if dueTime is not null
+      if (time != '--:--') {
+        TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(time)!;
+
+        //check if the due date has passed
+        if (dueDate.isBefore(DateTime.now()) &&
+            dueTime.hour <= DateTime.now().hour &&
+            dueTime.minute <= DateTime.now().minute) {
+          dueDatePassed = true;
+        }
+
+        return Row(children: [
+          Icon(Icons.calendar_month,
+              color: dueDatePassed ? Colors.red : Colors.black),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(date,
+              style: dueDatePassed
+                  ? const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    )
+                  : null)
+        ]);
+      } else {
+        //check if the due date has passed
+        if (dueDate.isBefore(DateTime.now())) {
+          dueDatePassed = true;
+        }
+
+        return Row(children: [
+          Icon(Icons.calendar_month,
+              color: dueDatePassed ? Colors.red : Colors.black),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(date,
+              style: dueDatePassed
+                  ? const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    )
+                  : null)
+        ]);
+      }
+    }
+
+    return Row(children: [
+      const Icon(
+        Icons.calendar_month,
+        color: Colors.black,
+      ),
+      const SizedBox(
+        width: 6,
+      ),
+      Text(date),
+    ]);
   }
 
   Row displayDueTime(Task loadedTask) {
-    return Row(
-      children: [
-        const Icon(Icons.access_time),
-        const SizedBox(width: 10),
-        Text(Utility.timeOfDayToString(loadedTask.dueTime),
-            style: const TextStyle(fontSize: 16)),
-      ],
-    );
+    var time = Utility.timeOfDayToString(loadedTask.dueTime);
+
+    if (time != '--:--') {
+      TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(time)!;
+
+      // check if the due time has passed
+      if (dueTime.hour <= DateTime.now().hour &&
+          dueTime.minute <= DateTime.now().minute &&
+          dueDatePassed) {
+        dueTimePassed = true;
+      }
+
+      return Row(children: [
+        Icon(Icons.access_time,
+            color: dueTimePassed ? Colors.red : Colors.black),
+        const SizedBox(
+          width: 6,
+        ),
+        Text(time,
+            style: dueTimePassed
+                ? const TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  )
+                : null)
+      ]);
+    }
+
+    return Row(children: [
+      const Icon(
+        Icons.access_time,
+        color: Colors.black,
+      ),
+      const SizedBox(
+        width: 6,
+      ),
+      Text(time),
+    ]);
   }
 
   //auxiliary methods
