@@ -4,8 +4,9 @@ import 'package:intl/intl.dart';
 import '../models/task.dart';
 import 'database_helper.dart';
 
-// Utility class
+// Utility class used to store static methods that are used in multiple classes
 class Utility {
+  //***************** String manipulation ********************
   static String priorityEnumToString(Priority? priority) {
     String priorityString = '';
     switch (priority) {
@@ -93,6 +94,23 @@ class Utility {
     return date;
   }
 
+  static badStringFormatToDateTime(String s) {
+    List<String> parts = s.split('/');
+    int day = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
+    int year = int.parse(parts[2]);
+    return DateTime(year, month, day);
+  }
+
+  static badStringFormatToTimeOfDay(String s) {
+    List<String> parts = s.split(':');
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+///////////////////////////////////////////////////////////////////
+//******************** Dialogs ********************
   static Future<bool?> displayQuestionDialog(
       BuildContext context, String text) {
     return showDialog(
@@ -135,6 +153,8 @@ class Utility {
             ));
   }
 
+///////////////////////////////////////////////////////
+  ///******************** Reminders ********************
   static List<String> getReminderTypes(
       bool? isDueTimeSelected, bool? isDueDateSelected) {
     //if the user selected only due time
@@ -291,6 +311,21 @@ class Utility {
     }
     return '';
   }
+////////////////////////////////////////////////////////////////////////////////////
+
+  //**************** Auxiliary methods for tasks ****************
+  static Future<void> removeSharingForTask(String taskId) async {
+    //delete the task from the users' shared tasks
+    var sharedWithUsers = await Utility.determineAlreadySharedWithUsers(taskId);
+    if (sharedWithUsers.isNotEmpty) {
+      for (var email in sharedWithUsers) {
+        await DBHelper.deleteSharedTaskFromUser(taskId, email);
+      }
+    }
+
+    //delete the users for the task from the database
+    await DBHelper.deleteSharedWithUsers(taskId);
+  }
 
   static void sortTaskListByDueTime(List<dynamic> taskList) {
     taskList.sort((task1, task2) {
@@ -328,38 +363,5 @@ class Utility {
     return alreadySelectedUserEmails;
   }
 
-  //auxiliary methods
-  static Future<void> removeSharingForTask(String taskId) async {
-    //delete the task from the users' shared tasks
-    var sharedWithUsers = await Utility.determineAlreadySharedWithUsers(taskId);
-    if (sharedWithUsers.isNotEmpty) {
-      for (var email in sharedWithUsers) {
-        await DBHelper.deleteSharedTaskFromUser(taskId, email);
-      }
-    }
-
-    //delete the users for the task from the database
-    await DBHelper.deleteSharedWithUsers(taskId);
-  }
-
-  static DateTime timeOfDayToDateTime(TimeOfDay timeOfDay) {
-    final now = DateTime.now();
-    return DateTime(
-        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
-  }
-
-  static badStringFormatToDateTime(String s) {
-    List<String> parts = s.split('/');
-    int day = int.parse(parts[0]);
-    int month = int.parse(parts[1]);
-    int year = int.parse(parts[2]);
-    return DateTime(year, month, day);
-  }
-
-  static badStringFormatToTimeOfDay(String s) {
-    List<String> parts = s.split(':');
-    int hour = int.parse(parts[0]);
-    int minute = int.parse(parts[1]);
-    return TimeOfDay(hour: hour, minute: minute);
-  }
+  ///////////////////////////////////////////////////////////////
 }

@@ -281,11 +281,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     // delete task from database
     DBHelper.deleteTask(id);
 
+    //delete the image from the storage
+    DBHelper.deleteImage(id);
+
     // remove task from UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }
 
-  Future<void> _markAsDeleted(BuildContext context, Task task) async {
+  void _markAsDeleted(BuildContext context, Task task) {
     // mark task as deleted in database
     DBHelper.markTaskAsDeleted(task.id!);
 

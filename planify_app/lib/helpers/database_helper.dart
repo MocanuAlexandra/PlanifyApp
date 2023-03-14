@@ -937,5 +937,23 @@ class DBHelper {
     //update the task with the new image in the database
     await task.reference.update({'imageUrl': imageUrl});
   }
+
+  //function for checking in the storage which tasks are marked as deleted and delete the images for them
+  static void deleteAllImages() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final tasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .where('isDeleted', isEqualTo: true)
+        .get();
+
+    for (var task in tasks.docs) {
+      if (task['imageUrl'] != null) {
+        final ref = FirebaseStorage.instance.refFromURL(task['imageUrl']);
+        await ref.delete();
+      }
+    }
+  }
   ///////////////////////////////////////////////////////////////////////////
 }

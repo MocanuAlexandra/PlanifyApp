@@ -46,6 +46,9 @@ class _TaskListItemState extends State<TaskListItem> {
     // delete task from database
     DBHelper.deleteTask(id);
 
+    //delete the image from the storage
+    DBHelper.deleteImage(id);
+
     // remove task from UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
   }

@@ -23,10 +23,11 @@ class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       bool? focusMode) async {
+    var provider = Provider.of<TaskProvider>(context, listen: false);
     await Provider.of<TaskProvider>(context, listen: false)
         .fetchSharedTasks(true, null, null, selectedOption, focusMode);
 
-    tasks = Provider.of<TaskProvider>(context, listen: false).tasksList;
+    tasks = provider.tasksList;
   }
 
   @override

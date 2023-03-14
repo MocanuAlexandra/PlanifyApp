@@ -67,6 +67,9 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
                         actions: [
                           TextButton(
                             onPressed: () {
+                              //remove the images for the tasks
+                              DBHelper.deleteAllImages();
+
                               //delete tasks from DB
                               DBHelper.deleteAllTasks();
 
