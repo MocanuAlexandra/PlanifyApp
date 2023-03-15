@@ -917,10 +917,13 @@ class DBHelper {
     await task.reference.update({'imageUrl': imageUrl});
   }
 
-  //TODO: check if the image is deleted like in the updateImageForTask function
   //function that updates the image for a shared task
   static Future<void> updateImageForSharedTask(
-      File? pickedImageFile, String taskId, String ownerId) async {
+      File? pickedImageFile,
+      String taskId,
+      String ownerId,
+      String? previousImageUrl,
+      bool isDeleted) async {
     final task = await FirebaseFirestore.instance
         .collection('users')
         .doc(ownerId)
@@ -937,7 +940,12 @@ class DBHelper {
       imageUrl =
           await DBHelper.uploadSharedImage(pickedImageFile, taskId, ownerId);
     } else {
-      imageUrl = null;
+      //check if the previous image was set
+      if (previousImageUrl != null && isDeleted == false) {
+        imageUrl = previousImageUrl;
+      } else {
+        imageUrl = null;
+      }
     }
 
     //update the task with the new image in the database
