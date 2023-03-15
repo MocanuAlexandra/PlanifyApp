@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/task.dart' as task_model;
 import '../models/task_address.dart';
@@ -13,7 +14,6 @@ import 'location_helper.dart';
 import 'utility.dart';
 
 class DBHelper {
-  ///////////////////////////FETCH FUNCTIONS////////////////////////////
   // ********** FETCHING FUNCTIONS **********
   // function for fetching categories from the database from the connected user
   static Future<List<Map<String, dynamic>>> fetchTaskCategories() async {
@@ -289,9 +289,9 @@ class DBHelper {
   }
 
   // function for deleting tasks in the database
-  static void deleteTask(String id) {
+  static Future<void> deleteTask(String id) async {
     final user = FirebaseAuth.instance.currentUser;
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('users')
         .doc(user!.uid)
         .collection('tasks')
@@ -822,15 +822,15 @@ class DBHelper {
 
 ////////////////////////////////////////////////////////////////////////
   //*********** IMAGE FUNCTIONS **********
-  static Future<String> uploadImage(
-      File? pickedImageFile, String taskId) async {
+  static Future<String> uploadImage(File? pickedImageFile) async {
+    var uuid = const Uuid();
     var returnedUrl = '';
 
     final ref = FirebaseStorage.instance
         .ref()
         .child('users_tasks_images')
         .child(DBHelper.currentUserId())
-        .child(taskId);
+        .child(uuid.v4());
 
     await ref.putFile(pickedImageFile!).whenComplete(
         () => ref.getDownloadURL().then((value) => returnedUrl = value));
@@ -839,14 +839,15 @@ class DBHelper {
   }
 
   static Future<String> uploadSharedImage(
-      File? pickedImageFile, String taskId, String owner) async {
+      File? pickedImageFile, String owner) async {
+    var uuid = const Uuid();
     var returnedUrl = '';
 
     final ref = FirebaseStorage.instance
         .ref()
         .child('users_tasks_images')
         .child(owner)
-        .child(taskId);
+        .child(uuid.v4());
 
     await ref.putFile(pickedImageFile!).whenComplete(
         () => ref.getDownloadURL().then((value) => returnedUrl = value));
@@ -855,27 +856,8 @@ class DBHelper {
   }
 
   // function that deletes the image from the storage
-  static Future<void> deleteImage(String taskId) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('users_tasks_images')
-        .child(DBHelper.currentUserId())
-        .child(taskId);
-
-    //check if the image exists
-    ref.getDownloadURL().then((url) {
-      ref.delete();
-    }).catchError((error) {
-      //do nothing
-    });
-  }
-
-  static Future<void> deleteSharedImage(String taskId, String owner) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('users_tasks_images')
-        .child(owner)
-        .child(taskId);
+  static Future<void> deleteImage(String imageUrl) async {
+    final ref = FirebaseStorage.instance.refFromURL(imageUrl);
 
     //check if the image exists
     ref.getDownloadURL().then((url) {
@@ -886,70 +868,57 @@ class DBHelper {
   }
 
   //function that updates the image for a task
-  static Future<void> updateImageForTask(File? pickedImageFile, String taskId,
-      String? previousImageUrl, bool deleted) async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    final task = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .get();
-
-    //delete the old image from the storage
-    await DBHelper.deleteImage(taskId);
-
+  static Future<String?> updateImageForTask(
+      File? pickedImageFile, String? previousImageUrl, bool deleted) async {
     String? imageUrl = '';
     if (pickedImageFile != null) {
-      //upload the new image to the storage
-      imageUrl = await DBHelper.uploadImage(pickedImageFile, taskId);
+      //check if the previous image was set and delete it
+      if (previousImageUrl != null) {
+        //delete the old image from the storage
+        await DBHelper.deleteImage(previousImageUrl);
+      }
+      //upload the new image to the storage and return the url
+      imageUrl = await DBHelper.uploadImage(pickedImageFile);
     } else {
-      //check if the previous image was set
+      //if user didn't pick a new image
+      //check if the user wants to delete the image
       if (previousImageUrl != null && deleted == false) {
         imageUrl = previousImageUrl;
       } else {
-        imageUrl = null;
+        if (previousImageUrl != null && deleted == true) {
+          await DBHelper.deleteImage(previousImageUrl);
+          imageUrl = null;
+        }
       }
     }
-
-    //update the task with the new image in the database
-    await task.reference.update({'imageUrl': imageUrl});
+    return imageUrl;
   }
 
   //function that updates the image for a shared task
-  static Future<void> updateImageForSharedTask(
-      File? pickedImageFile,
-      String taskId,
-      String ownerId,
-      String? previousImageUrl,
-      bool isDeleted) async {
-    final task = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(ownerId)
-        .collection('tasks')
-        .doc(taskId)
-        .get();
-
-    //delete the old image from the storage
-    await DBHelper.deleteSharedImage(taskId, ownerId);
-
+  static Future<String?> updateImageForSharedTask(File? pickedImageFile,
+      String ownerId, String? previousImageUrl, bool isDeleted) async {
     String? imageUrl = '';
     if (pickedImageFile != null) {
-      //upload the new image to the storage
-      imageUrl =
-          await DBHelper.uploadSharedImage(pickedImageFile, taskId, ownerId);
+      //check if the previous image was set and delete it
+      if (previousImageUrl != null) {
+        //delete the old image from the storage
+        await DBHelper.deleteImage(previousImageUrl);
+      }
+      //upload the new image to the storage and return the url
+      imageUrl = await DBHelper.uploadSharedImage(pickedImageFile, ownerId);
     } else {
-      //check if the previous image was set
+      //if user didn't pick a new image
+      //check if the user wants to delete the image
       if (previousImageUrl != null && isDeleted == false) {
         imageUrl = previousImageUrl;
       } else {
-        imageUrl = null;
+        if (previousImageUrl != null && isDeleted == true) {
+          await DBHelper.deleteImage(previousImageUrl);
+          imageUrl = null;
+        }
       }
     }
-
-    //update the task with the new image in the database
-    await task.reference.update({'imageUrl': imageUrl});
+    return imageUrl;
   }
 
   //function for checking in the storage which tasks are marked as deleted and delete the images for them

@@ -19,6 +19,7 @@ class TaskListItem extends StatefulWidget {
   final bool? isDeleted;
   final String? locationCategory;
   final String? owner;
+  final String? imageUrl;
 
   const TaskListItem({
     super.key,
@@ -32,6 +33,7 @@ class TaskListItem extends StatefulWidget {
     this.isDeleted,
     this.locationCategory,
     this.owner,
+    this.imageUrl,
   });
 
   @override
@@ -42,12 +44,16 @@ class _TaskListItemState extends State<TaskListItem> {
   bool dueDatePassed = false;
   bool dueTimePassed = false;
 
-  void _deleteTask(BuildContext context, String id) {
+  Future<void> _deleteTask(
+      BuildContext context, String id, String? imageUrl) async {
     // delete task from database
-    DBHelper.deleteTask(id);
+    await DBHelper.deleteTask(id);
 
-    //delete the image from the storage
-    DBHelper.deleteImage(id);
+    //check if the task has an image
+    if (imageUrl != null) {
+      //delete the image from the storage
+      await DBHelper.deleteImage(imageUrl);
+    }
 
     // remove task from UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
@@ -325,7 +331,7 @@ class _TaskListItemState extends State<TaskListItem> {
                               'Do you want to permanently delete the task?')
                           .then((value) {
                         if (value!) {
-                          _deleteTask(context, widget.id!);
+                          _deleteTask(context, widget.id!, widget.imageUrl);
                         }
                       });
                     },

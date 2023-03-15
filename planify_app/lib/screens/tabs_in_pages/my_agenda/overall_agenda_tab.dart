@@ -81,6 +81,7 @@ class _OverallAgendaTabState extends State<OverallAgendaTab> {
                       isDeleted: tasks.tasksList[index].isDeleted,
                       locationCategory: tasks.tasksList[index].locationCategory,
                       owner: tasks.tasksList[index].owner,
+                      imageUrl: tasks.tasksList[index].imageUrl,
                     ),
                   ),
                 ),

@@ -62,7 +62,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                                 'Do you want to permanently delete the task?')
                             .then((value) {
                             if (value!) {
-                              _deleteTask(context, loadedTask.id!);
+                              _deleteTask(context, loadedTask);
                               Navigator.of(context).pop();
                             }
                           });
@@ -421,15 +421,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  void _deleteTask(BuildContext context, String id) {
+  Future<void> _deleteTask(BuildContext context, Task loaded) async {
     // delete task from database
-    DBHelper.deleteTask(id);
+    await DBHelper.deleteTask(loaded.id!);
 
-    //delete the image from the storage
-    DBHelper.deleteImage(id);
+    //check if the task has an image
+    if (loaded.imageUrl != null) {
+      //delete the image from the storage
+      await DBHelper.deleteImage(loaded.imageUrl!);
+    }
 
     // remove task from UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).deleteTask(loaded.id!);
   }
 
   void _markAsDeleted(BuildContext context, Task task) {

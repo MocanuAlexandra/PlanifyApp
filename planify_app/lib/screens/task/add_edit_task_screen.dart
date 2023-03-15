@@ -521,56 +521,52 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           //check if the logged in user is the owner of the task in order to update the task accordingly
           if (_editedTask.owner == DBHelper.currentUserId() ||
               _editedTask.owner == null) {
+            //update the image in the database storage and get the url
+            //then set the image url in the task
+            _editedTask.imageUrl = await DBHelper.updateImageForTask(
+                _pickedImageFile, _editedTask.imageUrl, isImageDeleted);
+
             //update the task in the database
             await DBHelper.updateTask(_editedTask.id!, _editedTask);
 
             //delete the notifications for the task and then add the new ones
-            {
-              await deleteNotificationsForTask(_editedTask.id!)
-                  .then((value) async => {
-                        //check if the user selected a due date or time
-                        if (_editedTask.dueDate != null ||
-                            _editedTask.dueTime != null)
-                          {
-                            await addNotificationsForTask(_editedTask.id!),
-                          }
-                      });
-            }
+            await deleteNotificationsForTask(_editedTask.id!)
+                .then((value) async => {
+                      //check if the user selected a due date or time
+                      if (_editedTask.dueDate != null ||
+                          _editedTask.dueTime != null)
+                        {
+                          await addNotificationsForTask(_editedTask.id!),
+                        }
+                    });
 
             //remove sharing for task, then update it
             await Utility.removeSharingForTask(_editedTask.id!)
                 .then((value) async => {
                       await shareTask(_editedTask.id!),
                     });
-
-            await DBHelper.updateImageForTask(_pickedImageFile, _editedTask.id!,
-                _editedTask.imageUrl, isImageDeleted);
           } else {
+            //update the image in the database storage and get the url
+            //then set the image url in the task
+            _editedTask.imageUrl = await DBHelper.updateImageForSharedTask(
+                _pickedImageFile,
+                _editedTask.owner!,
+                _editedTask.imageUrl,
+                isImageDeleted);
+
             //update the task in the database
             await DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
 
             //delete the notifications for the task and then add the new ones
-            {
-              await deleteNotificationsForSharedTask(_editedTask.id!)
-                  .then((value) async => {
-                        //check if the user selected a due date or time
-                        if (_editedTask.dueDate != null ||
-                            _editedTask.dueTime != null)
-                          {
-                            await addNotificationsForTask(_editedTask.id!),
-                          }
-                      });
-            }
-
-            //update the image in the database storage
-            {
-              await DBHelper.updateImageForSharedTask(
-                  _pickedImageFile,
-                  _editedTask.id!,
-                  _editedTask.owner!,
-                  _editedTask.imageUrl,
-                  isImageDeleted);
-            }
+            await deleteNotificationsForSharedTask(_editedTask.id!)
+                .then((value) async => {
+                      //check if the user selected a due date or time
+                      if (_editedTask.dueDate != null ||
+                          _editedTask.dueTime != null)
+                        {
+                          await addNotificationsForTask(_editedTask.id!),
+                        }
+                    });
           }
 
           // go back to overall agenda screen
@@ -579,12 +575,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       }
       // if we didn't get an id, it means that we are adding a new task
       else {
+        //add the image in the database storage and get the url
+        //then set the image url in the task
+        _editedTask.imageUrl = await DBHelper.updateImageForTask(
+            _pickedImageFile, _editedTask.imageUrl, isImageDeleted);
+
         //add the task in the database
         String taskId = await DBHelper.addTask(_editedTask);
-
-        //add the image in the database storage
-        await DBHelper.updateImageForTask(
-            _pickedImageFile, taskId, _editedTask.imageUrl, isImageDeleted);
 
         //share the task with the selected users
         await shareTask(taskId);

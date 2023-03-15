@@ -64,6 +64,7 @@ dependencies:
   awesome_notifications: ^0.7.4+1 # For notifications
   shared_preferences: ^2.0.18 # For local storage
   url_launcher: ^6.1.10 # For opening URLs
+  uuid: ^3.0.6 # For generating UUIDs
 
 
 dev_dependencies:

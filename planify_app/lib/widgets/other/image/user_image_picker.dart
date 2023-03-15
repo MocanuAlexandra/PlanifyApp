@@ -37,15 +37,9 @@ class _UserImagePickerState extends State<UserImagePicker> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          child: Container(
+          child: SizedBox(
             width: 120,
             height: 120,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.white,
-                width: 1,
-              ),
-            ),
             child: _pickedImage == null
                 ? _previewImageUrl != null
                     ? ImagePreview(
