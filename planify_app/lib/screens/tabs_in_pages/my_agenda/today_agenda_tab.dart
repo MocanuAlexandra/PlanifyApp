@@ -18,6 +18,7 @@ class TodayAgendaTab extends StatefulWidget {
 }
 
 class _TodayAgendaTabState extends State<TodayAgendaTab> {
+  final ScrollController _controller = ScrollController();
   bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
   var tasks = [];
@@ -82,36 +83,43 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
     return Expanded(
       child: FutureBuilder(
         future: _fetchTasks(context, selectedOption, _focusMode),
-        builder: (context, snapshot) => snapshot.connectionState ==
-                ConnectionState.waiting
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : RefreshIndicator(
-                onRefresh: () =>
-                    _fetchTasks(context, selectedOption, _focusMode),
-                child: Consumer<TaskProvider>(
-                  builder: (context, tasks, ch) => ListView.builder(
-                    itemCount: tasks.tasksList.length,
-                    itemBuilder: (context, index) => TaskListItem(
-                      id: tasks.tasksList[index].id,
-                      title: tasks.tasksList[index].title,
-                      dueDate: Utility.dateTimeToString(
-                          tasks.tasksList[index].dueDate),
-                      address: tasks.tasksList[index].address,
-                      time: Utility.timeOfDayToString(
-                          tasks.tasksList[index].dueTime),
-                      priority: Utility.priorityEnumToString(
-                          tasks.tasksList[index].priority),
-                      isDone: tasks.tasksList[index].isDone,
-                      isDeleted: tasks.tasksList[index].isDeleted,
-                      locationCategory: tasks.tasksList[index].locationCategory,
-                      owner: tasks.tasksList[index].owner,
-                      imageUrl: tasks.tasksList[index].imageUrl,
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () =>
+                        _fetchTasks(context, selectedOption, _focusMode),
+                    child: Consumer<TaskProvider>(
+                      builder: (context, tasks, ch) => Scrollbar(
+                        controller: _controller,
+                        thumbVisibility: true,
+                        thickness: 5,
+                        child: ListView.builder(
+                          controller: _controller,
+                          itemCount: tasks.tasksList.length,
+                          itemBuilder: (context, index) => TaskListItem(
+                            id: tasks.tasksList[index].id,
+                            title: tasks.tasksList[index].title,
+                            dueDate: Utility.dateTimeToString(
+                                tasks.tasksList[index].dueDate),
+                            address: tasks.tasksList[index].address,
+                            time: Utility.timeOfDayToString(
+                                tasks.tasksList[index].dueTime),
+                            priority: Utility.priorityEnumToString(
+                                tasks.tasksList[index].priority),
+                            isDone: tasks.tasksList[index].isDone,
+                            isDeleted: tasks.tasksList[index].isDeleted,
+                            locationCategory:
+                                tasks.tasksList[index].locationCategory,
+                            owner: tasks.tasksList[index].owner,
+                            imageUrl: tasks.tasksList[index].imageUrl,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
       ),
     );
   }

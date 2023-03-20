@@ -18,6 +18,7 @@ class DeletedAgendaPage extends StatefulWidget {
 }
 
 class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
+  final ScrollController _controller = ScrollController();
   FilterOptions selectedOption = FilterOptions.deleted;
 
   Future<void> _fetchTasks(
@@ -110,23 +111,29 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
           : RefreshIndicator(
               onRefresh: () => _fetchTasks(context, selectedOption),
               child: Consumer<TaskProvider>(
-                builder: (context, tasks, ch) => ListView.builder(
-                  itemCount: tasks.tasksList.length,
-                  itemBuilder: (context, index) => TaskListItem(
-                    id: tasks.tasksList[index].id,
-                    title: tasks.tasksList[index].title,
-                    dueDate: Utility.dateTimeToString(
-                        tasks.tasksList[index].dueDate),
-                    address: tasks.tasksList[index].address,
-                    time: Utility.timeOfDayToString(
-                        tasks.tasksList[index].dueTime),
-                    priority: Utility.priorityEnumToString(
-                        tasks.tasksList[index].priority),
-                    isDone: tasks.tasksList[index].isDone,
-                    isDeleted: tasks.tasksList[index].isDeleted,
-                    locationCategory: tasks.tasksList[index].locationCategory,
-                    owner: tasks.tasksList[index].owner,
-                    imageUrl: tasks.tasksList[index].imageUrl,
+                builder: (context, tasks, ch) => Scrollbar(
+                  controller: _controller,
+                  thumbVisibility: true,
+                  thickness: 5,
+                  child: ListView.builder(
+                    controller: _controller,
+                    itemCount: tasks.tasksList.length,
+                    itemBuilder: (context, index) => TaskListItem(
+                      id: tasks.tasksList[index].id,
+                      title: tasks.tasksList[index].title,
+                      dueDate: Utility.dateTimeToString(
+                          tasks.tasksList[index].dueDate),
+                      address: tasks.tasksList[index].address,
+                      time: Utility.timeOfDayToString(
+                          tasks.tasksList[index].dueTime),
+                      priority: Utility.priorityEnumToString(
+                          tasks.tasksList[index].priority),
+                      isDone: tasks.tasksList[index].isDone,
+                      isDeleted: tasks.tasksList[index].isDeleted,
+                      locationCategory: tasks.tasksList[index].locationCategory,
+                      owner: tasks.tasksList[index].owner,
+                      imageUrl: tasks.tasksList[index].imageUrl,
+                    ),
                   ),
                 ),
               ),

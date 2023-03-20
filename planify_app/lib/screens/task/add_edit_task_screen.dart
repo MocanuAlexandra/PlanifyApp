@@ -32,6 +32,7 @@ class AddEditTaskScreen extends StatefulWidget {
 }
 
 class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
+  final ScrollController _controller = ScrollController();
   final _formKey = GlobalKey<FormState>();
   var _editedTask = task_model.Task(
     id: null,
@@ -710,31 +711,36 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           Form(
             key: _formKey,
             child: Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      titleField(),
-                      const SizedBox(height: 10),
-                      dueDateField(),
-                      dueTimeField(),
-                      UserImagePicker(
-                        imagePickFn: _pickedImage,
-                        previousImageUrl: _editedTask.imageUrl,
-                      ),
-                      const SizedBox(height: 3),
-                      locationField(),
-                      const SizedBox(height: 10),
-                      priorityField(),
-                      const SizedBox(height: 10),
-                      categoryField(context),
-                      const SizedBox(height: 10),
-                      reminderAndShareWithField(),
-                      const SizedBox(height: 5),
-                    ],
+              child: Scrollbar(
+                controller: _controller,
+                thumbVisibility: true,
+                thickness: 5,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        titleField(),
+                        const SizedBox(height: 10),
+                        dueDateField(),
+                        dueTimeField(),
+                        UserImagePicker(
+                          imagePickFn: _pickedImage,
+                          previousImageUrl: _editedTask.imageUrl,
+                        ),
+                        const SizedBox(height: 3),
+                        locationField(),
+                        const SizedBox(height: 10),
+                        priorityField(),
+                        const SizedBox(height: 10),
+                        categoryField(context),
+                        const SizedBox(height: 10),
+                        reminderAndShareWithField(),
+                        const SizedBox(height: 5),
+                      ],
+                    ),
                   ),
                 ),
               ),

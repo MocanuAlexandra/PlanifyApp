@@ -62,6 +62,7 @@ class _MainDrawerState extends State<MainDrawer> {
         FirebaseAuth.instance.signOut();
         GoogleSignIn().signOut();
         SchedulerBinding.instance.addPostFrameCallback((_) {});
+        Navigator.of(context).pushReplacementNamed('/auth');
       },
     );
   }
@@ -160,7 +161,7 @@ class _MainDrawerState extends State<MainDrawer> {
                           child: Scrollbar(
                             controller: _controller,
                             thumbVisibility: true,
-                            thickness: 10,
+                            thickness: 5,
                             child: ListView.builder(
                               controller: _controller,
                               shrinkWrap: true,

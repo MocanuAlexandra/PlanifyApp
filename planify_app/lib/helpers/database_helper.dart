@@ -934,7 +934,13 @@ class DBHelper {
     for (var task in tasks.docs) {
       if (task['imageUrl'] != null) {
         final ref = FirebaseStorage.instance.refFromURL(task['imageUrl']);
-        await ref.delete();
+
+        //check if the image exists
+        ref.getDownloadURL().then((url) {
+          ref.delete();
+        }).catchError((error) {
+          //do nothing
+        });
       }
     }
   }
