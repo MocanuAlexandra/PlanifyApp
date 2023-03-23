@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:planify_app/widgets/other/image/image_preview.dart';
+import '../../widgets/other/image/image_preview.dart';
 import '../pages/overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 

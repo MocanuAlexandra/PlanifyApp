@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
-import '../../../widgets/other/expandable_fab/expandable_floating_action_button.dart';
+import '../../../widgets/other/buttons/expandable_fab/expandable_floating_action_button.dart';
 import '../../../widgets/task/task_list_item.dart';
 
 class MonthAgendaTab extends StatefulWidget {

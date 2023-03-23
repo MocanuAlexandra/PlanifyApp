@@ -253,7 +253,7 @@ class DBHelper {
     }
 
     //check if user picked a category
-    String updatedCategory = 'No category';
+    String updatedCategory = 'Uncategorized';
     if (newTask.category != null) {
       updatedCategory = newTask.category!;
     }

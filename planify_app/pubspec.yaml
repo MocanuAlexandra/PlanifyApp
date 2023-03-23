@@ -33,11 +33,11 @@ dependencies:
     sdk: flutter
 
   # Firebase dependencies
-  firebase_core: ^2.7.1 # For Firebase Core
-  cloud_firestore: ^4.4.4 # For database
-  firebase_auth: ^4.2.10 # For authentication
+  firebase_core: ^2.8.0 # For Firebase Core
+  cloud_firestore: ^4.4.5 # For database
+  firebase_auth: ^4.3.0 # For authentication
   google_sign_in: ^6.0.2 # For Google Sign In
-  firebase_storage: ^11.0.15 # For Firebase Storage
+  firebase_storage: ^11.0.16 # For Firebase Storage
 
   # Validation dependencies
   flutter_form_builder: ^7.8.0 # For form creation
@@ -62,9 +62,11 @@ dependencies:
   http: ^0.13.5 # For HTTP requests 
   month_picker_dialog_2: ^0.6.2+1 # For month picker
   awesome_notifications: ^0.7.4+1 # For notifications
-  shared_preferences: ^2.0.18 # For local storage
+  shared_preferences: ^2.0.20 # For local storage
   url_launcher: ^6.1.10 # For opening URLs
-  uuid: ^3.0.6 # For generating UUIDs
+  uuid: ^3.0.7 # For generating UUIDs
+  speech_to_text: ^6.1.1 # For speech to text
+  avatar_glow: ^2.0.2 # For avatar glow
 
 
 dev_dependencies:

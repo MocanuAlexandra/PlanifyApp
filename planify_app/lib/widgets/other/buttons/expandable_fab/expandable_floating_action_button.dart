@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../../../screens/task/add_edit_task_category_screen.dart';
-import '../../../screens/task/add_edit_task_screen.dart';
+import '../../../../screens/task/add_edit_task_category_screen.dart';
+import '../../../../screens/task/add_edit_task_screen.dart';
+import '../../voice_control_card.dart';
 import 'action_button.dart';
 import 'expandable_fab.dart';
 
@@ -13,9 +15,16 @@ class ExpandableFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final stt.SpeechToText speech = stt.SpeechToText();
+
     return ExpandableFab(
       distance: 80,
       children: [
+        // action button used for voice input
+        ActionButton(
+          onPressed: () => startRecording(context),
+          icon: const Icon(Icons.mic_rounded),
+        ),
         // action button used for adding a new category
         ActionButton(
           onPressed: () {
@@ -36,6 +45,20 @@ class ExpandableFloatingActionButton extends StatelessWidget {
           icon: const Icon(Icons.note_add_rounded),
         ),
       ],
+    );
+  }
+
+  void startRecording(BuildContext ctx) {
+    showModalBottomSheet(
+      context: ctx,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          behavior: HitTestBehavior.opaque,
+          child: const RecordCard(),
+          //TODO resolve issue when tapp outside of the card
+        );
+      },
     );
   }
 }
