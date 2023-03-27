@@ -870,7 +870,7 @@ class DBHelper {
   //function that updates the image for a task
   static Future<String?> updateImageForTask(
       File? pickedImageFile, String? previousImageUrl, bool deleted) async {
-    String? imageUrl = '';
+    String? imageUrl;
     if (pickedImageFile != null) {
       //check if the previous image was set and delete it
       if (previousImageUrl != null) {
@@ -897,7 +897,7 @@ class DBHelper {
   //function that updates the image for a shared task
   static Future<String?> updateImageForSharedTask(File? pickedImageFile,
       String ownerId, String? previousImageUrl, bool isDeleted) async {
-    String? imageUrl = '';
+    String? imageUrl;
     if (pickedImageFile != null) {
       //check if the previous image was set and delete it
       if (previousImageUrl != null) {

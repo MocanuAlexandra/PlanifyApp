@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/services/voice_control_service.dart';
+import '../../services/voice_control_service.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 
 class VoiceControlCard extends StatefulWidget {
