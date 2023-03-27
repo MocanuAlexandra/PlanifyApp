@@ -464,8 +464,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           TextButton.icon(
             onPressed: _editedTask.id == null
                 // if task is not saved yet, then we don't need to check already selected users emails
-                ? () {
-                    showDialog(
+                ? () async {
+                    await showDialog(
                       context: context,
                       builder: (context) => UserListSearch(
                         checkedItems: _selectedUserEmails,
@@ -477,7 +477,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     _selectedUserEmails =
                         await Utility.determineAlreadySharedWithUsers(
                             _editedTask.id);
-                    showDialog(
+                    await showDialog(
                       context: context,
                       builder: (context) => UserListSearch(
                         checkedItems: _selectedUserEmails,
@@ -716,6 +716,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                 thumbVisibility: true,
                 thickness: 5,
                 child: SingleChildScrollView(
+                  controller: _controller,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(

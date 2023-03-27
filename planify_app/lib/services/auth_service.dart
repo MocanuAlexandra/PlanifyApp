@@ -33,7 +33,7 @@ class AuthService {
           .collection('users')
           .doc(userCredentials.user!.uid)
           .collection('categories')
-          .add({'name': 'No category'});
+          .add({'name': 'Uncategorized'});
     } else {
       //add default category if it doesn't exist
       for (var element in categories.docs) {
@@ -42,7 +42,7 @@ class AuthService {
               .collection('users')
               .doc(userCredentials.user!.uid)
               .collection('categories')
-              .add({'name': 'No category'});
+              .add({'name': 'Uncategorized'});
         }
       }
     }

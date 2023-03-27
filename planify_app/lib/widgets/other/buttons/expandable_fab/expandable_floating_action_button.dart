@@ -4,7 +4,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../../../../screens/task/add_edit_task_category_screen.dart';
 import '../../../../screens/task/add_edit_task_screen.dart';
-import '../../voice_control_card.dart';
+import '../../../task/voice_control_card.dart';
 import 'action_button.dart';
 import 'expandable_fab.dart';
 
@@ -55,7 +55,7 @@ class ExpandableFloatingActionButton extends StatelessWidget {
         return GestureDetector(
           onTap: () {},
           behavior: HitTestBehavior.opaque,
-          child: const RecordCard(),
+          child: const VoiceControlCard(),
           //TODO resolve issue when tapp outside of the card
         );
       },

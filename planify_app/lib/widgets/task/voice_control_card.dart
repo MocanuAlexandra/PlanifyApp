@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:planify_app/services/voice_control_service.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 
-class RecordCard extends StatefulWidget {
-  const RecordCard({super.key});
+class VoiceControlCard extends StatefulWidget {
+  const VoiceControlCard({super.key});
 
   @override
-  State<RecordCard> createState() => _RecordCardState();
+  State<VoiceControlCard> createState() => _VoiceControlCardState();
 }
 
-class _RecordCardState extends State<RecordCard> {
+class _VoiceControlCardState extends State<VoiceControlCard> {
   String text = 'Your voice recording will appear here..';
   bool _isRecording = false;
 

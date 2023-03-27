@@ -51,8 +51,17 @@ class _UserListSearchState extends State<UserListSearch> {
   Widget build(BuildContext context) {
     return SizedBox(
       child: AlertDialog(
-        title: const Text(
-          "Search users",
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "Search users",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         content: SizedBox(
           height: 250,
@@ -71,7 +80,9 @@ class _UserListSearchState extends State<UserListSearch> {
                   _focusNode.unfocus();
                 },
               ),
-              Expanded(
+              SizedBox(
+                height: 100,
+                width: 300,
                 child: ListView.builder(
                     itemCount: filterItems.length,
                     itemBuilder: (context, index) {
