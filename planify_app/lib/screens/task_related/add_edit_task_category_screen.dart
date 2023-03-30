@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/database_helper.dart';
+import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../models/task_category.dart';
 import '../../providers/task_category_provider.dart';
@@ -46,7 +46,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
                 icon: const Icon(Icons.delete),
                 onPressed: () {
                   //check if the category is the default category
-                  if (_editedCategory.name == 'No category') {
+                  if (_editedCategory.name == 'Uncategorized') {
                     Utility.displayInformationalDialog(
                         context, 'You cannot delete the default category.');
                     return;
@@ -103,10 +103,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
                           return null;
                         },
                         onSaved: (value) {
-                          _editedCategory = TaskCategory(
-                            id: _editedCategory.id,
-                            name: value,
-                          );
+                          _editedCategory.name = value;
                         },
                       ),
                     ],

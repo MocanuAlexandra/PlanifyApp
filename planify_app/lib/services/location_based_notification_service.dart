@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
-import '../helpers/location_helper.dart';
+import 'location_helper_service.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 import 'notification_service.dart';

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/database_helper.dart';
+import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../models/task_address.dart';
 import '../../providers/task_provider.dart';
-import '../../screens/task/task_details_screen.dart';
+import '../../screens/task_related/task_details_screen.dart';
 import '../../services/notification_service.dart';
 
 class TaskListItem extends StatefulWidget {

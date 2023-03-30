@@ -6,16 +6,16 @@ enum Priority { casual, necessary, important, unknown }
 
 class Task {
   final String? id;
-  final String? title;
-  final DateTime? dueDate;
-  final TimeOfDay? dueTime;
-  final TaskAddress? address;
-  final Priority? priority;
+  String? title;
+  DateTime? dueDate;
+  TimeOfDay? dueTime;
+  TaskAddress? address;
+  Priority? priority;
   bool isDone;
   bool isDeleted;
-  final String? category;
-  final String? locationCategory;
-  final String? owner;
+  String? category;
+  String? locationCategory;
+  String? owner;
   String? imageUrl;
 
   Task({

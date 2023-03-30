@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../helpers/database_helper.dart';
-import 'overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
+import 'overall_agenda_page.dart';
+import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../providers/task_provider.dart';
 import '../../widgets/drawer.dart';
-import '../../widgets/task/task_list_item.dart';
+import '../../widgets/task_related/task_list_item.dart';
 
 class DeletedAgendaPage extends StatefulWidget {
   static const routeName = '/deleted-agenda-tab';

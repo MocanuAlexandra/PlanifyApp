@@ -1,11 +1,13 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 
 class CheckboxList extends StatefulWidget {
   final String title;
   final List<String> items;
-  final List<String>? selectedItems;
+  List<String>? selectedItems;
 
-  const CheckboxList(
+  CheckboxList(
       {Key? key,
       required this.items,
       required this.selectedItems,
@@ -88,6 +90,8 @@ class _CheckboxListState extends State<CheckboxList> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
+                      _selectedItems = [];
+                      widget.selectedItems = [];
                       Navigator.of(context).pop(_selectedItems);
                     },
                     child: const Text(

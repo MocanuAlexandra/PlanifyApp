@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-import '../../helpers/location_helper.dart';
 import '../../models/task_address.dart';
 import '../../screens/location/map_screen.dart';
+import '../../services/location_helper_service.dart';
 import 'location_category.dart';
 
 class LocationInput extends StatefulWidget {

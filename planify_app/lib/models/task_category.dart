@@ -1,6 +1,6 @@
 class TaskCategory {
   final String? id;
-  final String? name;
+  String? name;
 
   TaskCategory({
     this.id,

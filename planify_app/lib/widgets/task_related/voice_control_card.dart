@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/voice_control_service.dart';
 import 'package:avatar_glow/avatar_glow.dart';
+
+import '../../services/voice_control_service.dart';
 
 class VoiceControlCard extends StatefulWidget {
   const VoiceControlCard({super.key});

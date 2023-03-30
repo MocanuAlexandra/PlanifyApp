@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
-import '../../../widgets/task/task_list_item.dart';
+import '../../../widgets/task_related/task_list_item.dart';
 
 class SharedOverallAgendaTab extends StatefulWidget {
   static const routeName = '/shared-overall-agenda-tab';

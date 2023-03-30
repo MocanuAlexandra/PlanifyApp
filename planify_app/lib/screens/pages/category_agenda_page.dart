@@ -5,8 +5,8 @@ import '../../helpers/utility.dart';
 import '../../providers/task_provider.dart';
 import '../../widgets/drawer.dart';
 import '../../widgets/other/buttons/expandable_fab/expandable_floating_action_button.dart';
-import '../../widgets/task/task_list_item.dart';
-import '../task/add_edit_task_category_screen.dart';
+import '../../widgets/task_related/task_list_item.dart';
+import '../task_related/add_edit_task_category_screen.dart';
 
 class CategoryAgendaPage extends StatefulWidget {
   static const routeName = '/category-agenda-tab';

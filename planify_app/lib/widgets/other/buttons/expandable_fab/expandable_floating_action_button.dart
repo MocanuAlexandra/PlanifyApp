@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../../../../screens/task/add_edit_task_category_screen.dart';
-import '../../../../screens/task/add_edit_task_screen.dart';
-import '../../../task/voice_control_card.dart';
+import '../../../../screens/task_related/add_edit_task_category_screen.dart';
+import '../../../../screens/task_related/add_edit_task_screen.dart';
+import '../../../task_related/voice_control_card.dart';
 import 'action_button.dart';
 import 'expandable_fab.dart';
 

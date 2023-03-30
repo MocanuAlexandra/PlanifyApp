@@ -3,7 +3,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice_ex/places.dart';
 
-import '../../helpers/location_helper.dart';
+import '../../services/location_helper_service.dart';
 import '../../models/task_address.dart';
 
 class MapScreen extends StatefulWidget {

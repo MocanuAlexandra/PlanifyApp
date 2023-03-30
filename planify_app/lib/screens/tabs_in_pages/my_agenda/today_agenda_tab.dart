@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../helpers/location_helper.dart';
+import '../../../services/location_helper_service.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
 import '../../../widgets/other/buttons/expandable_fab/expandable_floating_action_button.dart';
-import '../../../widgets/task/task_list_item.dart';
+import '../../../widgets/task_related/task_list_item.dart';
 
 class TodayAgendaTab extends StatefulWidget {
   static const routeName = '/today-agenda-tab';

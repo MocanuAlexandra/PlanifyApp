@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../helpers/location_helper.dart';
+import '../../../services/location_helper_service.dart';
 import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
-import '../../../widgets/task/task_list_item.dart';
+import '../../../widgets/task_related/task_list_item.dart';
 
 class SharedTodayAgendaTab extends StatefulWidget {
   static const routeName = '/shared-today-agenda-tab';

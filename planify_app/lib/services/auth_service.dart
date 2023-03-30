@@ -37,7 +37,7 @@ class AuthService {
     } else {
       //add default category if it doesn't exist
       for (var element in categories.docs) {
-        if (element.data()['name'] != 'No category') {
+        if (element.data()['name'] != 'Uncategorized') {
           await FirebaseFirestore.instance
               .collection('users')
               .doc(userCredentials.user!.uid)

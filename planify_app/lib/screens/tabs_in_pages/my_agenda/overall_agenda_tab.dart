@@ -5,7 +5,7 @@ import '../../../helpers/utility.dart';
 import '../../../providers/task_provider.dart';
 import '../../../widgets/drawer.dart';
 import '../../../widgets/other/buttons/expandable_fab/expandable_floating_action_button.dart';
-import '../../../widgets/task/task_list_item.dart';
+import '../../../widgets/task_related/task_list_item.dart';
 
 class OverallAgendaTab extends StatefulWidget {
   static const routeName = '/overall-agenda-tab';

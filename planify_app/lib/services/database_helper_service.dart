@@ -10,8 +10,8 @@ import '../models/task_address.dart';
 import '../models/task_category.dart';
 import '../models/task_reminder.dart';
 import '../models/user.dart';
-import 'location_helper.dart';
-import 'utility.dart';
+import 'location_helper_service.dart';
+import '../helpers/utility.dart';
 
 class DBHelper {
   // ********** FETCHING FUNCTIONS **********
@@ -529,6 +529,7 @@ class DBHelper {
         .doc(user.uid)
         .collection('tasks')
         .where('category', isEqualTo: category['name'])
+        .where('isDeleted', isEqualTo: false)
         .get();
     return tasks.docs.isNotEmpty;
   }

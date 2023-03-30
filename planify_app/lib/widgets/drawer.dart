@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import '../screens/pages/deleted_agenda_page.dart';
 import '../screens/pages/month_agenda_page.dart';
 import '../screens/pages/today_agenda_page.dart';
-import 'package:provider/provider.dart';
-
 import '../providers/task_category_provider.dart';
 import '../screens/pages/category_agenda_page.dart';
 import '../screens/settings_screen.dart';

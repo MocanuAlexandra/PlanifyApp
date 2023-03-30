@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +10,11 @@ import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
 import '../../screens/auth/auth_screen.dart';
 import '../../screens/settings_screen.dart';
-import '../../screens/task/add_edit_task_category_screen.dart';
-import '../../screens/task/add_edit_task_screen.dart';
-import '../../screens/task/task_details_screen.dart';
+import 'screens/task_related/add_edit_task_category_screen.dart';
+import 'screens/task_related/add_edit_task_screen.dart';
+import 'screens/task_related/task_details_screen.dart';
 import '../../services/location_based_notification_service.dart';
 import '../../services/notification_service.dart';
-import 'firebase_options.dart';
 import 'providers/task_category_provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/pages/category_agenda_page.dart';

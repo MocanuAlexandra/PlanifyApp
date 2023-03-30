@@ -1,14 +1,14 @@
 import 'dart:io';
 
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+
 import '../../models/task.dart';
 import '../../widgets/other/image/user_image_picker.dart';
 import '../../widgets/other/user_list_search.dart';
-import 'package:provider/provider.dart';
-
-import '../../helpers/database_helper.dart';
+import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../models/task_category.dart';
 import '../../models/task.dart' as task_model;
@@ -115,19 +115,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       ),
       validator: FormBuilderValidators.required(errorText: 'Required'),
       onSaved: (value) {
-        _editedTask = task_model.Task(
-          id: _editedTask.id,
-          title: value.toString(),
-          dueDate: _editedTask.dueDate,
-          address: _editedTask.address,
-          dueTime: _editedTask.dueTime,
-          priority: _editedTask.priority,
-          isDone: _editedTask.isDone,
-          category: _editedTask.category,
-          locationCategory: _editedTask.locationCategory,
-          owner: _editedTask.owner,
-          imageUrl: _editedTask.imageUrl,
-        );
+        _editedTask.title = value.toString();
       },
     );
   }
@@ -156,19 +144,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         IconButton(
             onPressed: () async {
               setState(() {
-                _editedTask = task_model.Task(
-                  id: _editedTask.id,
-                  title: _editedTask.title,
-                  dueDate: null,
-                  address: _editedTask.address,
-                  dueTime: _editedTask.dueTime,
-                  priority: _editedTask.priority,
-                  isDone: _editedTask.isDone,
-                  category: _editedTask.category,
-                  locationCategory: _editedTask.locationCategory,
-                  owner: _editedTask.owner,
-                  imageUrl: _editedTask.imageUrl,
-                );
+                _editedTask.dueDate = null;
               });
               _dueTimeDueDateChanged = true;
 
@@ -209,19 +185,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         IconButton(
             onPressed: () async {
               setState(() {
-                _editedTask = task_model.Task(
-                  id: _editedTask.id,
-                  title: _editedTask.title,
-                  dueDate: _editedTask.dueDate,
-                  address: _editedTask.address,
-                  dueTime: null,
-                  priority: _editedTask.priority,
-                  isDone: _editedTask.isDone,
-                  category: _editedTask.category,
-                  locationCategory: _editedTask.locationCategory,
-                  owner: _editedTask.owner,
-                  imageUrl: _editedTask.imageUrl,
-                );
+                _editedTask.dueTime = null;
               });
               _dueTimeDueDateChanged = true;
 
@@ -339,19 +303,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       ],
       onChanged: (value) {
         setState(() {
-          _editedTask = task_model.Task(
-            id: _editedTask.id,
-            title: _editedTask.title,
-            dueDate: _editedTask.dueDate,
-            address: _editedTask.address,
-            dueTime: _editedTask.dueTime,
-            priority: value,
-            isDone: _editedTask.isDone,
-            category: _editedTask.category,
-            locationCategory: _editedTask.locationCategory,
-            owner: _editedTask.owner,
-            imageUrl: _editedTask.imageUrl,
-          );
+          _editedTask.priority = value;
         });
       },
       hint: const Text(
@@ -373,19 +325,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   value: _editedTask.category,
                   onChanged: (String? value) {
                     setState(() {
-                      _editedTask = task_model.Task(
-                        id: _editedTask.id,
-                        title: _editedTask.title,
-                        dueDate: _editedTask.dueDate,
-                        address: _editedTask.address,
-                        dueTime: _editedTask.dueTime,
-                        priority: _editedTask.priority,
-                        isDone: _editedTask.isDone,
-                        category: value,
-                        locationCategory: _editedTask.locationCategory,
-                        owner: _editedTask.owner,
-                        imageUrl: _editedTask.imageUrl,
-                      );
+                      _editedTask.category = value;
                     });
                   },
                   items: Provider.of<TaskCategoryProvider>(context)
@@ -506,9 +446,10 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
 
     if (isValid) {
       setState(() {
-        _isLoading = true; // set the loading state to true
+        _isLoading = true;
       });
 
+      // save the form
       _formKey.currentState!.save();
 
       // if we got an id, it means that we are editing a task
@@ -823,20 +764,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   })
                 },
               setState(() {
-                _editedTask = task_model.Task(
-                  id: _editedTask.id,
-                  title: _editedTask.title,
-                  dueDate: pickedDate,
-                  address: _editedTask.address,
-                  dueTime: _editedTask.dueTime,
-                  priority: _editedTask.priority,
-                  isDone: _editedTask.isDone,
-                  isDeleted: _editedTask.isDeleted,
-                  category: _editedTask.category,
-                  locationCategory: _editedTask.locationCategory,
-                  owner: _editedTask.owner,
-                  imageUrl: _editedTask.imageUrl,
-                );
+                _editedTask.dueDate = pickedDate;
               }),
             }
         });
@@ -863,57 +791,20 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   })
                 },
               setState(() {
-                _editedTask = task_model.Task(
-                  id: _editedTask.id,
-                  title: _editedTask.title,
-                  dueDate: _editedTask.dueDate,
-                  address: _editedTask.address,
-                  dueTime: pickedTime,
-                  priority: _editedTask.priority,
-                  isDone: _editedTask.isDone,
-                  isDeleted: _editedTask.isDeleted,
-                  category: _editedTask.category,
-                  locationCategory: _editedTask.locationCategory,
-                  owner: _editedTask.owner,
-                  imageUrl: _editedTask.imageUrl,
-                );
+                _editedTask.dueTime = pickedTime;
               }),
             }
         });
   }
 
   void _selectPlace(double? lat, double? lng) {
-    _editedTask = task_model.Task(
-      id: _editedTask.id,
-      title: _editedTask.title,
-      dueDate: _editedTask.dueDate,
-      address: TaskAddress(latitude: lat, longitude: lng),
-      dueTime: _editedTask.dueTime,
-      priority: _editedTask.priority,
-      isDone: _editedTask.isDone,
-      isDeleted: _editedTask.isDeleted,
-      category: _editedTask.category,
-      locationCategory: null,
-      owner: _editedTask.owner,
-      imageUrl: _editedTask.imageUrl,
-    );
+    _editedTask.address = TaskAddress(latitude: lat, longitude: lng);
+    _editedTask.locationCategory = null;
   }
 
   void _selectCategory(String? selectedLocationCategory) {
-    _editedTask = task_model.Task(
-      id: _editedTask.id,
-      title: _editedTask.title,
-      dueDate: _editedTask.dueDate,
-      address: null,
-      dueTime: _editedTask.dueTime,
-      priority: _editedTask.priority,
-      isDone: _editedTask.isDone,
-      isDeleted: _editedTask.isDeleted,
-      category: _editedTask.category,
-      locationCategory: selectedLocationCategory,
-      owner: _editedTask.owner,
-      imageUrl: _editedTask.imageUrl,
-    );
+    _editedTask.locationCategory = selectedLocationCategory;
+    _editedTask.address = null;
   }
 
   void _displayDialogForDoneTask() {
@@ -932,20 +823,7 @@ You have to set new reminders if you want to be notified about this task.""",
                 child: const Text("Yes"),
                 onPressed: () {
                   // change the task to not done
-                  _editedTask = task_model.Task(
-                    id: _editedTask.id,
-                    title: _editedTask.title,
-                    dueDate: _editedTask.dueDate,
-                    address: _editedTask.address,
-                    dueTime: _editedTask.dueTime,
-                    priority: _editedTask.priority,
-                    isDone: false,
-                    isDeleted: _editedTask.isDeleted,
-                    category: _editedTask.category,
-                    locationCategory: _editedTask.locationCategory,
-                    owner: _editedTask.owner,
-                    imageUrl: _editedTask.imageUrl,
-                  );
+                  _editedTask.isDone = false;
 
                   // check if the logged in user is the owner of the task
                   if (_editedTask.owner == DBHelper.currentUserId() ||
@@ -965,20 +843,7 @@ You have to set new reminders if you want to be notified about this task.""",
                 child: const Text("No"),
                 onPressed: () {
                   // change the task to done
-                  _editedTask = task_model.Task(
-                    id: _editedTask.id,
-                    title: _editedTask.title,
-                    dueDate: _editedTask.dueDate,
-                    address: _editedTask.address,
-                    dueTime: _editedTask.dueTime,
-                    priority: _editedTask.priority,
-                    isDone: true,
-                    isDeleted: _editedTask.isDeleted,
-                    category: _editedTask.category,
-                    locationCategory: _editedTask.locationCategory,
-                    owner: _editedTask.owner,
-                    imageUrl: _editedTask.imageUrl,
-                  );
+                  _editedTask.isDone = true;
 
                   // check if the logged in user is the owner of the task
                   if (_editedTask.owner == DBHelper.currentUserId() ||

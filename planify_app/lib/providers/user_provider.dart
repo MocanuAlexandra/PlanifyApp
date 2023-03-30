@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../helpers/database_helper.dart';
+import '../services/database_helper_service.dart';
 import '../models/user.dart';
 
 class UserProvider with ChangeNotifier {

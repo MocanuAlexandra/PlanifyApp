@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../widgets/other/image/image_preview.dart';
-import '../pages/overall_agenda_page.dart';
 import 'package:provider/provider.dart';
 
-import '../../helpers/database_helper.dart';
+import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
 import '../../services/notification_service.dart';
+import '../../widgets/other/image/image_preview.dart';
+import '../pages/overall_agenda_page.dart';
 import 'add_edit_task_screen.dart';
 
 class TaskDetailsScreen extends StatefulWidget {

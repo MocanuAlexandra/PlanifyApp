@@ -5,7 +5,7 @@ import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/task.dart';
-import 'utility.dart';
+import '../helpers/utility.dart';
 
 const GOOGLE_API_KEY = 'AIzaSyBCtWNcI4lD7pMey-ZghzlfRvFjQ2FfLhM';
 
