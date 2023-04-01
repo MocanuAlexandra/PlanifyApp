@@ -91,9 +91,9 @@ Make sure the app is running in the background.""",
                     value: _intervalOfNotification,
                     items: const [
                       DropdownMenuItem(
-                        value: 0,
+                        value: 2,
                         child: Text(
-                          'Non-stop',
+                          'Every 2 minutes',
                           style: TextStyle(fontSize: 16),
                         ),
                       ),

@@ -76,7 +76,7 @@ class NotificationService {
         id: type.hashCode + notificationTime.hashCode,
         channelKey: 'basic_channel',
         title: "You are near $locationName ",
-        body: "You have a task you can do in this $type",
+        body: "You have a task you can do here",
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,
@@ -87,6 +87,7 @@ class NotificationService {
       schedule: NotificationCalendar(
         hour: notificationTime.hour,
         minute: notificationTime.minute,
+        second: notificationTime.second + 2,
         repeats: true,
         preciseAlarm: true,
       ),

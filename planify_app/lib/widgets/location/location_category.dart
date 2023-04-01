@@ -52,6 +52,7 @@ class _LocationCategoryState extends State<LocationCategory> {
     "electronics_store",
     "fire_station",
     "florist",
+    "food",
     "furniture_store",
     "gas_station",
     "gym",

@@ -148,7 +148,7 @@ class _MyAppState extends State<MyApp> {
 
   void _setFilters(Map<String, dynamic> filterData, BuildContext context_) {
     //save filters in shared preferences
-    saveFiltersInSP(filterData).then((value) => {
+    saveFiltersInSP(filterData).then((value) async => {
           setState(() {
             _filters = filterData;
           }),
@@ -156,13 +156,13 @@ class _MyAppState extends State<MyApp> {
           if (_filters['locationBasedNotification'] != false &&
               _filters['intervalOfNotification'] != null)
             {
-              LocationBasedNotificationService.turnOff(),
-              LocationBasedNotificationService.turnOn(
+              await LocationBasedNotificationService.turnOff(),
+              await LocationBasedNotificationService.turnOn(
                   context_, _filters['intervalOfNotification']),
             }
           else
             {
-              LocationBasedNotificationService.turnOff(),
+              await LocationBasedNotificationService.turnOff(),
             }
         });
   }
