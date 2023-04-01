@@ -1,22 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class VoiceControlService {
+  //! Default language is device language
   static final _speech = SpeechToText();
+  static bool isAvailable = false;
 
   static Future<bool> toggleRecording({
     required Function(String text) onResult,
-    required ValueChanged<bool> onListening,
   }) async {
     if (_speech.isListening) {
       _speech.stop();
       return true;
     }
-
-    final isAvailable = await _speech.initialize(
-        onStatus: (status) => onListening(
-              _speech.isListening,
-            ));
 
     if (isAvailable) {
       _speech.listen(
@@ -25,5 +20,16 @@ class VoiceControlService {
     }
 
     return isAvailable;
+  }
+
+  static stopRecording() {
+    if (_speech.isListening) {
+      _speech.stop();
+    }
+  }
+
+  static Future<void> initialize() async {
+    isAvailable = await _speech.initialize(
+        finalTimeout: const Duration(seconds: 60), debugLogging: true);
   }
 }

@@ -15,8 +15,6 @@ class ExpandableFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stt.SpeechToText speech = stt.SpeechToText();
-
     return ExpandableFab(
       distance: 80,
       children: [

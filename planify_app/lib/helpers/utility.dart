@@ -109,6 +109,163 @@ class Utility {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
+  static int _getMonthNumber(String month) {
+    switch (month) {
+      case 'January':
+        return 01;
+      case 'February':
+        return 02;
+      case 'March':
+        return 03;
+      case 'April':
+        return 04;
+      case 'May':
+        return 05;
+      case 'June':
+        return 06;
+      case 'July':
+        return 07;
+      case 'August':
+        return 08;
+      case 'September':
+        return 09;
+      case 'October':
+        return 10;
+      case 'November':
+        return 11;
+      case 'December':
+        return 12;
+      case 'january':
+        return 01;
+      case 'february':
+        return 02;
+      case 'march':
+        return 03;
+      case 'april':
+        return 04;
+      case 'may':
+        return 05;
+      case 'june':
+        return 06;
+      case 'july':
+        return 07;
+      case 'august':
+        return 08;
+      case 'september':
+        return 09;
+      case 'october':
+        return 10;
+      case 'november':
+        return 11;
+      case 'december':
+        return 12;
+      default:
+        return 0;
+    }
+  }
+
+  static DateTime? getStringDueDateFromVoiceInput(String dueDate) {
+    //split by space to get the month, day and eventually year
+    List<String> parts = dueDate.split(' ');
+
+    //check if the date has a year
+    if (parts.length == 3) {
+      //get the month
+      String month = parts[0];
+      //get the day
+      String day = parts[1];
+      //get the year
+      String year = parts[2];
+
+      //get the month number
+      int monthNumber = _getMonthNumber(month);
+      //add a 0 to the month if it is less than 10
+      if (monthNumber < 10) {
+        month = '0$monthNumber';
+      } else {
+        month = '$monthNumber';
+      }
+
+      //remove the st, nd, rd, th from the day
+      day = day.substring(0, day.length - 2);
+
+      //check for the date validity
+      if (_isValidDate(monthNumber, int.parse(day)) == false) {
+        //if the date is not valid, return null
+        return null;
+      }
+
+      //add a 0 to the day if it is less than 10
+      if (int.parse(day) < 10) {
+        day = '0$day';
+      }
+
+      //date in the format dd/mm/yyyy
+      String stringDate = '$day/$month/$year';
+
+      //transform the string to a date
+      DateTime date = badStringFormatToDateTime(stringDate);
+      return date;
+    } else {
+      //get the month
+      String month = parts[0];
+      //get the day
+      String day = parts[1];
+
+      //get the month number
+      int monthNumber = _getMonthNumber(month);
+      //add a 0 to the month if it is less than 10
+      if (monthNumber < 10) {
+        month = '0$monthNumber';
+      } else {
+        month = '$monthNumber';
+      }
+
+      //check if the day has a st, nd, rd, th
+      if (day.contains('st') ||
+          day.contains('nd') ||
+          day.contains('rd') ||
+          day.contains('th')) {
+        //remove the st, nd, rd, th from the day
+        day = day.substring(0, day.length - 2);
+      }
+
+      //check for the date validity
+      if (_isValidDate(monthNumber, int.parse(day)) == false) {
+        //if the date is not valid, return null
+        return null;
+      }
+
+      //add a 0 to the day if it is less than 10
+      if (int.parse(day) < 10) {
+        day = '0$day';
+      }
+
+      // date in the format dd/mm/yyyy
+      // put the current year
+      String year = DateTime.now().year.toString();
+      String stringDate = '$day/$month/$year';
+
+      //transform the string to a date
+      DateTime date = badStringFormatToDateTime(stringDate);
+      return date;
+    }
+  }
+
+  static bool _isValidDate(int month, int day) {
+    if (day < 1) {
+      return false;
+    }
+
+    final daysInMonth = DateTime(DateTime.now().year, month, 0).day;
+
+    if (day > daysInMonth) {
+      return false;
+    }
+
+    return true;
+  }
+
 ///////////////////////////////////////////////////////////////////
 //******************** Dialogs ********************
   static Future<bool?> displayQuestionDialog(
