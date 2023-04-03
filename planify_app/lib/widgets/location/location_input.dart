@@ -145,40 +145,37 @@ class _LocationInputState extends State<LocationInput> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton.icon(
-              onPressed: () => {
-                selectLocationCategory(context),
-              },
-              icon: const Icon(Icons.share_location_sharp),
-              label: const Text(
-                'Category',
-                style: TextStyle(fontSize: 15),
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
+                onPressed: () => {
+                      selectLocationCategory(context),
+                    },
+                icon: const Icon(Icons.share_location_sharp),
+                label: const Text(
+                  'Category',
+                  style: TextStyle(fontSize: 15),
+                ),
+                style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.secondary,
+                    iconColor: Theme.of(context).colorScheme.primary)),
             TextButton.icon(
-              onPressed: _selectOnMap,
-              icon: const Icon(Icons.map),
-              label: const Text(
-                'Search',
-                style: TextStyle(fontSize: 15),
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
+                onPressed: _selectOnMap,
+                icon: const Icon(Icons.map),
+                label: const Text(
+                  'Search',
+                  style: TextStyle(fontSize: 15),
+                ),
+                style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.secondary,
+                    iconColor: Theme.of(context).colorScheme.primary)),
             TextButton.icon(
-              onPressed: _deleteLocation,
-              icon: const Icon(Icons.delete),
-              label: const Text(
-                'Delete',
-                style: TextStyle(fontSize: 15),
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
+                onPressed: _deleteLocation,
+                icon: const Icon(Icons.delete),
+                label: const Text(
+                  'Delete',
+                  style: TextStyle(fontSize: 15),
+                ),
+                style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.secondary,
+                    iconColor: Theme.of(context).colorScheme.primary)),
           ],
         ),
       ],

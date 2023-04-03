@@ -1,37 +1,73 @@
+import 'package:flutter/material.dart';
 import 'package:planify_app/helpers/utility.dart';
 
 import '../models/task.dart';
 
 class TextProcessingService {
-  /// This method processes the text that is passed to it and returns a Task object
+  // This method processes the text that is passed to it and returns a Task object
   static Task? processText(String inputText) {
-    // eliminate the prepositions from inputText
-    inputText = inputText.replaceAll(RegExp(r'(a|an|the|on|in)\s'), '');
+    DateTime? dueDate;
+    TimeOfDay? dueTime;
 
-    //define the regex
+    // define the regex pattern
+    // this contain the action that the user wants to perform and the task details
     final regex = RegExp(
-        r'^(add|insert|put|go|go to|go for)\s+(\w+)\s+((January|February|March|April|May|June|July|August|September|October|November|December|january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?(?: \d{4})?)$');
+        r'^(add|insert|put|go to|go for|go|remind me to|remind me|buy|set a reminder to|set a reminder for)\s((?:\w+\s*)+(?:(?:1[0-2]|[1-9])(?::(?:[0-5][0-9]))?\s?(?:A\.M\.|P\.M\.|a\.m\.|p\.m\.|AM|PM|am|pm)?)?)$');
 
     // find the match
     final match = regex.firstMatch(inputText);
 
     if (match != null) {
-      // the name of the task
-      final taskName = match.group(2);
+      final taskDetails = match.group(2)!.split(RegExp(r'\bon\b|\bat\b'));
 
-      // the due date
-      final dueDateGroup = match.group(3);
-      final dueDate = Utility.getStringDueDateFromVoiceInput(dueDateGroup!);
+      //get the task title
+      final taskTitle = taskDetails[0].trim();
 
-      //create the Task object
-      final newTask = Task(
-        title: taskName,
+      //check if the next string is a date
+      if (taskDetails.length > 1) {
+        final firstPart = taskDetails[1].trim();
+
+        //check if the date is a valid or time and transform it to a DateTime object or TimeOfDay object
+        if (Utility.isStringDate(firstPart)) {
+          //if the date is valid, transform it to a DateTime object
+          dueDate =
+              Utility.transformStringDueDateVoiceInputToDateTime(firstPart);
+        }
+
+        // if it is not, check if it is a valid time
+        else if (Utility.isStringTime(firstPart)) {
+          //if the time is valid, transform it to a TimeOfDay object
+          dueTime =
+              Utility.transformStringDueTimeVoiceInputToTimeOfDay(firstPart);
+        }
+
+        //check if the next string is a time or date and transform it to a TimeOfDay object or DateTime object
+        if (taskDetails.length > 2) {
+          final secondPart = taskDetails[2].trim();
+
+          //check if the date is a valid date
+          if (Utility.isStringDate(secondPart)) {
+            //if the date is valid, transform it to a DateTime object
+            dueDate =
+                Utility.transformStringDueDateVoiceInputToDateTime(secondPart);
+          }
+
+          // if it is not, check if it is a valid time
+          else if (Utility.isStringTime(secondPart)) {
+            //if the time is valid, transform it to a TimeOfDay object
+            dueTime =
+                Utility.transformStringDueTimeVoiceInputToTimeOfDay(secondPart);
+          }
+        }
+      }
+
+      //return the task object
+      return Task(
+        title: taskTitle,
         dueDate: dueDate,
+        dueTime: dueTime,
       );
-
-      return newTask;
     } else {
-      //TODO handle the case when the input text doesn't match the regex
       return null;
     }
   }

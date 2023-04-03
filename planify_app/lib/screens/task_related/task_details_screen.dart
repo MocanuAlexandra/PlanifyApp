@@ -104,7 +104,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
                       displayCategory(loadedTask),
                       const SizedBox(height: 10),
                       //check if the owner is the current user, so that the owner is not displayed
@@ -212,12 +211,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
     //check if the dueDate is not null
     if (date != '--/--/----') {
-      DateTime dueDate = Utility.badStringFormatToDateTime(date)!;
+      DateTime dueDate = Utility.badStringFormatToDateTime(date);
 
       var time = Utility.timeOfDayToString(loadedTask.dueTime);
       //check if dueTime is not null
       if (time != '--:--') {
-        TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(time)!;
+        TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(time);
 
         //check if the due date has passed
         if (dueDate.isBefore(DateTime.now()) &&
@@ -228,14 +227,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
         return Row(children: [
           Icon(Icons.calendar_month,
-              color: dueDatePassed ? Colors.red : Colors.black),
+              color: dueDatePassed
+                  ? const Color.fromARGB(255, 217, 61, 50)
+                  : Colors.black),
           const SizedBox(
             width: 10,
           ),
           Text(date,
               style: dueDatePassed
                   ? const TextStyle(
-                      color: Colors.red,
+                      color: Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     )
@@ -252,7 +253,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
         return Row(children: [
           Icon(Icons.calendar_month,
-              color: dueDatePassed ? Colors.red : Colors.black),
+              color: dueDatePassed
+                  ? const Color.fromARGB(255, 217, 61, 50)
+                  : Colors.black),
           const SizedBox(
             width: 10,
           ),
@@ -260,7 +263,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             date,
             style: dueDatePassed
                 ? const TextStyle(
-                    color: Colors.red,
+                    color: Color.fromARGB(255, 217, 61, 50),
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   )
@@ -297,7 +300,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     var time = Utility.timeOfDayToString(loadedTask.dueTime);
 
     if (time != '--:--') {
-      TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(time)!;
+      TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(time);
 
       // check if the due time has passed
       if (dueTime.hour <= DateTime.now().hour &&
@@ -308,7 +311,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
       return Row(children: [
         Icon(Icons.access_time,
-            color: dueTimePassed ? Colors.red : Colors.black),
+            color: dueTimePassed
+                ? const Color.fromARGB(255, 217, 61, 50)
+                : Colors.black),
         const SizedBox(
           width: 10,
         ),
@@ -316,7 +321,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           time,
           style: dueTimePassed
               ? const TextStyle(
-                  color: Colors.red,
+                  color: Color.fromARGB(255, 217, 61, 50),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 )
@@ -415,7 +420,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   Text displayTitle(Task loadedTask) {
     return Text(
       loadedTask.title!,
-      style: const TextStyle(fontSize: 20),
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       softWrap: true,
       maxLines: 3,
     );
@@ -455,7 +460,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
   Color _priorityColor(Priority? priority) {
     return Utility.priorityEnumToString(priority) == "Important"
-        ? Colors.red
+        ? const Color.fromARGB(255, 217, 61, 50)
         : Utility.priorityEnumToString(priority) == "Necessary"
             ? Colors.orange
             : Utility.priorityEnumToString(priority) == "Casual"

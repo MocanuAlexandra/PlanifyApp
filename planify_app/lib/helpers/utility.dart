@@ -28,6 +28,14 @@ class Utility {
     return priorityString;
   }
 
+  static String dateTimeToString(DateTime? dueDate) {
+    String date = '--/--/----';
+    if (dueDate != null) {
+      date = DateFormat('dd/MM/yyyy').format(dueDate);
+    }
+    return date;
+  }
+
   static String timeOfDayToString(TimeOfDay? selectedTime) {
     String time = "--:--";
     if (selectedTime != null) {
@@ -86,15 +94,7 @@ class Utility {
     return dateTime;
   }
 
-  static dateTimeToString(DateTime? dueDate) {
-    String date = '--/--/----';
-    if (dueDate != null) {
-      date = DateFormat('dd/MM/yyyy').format(dueDate);
-    }
-    return date;
-  }
-
-  static badStringFormatToDateTime(String s) {
+  static DateTime badStringFormatToDateTime(String s) {
     List<String> parts = s.split('/');
     int day = int.parse(parts[0]);
     int month = int.parse(parts[1]);
@@ -102,69 +102,14 @@ class Utility {
     return DateTime(year, month, day);
   }
 
-  static badStringFormatToTimeOfDay(String s) {
+  static TimeOfDay badStringFormatToTimeOfDay(String s) {
     List<String> parts = s.split(':');
     int hour = int.parse(parts[0]);
     int minute = int.parse(parts[1]);
     return TimeOfDay(hour: hour, minute: minute);
   }
 
-  static int _getMonthNumber(String month) {
-    switch (month) {
-      case 'January':
-        return 01;
-      case 'February':
-        return 02;
-      case 'March':
-        return 03;
-      case 'April':
-        return 04;
-      case 'May':
-        return 05;
-      case 'June':
-        return 06;
-      case 'July':
-        return 07;
-      case 'August':
-        return 08;
-      case 'September':
-        return 09;
-      case 'October':
-        return 10;
-      case 'November':
-        return 11;
-      case 'December':
-        return 12;
-      case 'january':
-        return 01;
-      case 'february':
-        return 02;
-      case 'march':
-        return 03;
-      case 'april':
-        return 04;
-      case 'may':
-        return 05;
-      case 'june':
-        return 06;
-      case 'july':
-        return 07;
-      case 'august':
-        return 08;
-      case 'september':
-        return 09;
-      case 'october':
-        return 10;
-      case 'november':
-        return 11;
-      case 'december':
-        return 12;
-      default:
-        return 0;
-    }
-  }
-
-  static DateTime? getStringDueDateFromVoiceInput(String dueDate) {
+  static DateTime? transformStringDueDateVoiceInputToDateTime(String dueDate) {
     //split by space to get the month, day and eventually year
     List<String> parts = dueDate.split(' ');
 
@@ -252,18 +197,89 @@ class Utility {
     }
   }
 
-  static bool _isValidDate(int month, int day) {
-    if (day < 1) {
-      return false;
+  static TimeOfDay transformStringDueTimeVoiceInputToTimeOfDay(String time) {
+    TimeOfDay timeOfDay = TimeOfDay.now();
+    bool isPm = false;
+
+    //if the time contains  or P.M. p.m. or PM or pm
+    //add a flag to know that it is a PM time
+    if (time.contains('P.M.') ||
+        time.contains('p.m.') ||
+        time.contains('PM') ||
+        time.contains('pm')) {
+      isPm = true;
     }
 
-    final daysInMonth = DateTime(DateTime.now().year, month, 0).day;
+    //then remove the P.M. p.m. PM pm or A.M. a.m. AM am from the time
+    time = time.replaceAll('P.M.', '');
+    time = time.replaceAll('p.m.', '');
+    time = time.replaceAll('PM', '');
+    time = time.replaceAll('pm', '');
+    time = time.replaceAll('A.M.', '');
+    time = time.replaceAll('a.m.', '');
+    time = time.replaceAll('AM', '');
+    time = time.replaceAll('am', '');
 
-    if (day > daysInMonth) {
-      return false;
+    //split by space to get the hour and eventually minutes
+    List<String> parts = time.split(':');
+
+    //check if the time has minutes
+    if (parts.length == 2) {
+      //get the hour
+      String hour = parts[0];
+      //get the minutes
+      String minutes = parts[1];
+
+      //check if the hour is less than 10
+      if (int.parse(hour) < 10) {
+        //add a 0 to the hour
+        hour = '0$hour';
+      }
+
+      //check if the minutes is less than 10
+      if (int.parse(minutes) < 10) {
+        //add a 0 to the minutes
+        minutes = '0$minutes';
+      }
+
+      //check if the time is PM
+      if (isPm == true && int.parse(hour) != 12) {
+        //add 12 to the hour
+        hour = (int.parse(hour) + 12).toString();
+      }
+
+      //time in the format hh:mm
+      String stringTime = '$hour:$minutes';
+
+      //transform the string to a time
+      timeOfDay = badStringFormatToTimeOfDay(stringTime);
     }
 
-    return true;
+    //check if the time has no minutes
+    if (parts.length == 1) {
+      //get the hour
+      String hour = parts[0];
+
+      //check if the hour is less than 10
+      if (int.parse(hour) < 10) {
+        //add a 0 to the hour
+        hour = '0$hour';
+      }
+
+      //check if the time is PM
+      if (isPm == true && int.parse(hour) != 12) {
+        //add 12 to the hour
+        hour = (int.parse(hour) + 12).toString();
+      }
+
+      //time in the format hh:mm
+      String stringTime = '$hour:00';
+
+      //transform the string to a time
+      timeOfDay = badStringFormatToTimeOfDay(stringTime);
+    }
+
+    return timeOfDay;
   }
 
 ///////////////////////////////////////////////////////////////////
@@ -521,4 +537,102 @@ class Utility {
   }
 
   ///////////////////////////////////////////////////////////////
+  //**************** Auxiliary methods for date/time ****************
+
+  static bool isPastDue(DateTime dueDate, TimeOfDay dueTime) {
+    final now = DateTime.now();
+    final dueDateTime = DateTime(
+      dueDate.year,
+      dueDate.month,
+      dueDate.day,
+      dueTime.hour,
+      dueTime.minute,
+    );
+    return now.isAfter(dueDateTime);
+  }
+
+  static bool _isValidDate(int month, int day) {
+    if (day < 1) {
+      return false;
+    }
+
+    final daysInMonth = DateTime(DateTime.now().year, month, 0).day;
+
+    if (day > daysInMonth) {
+      return false;
+    }
+
+    return true;
+  }
+
+  static int _getMonthNumber(String month) {
+    switch (month) {
+      case 'January':
+        return 01;
+      case 'February':
+        return 02;
+      case 'March':
+        return 03;
+      case 'April':
+        return 04;
+      case 'May':
+        return 05;
+      case 'June':
+        return 06;
+      case 'July':
+        return 07;
+      case 'August':
+        return 08;
+      case 'September':
+        return 09;
+      case 'October':
+        return 10;
+      case 'November':
+        return 11;
+      case 'December':
+        return 12;
+      case 'january':
+        return 01;
+      case 'february':
+        return 02;
+      case 'march':
+        return 03;
+      case 'april':
+        return 04;
+      case 'may':
+        return 05;
+      case 'june':
+        return 06;
+      case 'july':
+        return 07;
+      case 'august':
+        return 08;
+      case 'september':
+        return 09;
+      case 'october':
+        return 10;
+      case 'november':
+        return 11;
+      case 'december':
+        return 12;
+      default:
+        return 0;
+    }
+  }
+
+  static bool isStringDate(String date) {
+    final regexPattern = RegExp(
+        r'((?:January|February|March|April|May|June|July|August|September|October|November|December|january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?(?: \d{4})?)$');
+
+    return regexPattern.hasMatch(date);
+  }
+
+  static bool isStringTime(String time) {
+    final regexPattern = RegExp(
+        r'((?:(?:1[0-2]|[1-9])(?::(?:[0-5][0-9]))?\s?(?:A\.M\.|P\.M\.|a\.m\.|p\.m\.|AM|PM|am|pm)?)?)$');
+
+    return regexPattern.hasMatch(time);
+  }
+
+  //////////////////////////////////////////////////////////////
 }

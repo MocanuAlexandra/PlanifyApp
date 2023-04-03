@@ -26,15 +26,15 @@ class _AuthScreenState extends State<AuthScreen> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color.fromARGB(255, 161, 82, 246).withOpacity(0.5),
-                  const Color.fromARGB(255, 56, 251, 137).withOpacity(0.9),
+                  Color.fromARGB(255, 78, 195, 199),
+                  Color.fromARGB(255, 1, 55, 58),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                stops: const [0, 1],
+                stops: [0, 1],
               ),
             ),
           ),

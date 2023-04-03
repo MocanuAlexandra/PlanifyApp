@@ -94,10 +94,9 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           title: 'Planify App',
           theme: ThemeData(
-            primarySwatch: Colors.purple,
             colorScheme: ColorScheme.fromSwatch().copyWith(
-              primary: const Color.fromARGB(255, 156, 39, 176),
-              secondary: const Color.fromARGB(255, 19, 208, 164),
+              primary: const Color.fromARGB(255, 66, 173, 176),
+              secondary: const Color.fromARGB(255, 1, 96, 100),
             ),
           ),
           home: StreamBuilder(

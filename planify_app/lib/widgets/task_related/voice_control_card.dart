@@ -61,7 +61,7 @@ class _VoiceControlCardState extends State<VoiceControlCard> {
                 children: [
                   AvatarGlow(
                     animate: _isRecording,
-                    glowColor: Theme.of(context).primaryColor,
+                    glowColor: Theme.of(context).colorScheme.secondary,
                     endRadius: 50.0,
                     child: IconButton(
                         onPressed: toggleRecording,
@@ -70,7 +70,7 @@ class _VoiceControlCardState extends State<VoiceControlCard> {
                   ElevatedButton(
                     onPressed: processAndAddToDB,
                     style: TextButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
                       foregroundColor:
                           Theme.of(context).textTheme.labelLarge!.color,
                     ),

@@ -124,91 +124,124 @@ class _TaskListItemState extends State<TaskListItem> {
   }
 
   Row displayTime() {
-    //check if the time is not null
+    // if the due time is not null
     if (widget.time != '--:--') {
-      TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(widget.time!)!;
+      TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(widget.time!);
 
-      // check if the due time has passed
-      if (dueTime.hour <= DateTime.now().hour &&
-          dueTime.minute <= DateTime.now().minute &&
-          dueDatePassed) {
-        dueTimePassed = true;
+      // check if the due date is not null
+      if (widget.dueDate != '--/--/----') {
+        DateTime dueDate = Utility.badStringFormatToDateTime(widget.dueDate!);
+
+        // check if the due date/time has passed
+        if (Utility.isPastDue(dueDate, dueTime)) {
+          dueTimePassed = true;
+        }
+
+        return Row(children: [
+          Icon(Icons.access_time,
+              color: dueTimePassed
+                  ? const Color.fromARGB(255, 217, 61, 50)
+                  : Colors.black),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(widget.time!,
+              style: dueTimePassed
+                  ? const TextStyle(
+                      color: Color.fromARGB(255, 217, 61, 50),
+                      fontWeight: FontWeight.bold,
+                    )
+                  : null)
+        ]);
+        //if the due date is null, check only if the due time has passed
+        // keep the due date as DateTime.now()
+      } else {
+        //check if the due time has passed
+        if (Utility.isPastDue(DateTime.now(), dueTime)) {
+          dueTimePassed = true;
+        }
+
+        return Row(children: [
+          Icon(Icons.access_time,
+              color: dueTimePassed
+                  ? const Color.fromARGB(255, 217, 61, 50)
+                  : Colors.black),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(widget.time!,
+              style: dueTimePassed
+                  ? const TextStyle(
+                      color: Color.fromARGB(255, 217, 61, 50),
+                      fontWeight: FontWeight.bold,
+                    )
+                  : null)
+        ]);
       }
 
+      //if the time is null
+    } else {
       return Row(children: [
-        Icon(Icons.access_time,
-            color: dueTimePassed ? Colors.red : Colors.black),
+        const Icon(
+          Icons.access_time,
+          color: Colors.black,
+        ),
         const SizedBox(
           width: 6,
         ),
-        Text(widget.time!,
-            style: dueTimePassed
-                ? const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  )
-                : null)
+        Text(widget.time!),
       ]);
     }
-
-    return Row(children: [
-      const Icon(
-        Icons.access_time,
-        color: Colors.black,
-      ),
-      const SizedBox(
-        width: 6,
-      ),
-      Text(widget.time!),
-    ]);
   }
 
   Row displayDueDate() {
     //check if the dueDate is not null
     if (widget.dueDate != '--/--/----') {
-      DateTime dueDate = Utility.badStringFormatToDateTime(widget.dueDate!)!;
+      DateTime dueDate = Utility.badStringFormatToDateTime(widget.dueDate!);
 
       //check if dueTime is not null
       if (widget.time != '--:--') {
-        TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(widget.time!)!;
+        TimeOfDay dueTime = Utility.badStringFormatToTimeOfDay(widget.time!);
 
         //check if the due date has passed
-        if (dueDate.isBefore(DateTime.now()) &&
-            dueTime.hour <= DateTime.now().hour &&
-            dueTime.minute <= DateTime.now().minute) {
+        if (Utility.isPastDue(dueDate, dueTime)) {
           dueDatePassed = true;
         }
 
         return Row(children: [
           Icon(Icons.calendar_month,
-              color: dueDatePassed ? Colors.red : Colors.black),
+              color: dueDatePassed
+                  ? const Color.fromARGB(255, 217, 61, 50)
+                  : Colors.black),
           const SizedBox(
             width: 6,
           ),
           Text(widget.dueDate!,
               style: dueDatePassed
                   ? const TextStyle(
-                      color: Colors.red,
+                      color: Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                     )
                   : null)
         ]);
       } else {
         //check if the due date has passed
-        if (dueDate.isBefore(DateTime.now())) {
+        if (DateTime.now().isAfter(dueDate)) {
           dueDatePassed = true;
         }
 
         return Row(children: [
           Icon(Icons.calendar_month,
-              color: dueDatePassed ? Colors.red : Colors.black),
+              color: dueDatePassed
+                  ? const Color.fromARGB(255, 217, 61, 50)
+                  : Colors.black),
           const SizedBox(
             width: 6,
           ),
           Text(widget.dueDate!,
               style: dueDatePassed
                   ? const TextStyle(
-                      color: Colors.red,
+                      color: Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                     )
                   : null)
@@ -311,7 +344,8 @@ class _TaskListItemState extends State<TaskListItem> {
           if (widget.owner == DBHelper.currentUserId())
             !widget.isDeleted! // if isDeleted is false, show the delete button
                 ? IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: const Icon(Icons.delete,
+                        color: Color.fromARGB(255, 217, 61, 50)),
                     onPressed: () {
                       // display alert dialog
                       Utility.displayQuestionDialog(
@@ -324,7 +358,8 @@ class _TaskListItemState extends State<TaskListItem> {
                     },
                   )
                 : IconButton(
-                    icon: const Icon(Icons.delete_forever, color: Colors.red),
+                    icon: const Icon(Icons.delete_forever,
+                        color: Color.fromARGB(255, 217, 61, 50)),
                     onPressed: () {
                       // display alert dialog
                       Utility.displayQuestionDialog(context,
@@ -419,7 +454,7 @@ class _TaskListItemState extends State<TaskListItem> {
 
   Color? _priorityIconColor(String priority) {
     return priority == "Important"
-        ? Colors.red
+        ? const Color.fromARGB(255, 217, 61, 50)
         : priority == "Necessary"
             ? Colors.orange
             : priority == "Casual"

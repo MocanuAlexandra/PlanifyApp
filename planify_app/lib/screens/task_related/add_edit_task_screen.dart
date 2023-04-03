@@ -130,16 +130,15 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           ),
         ),
         TextButton.icon(
-          onPressed: _presentDatePicker,
-          icon: const Icon(Icons.calendar_month),
-          label: const Text(
-            'Choose date',
-            style: TextStyle(fontSize: 15),
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
-          ),
-        ),
+            onPressed: _presentDatePicker,
+            icon: const Icon(Icons.calendar_month),
+            label: const Text(
+              'Choose date',
+              style: TextStyle(fontSize: 15),
+            ),
+            style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.secondary,
+                iconColor: Theme.of(context).colorScheme.primary)),
         //delete selected date
         IconButton(
             onPressed: () async {
@@ -171,16 +170,15 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           ),
         ),
         TextButton.icon(
-          onPressed: _presentTimePicker,
-          icon: const Icon(Icons.access_time),
-          label: const Text(
-            'Choose time',
-            style: TextStyle(fontSize: 15),
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
-          ),
-        ),
+            onPressed: _presentTimePicker,
+            icon: const Icon(Icons.access_time),
+            label: const Text(
+              'Choose time',
+              style: TextStyle(fontSize: 15),
+            ),
+            style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.secondary,
+                iconColor: Theme.of(context).colorScheme.primary)),
         //delete selected time
         IconButton(
             onPressed: () async {
@@ -349,90 +347,90 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TextButton.icon(
-          onPressed: _editedTask.dueTime == null && _editedTask.dueDate == null
-              ? () => Utility.displayInformationalDialog(
-                  context, 'Please select due date or due time first!')
-              : _editedTask.dueTime == null && _editedTask.dueDate != null
-                  ? () async {
-                      final result = await showDialog(
-                        context: context,
-                        builder: (context) => _showReminderPicker(false, true),
-                      );
-                      if (result != null) {
-                        setState(() {
-                          _selectedReminders = result;
-                        });
-                      }
-                    }
-                  : _editedTask.dueTime != null && _editedTask.dueDate == null
-                      ? () async {
-                          final result = await showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _showReminderPicker(true, false),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              _selectedReminders = result;
-                            });
-                          }
+            onPressed: _editedTask.dueTime == null &&
+                    _editedTask.dueDate == null
+                ? () => Utility.displayInformationalDialog(
+                    context, 'Please select due date or due time first!')
+                : _editedTask.dueTime == null && _editedTask.dueDate != null
+                    ? () async {
+                        final result = await showDialog(
+                          context: context,
+                          builder: (context) =>
+                              _showReminderPicker(false, true),
+                        );
+                        if (result != null) {
+                          setState(() {
+                            _selectedReminders = result;
+                          });
                         }
-                      : () async {
-                          final result = await showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _showReminderPicker(true, true),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              _selectedReminders = result;
-                            });
+                      }
+                    : _editedTask.dueTime != null && _editedTask.dueDate == null
+                        ? () async {
+                            final result = await showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _showReminderPicker(true, false),
+                            );
+                            if (result != null) {
+                              setState(() {
+                                _selectedReminders = result;
+                              });
+                            }
                           }
-                        },
-          icon: const Icon(Icons.access_alarm),
-          label: const Text(
-            'Set reminder',
-            style: TextStyle(fontSize: 15),
-          ),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
-          ),
-        ),
+                        : () async {
+                            final result = await showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _showReminderPicker(true, true),
+                            );
+                            if (result != null) {
+                              setState(() {
+                                _selectedReminders = result;
+                              });
+                            }
+                          },
+            icon: const Icon(Icons.access_alarm),
+            label: const Text(
+              'Set reminder',
+              style: TextStyle(fontSize: 15),
+            ),
+            style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.secondary,
+                iconColor: Theme.of(context).colorScheme.primary)),
         //only owner can share the task
         if (_editedTask.owner == DBHelper.currentUserId() ||
             _editedTask.owner == null)
           TextButton.icon(
-            onPressed: _editedTask.id == null
-                // if task is not saved yet, then we don't need to check already selected users emails
-                ? () async {
-                    await showDialog(
-                      context: context,
-                      builder: (context) => UserListSearch(
-                        checkedItems: _selectedUserEmails,
-                      ),
-                    );
-                  }
-                // if task is saved, then we need to check already selected users emails
-                : () async {
-                    _selectedUserEmails =
-                        await Utility.determineAlreadySharedWithUsers(
-                            _editedTask.id);
-                    await showDialog(
-                      context: context,
-                      builder: (context) => UserListSearch(
-                        checkedItems: _selectedUserEmails,
-                      ),
-                    );
-                  },
-            icon: const Icon(Icons.share),
-            label: const Text(
-              'Share with',
-              style: TextStyle(fontSize: 15),
-            ),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).primaryColor,
-            ),
-          ),
+              onPressed: _editedTask.id == null
+                  // if task is not saved yet, then we don't need to check already selected users emails
+                  ? () async {
+                      await showDialog(
+                        context: context,
+                        builder: (context) => UserListSearch(
+                          checkedItems: _selectedUserEmails,
+                        ),
+                      );
+                    }
+                  // if task is saved, then we need to check already selected users emails
+                  : () async {
+                      _selectedUserEmails =
+                          await Utility.determineAlreadySharedWithUsers(
+                              _editedTask.id);
+                      await showDialog(
+                        context: context,
+                        builder: (context) => UserListSearch(
+                          checkedItems: _selectedUserEmails,
+                        ),
+                      );
+                    },
+              icon: const Icon(Icons.share),
+              label: const Text(
+                'Share with',
+                style: TextStyle(fontSize: 15),
+              ),
+              style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.secondary,
+                  iconColor: Theme.of(context).colorScheme.primary)),
       ],
     );
   }
