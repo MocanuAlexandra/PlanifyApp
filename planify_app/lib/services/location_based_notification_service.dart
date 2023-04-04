@@ -5,7 +5,6 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import 'location_helper_service.dart';
-import '../models/task.dart';
 import '../providers/task_provider.dart';
 import 'notification_service.dart';
 
@@ -15,8 +14,7 @@ class LocationBasedNotificationService {
   static StreamSubscription<LocationData>? _locationSubscription;
   static BuildContext? _context;
   static BuildContext? _contextt;
-  static DateTime lastNotifiedTime = DateTime.now();
-  static bool isFirstTime = true;
+  static Timer? timer;
 
   static Future<List<dynamic>> getListOfNearbyPlaces() async {
     await LocationHelper.getNearbyPlacesWithType(
@@ -26,22 +24,11 @@ class LocationBasedNotificationService {
     return _nearbyPlaces!;
   }
 
-  static void checkForLocations(
-      BuildContext context, int interval, bool isFirstTime) async {
+  static void checkForLocations(BuildContext context, int interval) async {
     _context = context;
-    var tasks = <Task>[];
+    var tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList;
 
-    //check if enough time has passed since the last notification
-    var difference = DateTime.now().difference(lastNotifiedTime);
-    if (difference.inMinutes < interval && !isFirstTime) {
-      return;
-    } else {
-      // set the last notified time to now
-      lastNotifiedTime = DateTime.now();
-
-      //get the user tasks
-      tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList;
-
+    timer = Timer.periodic(Duration(minutes: interval), (timer) async {
       //iterate through the tasks that are not deleted and not done
       //and have a location category
       for (var task in tasks) {
@@ -120,7 +107,7 @@ class LocationBasedNotificationService {
           }
         }
       }
-    }
+    });
   }
 
   static Future<bool> checkLocationPermission(BuildContext context) async {
@@ -156,8 +143,7 @@ class LocationBasedNotificationService {
       //and we will check for the first time for nearby places
       if (_currentLocation == null) {
         _currentLocation = location;
-        checkForLocations(_contextt!, interval, isFirstTime);
-        isFirstTime = false;
+        checkForLocations(_contextt!, interval);
       }
 
       //TODO uncomment this in production because it is for testing purposes
@@ -174,7 +160,7 @@ class LocationBasedNotificationService {
       _currentLocation = location;
 
       // check for nearby places
-      checkForLocations(_contextt!, interval, isFirstTime);
+      checkForLocations(_contextt!, interval);
     });
   }
 

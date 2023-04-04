@@ -19,6 +19,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   //filters
   var _locationBasedNotification = false;
   int? _intervalOfNotification;
+  var _selfEmptyingTrash = false;
+  int? _intervalOfSelfEmptyingTrash;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               final selectedFilters = {
                 'locationBasedNotification': _locationBasedNotification,
                 'intervalOfNotification': _intervalOfNotification,
+                'selfEmptyingTrash': _selfEmptyingTrash,
+                'intervalOfSelfEmptyingTrash': _intervalOfSelfEmptyingTrash,
               };
               saveFilters(context, selectedFilters);
             },
@@ -136,6 +140,81 @@ Make sure the app is running in the background.""",
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
+                const SizedBox(
+                  height: 20,
+                ),
+                // trash self emptying
+                SwitchListTile(
+                  title: const Text('Self emptying trash',
+                      style: TextStyle(fontSize: 17)),
+                  value: _selfEmptyingTrash,
+                  subtitle: const Text(
+                    """Turn on to empty the trash automatically.""",
+                    softWrap: true,
+                  ),
+                  onChanged: (newValue) async {
+                    bool updatedFilterValue;
+
+                    //check if the user wants to enable or disable this functionality
+                    if (newValue) {
+                      // if the user wants to enable this functionality, update the filter value with true,
+                      updatedFilterValue = true;
+                    } else {
+                      updatedFilterValue = false;
+                      _intervalOfSelfEmptyingTrash = null;
+                    }
+
+                    // update _selfEmptyingTrash with the updated filter value
+                    setState(() {
+                      _selfEmptyingTrash = updatedFilterValue;
+                    });
+                  },
+                ),
+                //user can select the interval of self emptying only if self emptying is enabled
+                if (_selfEmptyingTrash)
+                  DropdownButtonFormField<int>(
+                    icon: const Icon(Icons.arrow_drop_down),
+                    value: _intervalOfSelfEmptyingTrash,
+                    items: const [
+                      DropdownMenuItem(
+                        value: 1,
+                        child: Text(
+                          'Every 1 minute',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 5,
+                        child: Text(
+                          'Every 5 minute',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 15,
+                        child: Text(
+                          'Every 15 minute',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 30,
+                        child: Text(
+                          'Every 30 minute',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _intervalOfSelfEmptyingTrash = value!;
+                      });
+                    },
+                    hint: const Text(
+                      'Select interval of self emptying',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -149,6 +228,9 @@ Make sure the app is running in the background.""",
     _locationBasedNotification =
         widget.currentFilters['locationBasedNotification']!;
     _intervalOfNotification = widget.currentFilters['intervalOfNotification'];
+    _selfEmptyingTrash = widget.currentFilters['selfEmptyingTrash']!;
+    _intervalOfSelfEmptyingTrash =
+        widget.currentFilters['intervalOfSelfEmptyingTrash'];
     super.initState();
   }
 
@@ -156,6 +238,13 @@ Make sure the app is running in the background.""",
     if (_intervalOfNotification == null && _locationBasedNotification) {
       Utility.displayInformationalDialog(context,
           'You must select an interval at which you want to receive location-based notifications');
+    } else {
+      widget.saveFilters!(selectedFilters, context);
+    }
+
+    if (_intervalOfSelfEmptyingTrash == null && _selfEmptyingTrash) {
+      Utility.displayInformationalDialog(context,
+          'You must select an interval at which you want to empty the trash');
     } else {
       widget.saveFilters!(selectedFilters, context);
     }

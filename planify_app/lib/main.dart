@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:planify_app/services/task_manipulation_service.dart';
+
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -48,6 +51,8 @@ class _MyAppState extends State<MyApp> {
   Map<String, dynamic> _filters = {
     'locationBasedNotification': false,
     'intervalOfNotification': null,
+    'selfEmptyingTrash': false,
+    'intervalOfSelfEmptyingTrash': null,
   };
 
   void initFilters() async {
@@ -162,7 +167,17 @@ class _MyAppState extends State<MyApp> {
           else
             {
               await LocationBasedNotificationService.turnOff(),
+            },
+
+          //check if self emptying trash is enabled
+          if (_filters['selfEmptyingTrash'] != false &&
+              _filters['intervalOfSelfEmptyingTrash'] != null)
+            {
+              TaskManipulationService.turnOnAutoEmptyingTrash(
+                  _filters['intervalOfSelfEmptyingTrash'], context_)
             }
+          else
+            {TaskManipulationService.turnOffAutoEmptyingTrash()}
         });
   }
 }

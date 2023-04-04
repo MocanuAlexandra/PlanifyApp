@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planify_app/services/task_manipulation_service.dart';
 import 'package:provider/provider.dart';
 
 import 'overall_agenda_page.dart';
@@ -68,15 +69,8 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              //remove the images for the tasks
-                              DBHelper.deleteAllImages();
-
-                              //delete tasks from DB
-                              DBHelper.deleteAllTasks();
-
-                              // remove task from UI
-                              Provider.of<TaskProvider>(context, listen: false)
-                                  .deleteAllTasks();
+                              // empty trash
+                              TaskManipulationService.emptyTrash(context, null);
 
                               //close dialog
                               Navigator.of(context).pushReplacementNamed(
