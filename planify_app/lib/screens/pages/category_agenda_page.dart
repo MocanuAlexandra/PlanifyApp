@@ -19,14 +19,13 @@ class CategoryAgendaPage extends StatefulWidget {
 
 class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   final ScrollController _controller = ScrollController();
-  bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
   var _category;
   var _isInit = true;
 
   @override
   void initState() {
-    _fetchTasks(context, selectedOption, _focusMode, _category);
+    _fetchTasks(context, selectedOption, _category);
     super.initState();
   }
 
@@ -43,9 +42,9 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   }
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
-      bool? focusMode, String? category) async {
+      String? category) async {
     await Provider.of<TaskProvider>(context, listen: false)
-        .fetchTasks(null, null, null, selectedOption, focusMode, _category);
+        .fetchTasks(null, null, null, selectedOption, _category);
   }
 
   @override
@@ -64,7 +63,6 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
       drawer: const MainDrawer(),
       body: Column(
         children: [
-          changeFocusMode(context),
           displayTasks(context),
         ],
       ),
@@ -75,68 +73,45 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   Expanded displayTasks(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption, _focusMode, _category),
-        builder: (context, snapshot) => snapshot.connectionState ==
-                ConnectionState.waiting
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : RefreshIndicator(
-                onRefresh: () =>
-                    _fetchTasks(context, selectedOption, _focusMode, _category),
-                child: Consumer<TaskProvider>(
-                  builder: (context, tasks, ch) => Scrollbar(
-                    controller: _controller,
-                    thumbVisibility: true,
-                    thickness: 5,
-                    child: ListView.builder(
-                      controller: _controller,
-                      itemCount: tasks.tasksList.length,
-                      itemBuilder: (context, index) => TaskListItem(
-                        id: tasks.tasksList[index].id,
-                        title: tasks.tasksList[index].title,
-                        dueDate: Utility.dateTimeToString(
-                            tasks.tasksList[index].dueDate),
-                        address: tasks.tasksList[index].address,
-                        time: Utility.timeOfDayToString(
-                            tasks.tasksList[index].dueTime),
-                        priority: Utility.priorityEnumToString(
-                            tasks.tasksList[index].priority),
-                        isDone: tasks.tasksList[index].isDone,
-                        isDeleted: tasks.tasksList[index].isDeleted,
-                        locationCategory:
-                            tasks.tasksList[index].locationCategory,
-                        owner: tasks.tasksList[index].owner,
-                        imageUrl: tasks.tasksList[index].imageUrl,
+        future: _fetchTasks(context, selectedOption, _category),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () =>
+                        _fetchTasks(context, selectedOption, _category),
+                    child: Consumer<TaskProvider>(
+                      builder: (context, tasks, ch) => Scrollbar(
+                        controller: _controller,
+                        thumbVisibility: true,
+                        thickness: 5,
+                        child: ListView.builder(
+                          controller: _controller,
+                          itemCount: tasks.tasksList.length,
+                          itemBuilder: (context, index) => TaskListItem(
+                            id: tasks.tasksList[index].id,
+                            title: tasks.tasksList[index].title,
+                            dueDate: Utility.dateTimeToString(
+                                tasks.tasksList[index].dueDate),
+                            address: tasks.tasksList[index].address,
+                            time: Utility.timeOfDayToString(
+                                tasks.tasksList[index].dueTime),
+                            priority: Utility.priorityEnumToString(
+                                tasks.tasksList[index].priority),
+                            isDone: tasks.tasksList[index].isDone,
+                            isDeleted: tasks.tasksList[index].isDeleted,
+                            locationCategory:
+                                tasks.tasksList[index].locationCategory,
+                            owner: tasks.tasksList[index].owner,
+                            imageUrl: tasks.tasksList[index].imageUrl,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
       ),
-    );
-  }
-
-  Row changeFocusMode(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          'Focus Mode',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        Switch.adaptive(
-          activeColor: Theme.of(context).colorScheme.secondary,
-          value: _focusMode,
-          onChanged: (bool value) {
-            setState(() {
-              _focusMode = value;
-            });
-          },
-        ),
-      ],
     );
   }
 
@@ -147,7 +122,7 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
         setState(() {
           selectedOption = selectedValue;
         });
-        _fetchTasks(context, selectedOption, _focusMode, _category);
+        _fetchTasks(context, selectedOption, _category);
       },
       itemBuilder: (_) => [
         PopupMenuItem(

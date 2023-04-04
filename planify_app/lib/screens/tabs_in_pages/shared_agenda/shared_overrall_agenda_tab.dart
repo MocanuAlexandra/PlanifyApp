@@ -17,18 +17,17 @@ class SharedOverallAgendaTab extends StatefulWidget {
 
 class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
   final ScrollController _controller = ScrollController();
-  bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
 
-  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
-      bool? focusMode) async {
+  Future<void> _fetchTasks(
+      BuildContext context, FilterOptions? selectedOption) async {
     await Provider.of<TaskProvider>(context, listen: false)
-        .fetchSharedTasks(null, null, null, selectedOption, focusMode);
+        .fetchSharedTasks(null, null, null, selectedOption);
   }
 
   @override
   void initState() {
-    _fetchTasks(context, selectedOption, _focusMode);
+    _fetchTasks(context, selectedOption);
     super.initState();
   }
 
@@ -44,7 +43,6 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
       drawer: const MainDrawer(),
       body: Column(
         children: [
-          changeFocusMode(context),
           displayTasks(context),
         ],
       ),
@@ -54,15 +52,14 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
   Expanded displayTasks(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption, _focusMode),
+        future: _fetchTasks(context, selectedOption),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : RefreshIndicator(
-                    onRefresh: () =>
-                        _fetchTasks(context, selectedOption, _focusMode),
+                    onRefresh: () => _fetchTasks(context, selectedOption),
                     child: Consumer<TaskProvider>(
                       builder: (context, tasks, ch) => Scrollbar(
                         controller: _controller,
@@ -96,29 +93,6 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
     );
   }
 
-  Row changeFocusMode(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          'Focus Mode',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        Switch.adaptive(
-          activeColor: Theme.of(context).colorScheme.secondary,
-          value: _focusMode,
-          onChanged: (bool value) {
-            setState(() {
-              _focusMode = value;
-            });
-          },
-        ),
-      ],
-    );
-  }
-
   PopupMenuButton<FilterOptions> displayFilters(BuildContext context) {
     return PopupMenuButton(
       icon: const Icon(Icons.more_vert),
@@ -126,7 +100,7 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
         setState(() {
           selectedOption = selectedValue;
         });
-        _fetchTasks(context, selectedOption, _focusMode);
+        _fetchTasks(context, selectedOption);
       },
       itemBuilder: (_) => [
         PopupMenuItem(
@@ -165,6 +139,19 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
               ),
               SizedBox(width: 8),
               Text('Done'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: FilterOptions.focusMode,
+          child: Row(
+            children: const [
+              Icon(
+                Icons.notification_important_rounded,
+                color: Colors.black,
+              ),
+              SizedBox(width: 8),
+              Text('Focus Mode'),
             ],
           ),
         ),

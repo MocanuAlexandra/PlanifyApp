@@ -18,14 +18,13 @@ class SharedMonthAgendaTab extends StatefulWidget {
 
 class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
   final ScrollController _controller = ScrollController();
-  bool _focusMode = false;
   FilterOptions selectedOption = FilterOptions.inProgress;
   DateTime? _selectedDate = DateTime.now();
 
-  Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
-      bool? focusMode) async {
+  Future<void> _fetchTasks(
+      BuildContext context, FilterOptions? selectedOption) async {
     await Provider.of<TaskProvider>(context, listen: false)
-        .fetchSharedTasks(null, true, _selectedDate, selectedOption, focusMode);
+        .fetchSharedTasks(null, true, _selectedDate, selectedOption);
   }
 
   void _presentMonthPicker() async {
@@ -44,7 +43,7 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
 
   @override
   void initState() {
-    _fetchTasks(context, selectedOption, _focusMode);
+    _fetchTasks(context, selectedOption);
     super.initState();
   }
 
@@ -64,7 +63,6 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
       drawer: const MainDrawer(),
       body: Column(
         children: [
-          changeFocusMode(context),
           displayTasks(context),
         ],
       ),
@@ -78,7 +76,7 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
         setState(() {
           selectedOption = selectedValue;
         });
-        _fetchTasks(context, selectedOption, _focusMode);
+        _fetchTasks(context, selectedOption);
       },
       itemBuilder: (_) => [
         PopupMenuItem(
@@ -120,6 +118,19 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
             ],
           ),
         ),
+        PopupMenuItem(
+          value: FilterOptions.focusMode,
+          child: Row(
+            children: const [
+              Icon(
+                Icons.notification_important_rounded,
+                color: Colors.black,
+              ),
+              SizedBox(width: 8),
+              Text('Focus Mode'),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -127,15 +138,14 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
   Expanded displayTasks(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption, _focusMode),
+        future: _fetchTasks(context, selectedOption),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : RefreshIndicator(
-                    onRefresh: () =>
-                        _fetchTasks(context, selectedOption, _focusMode),
+                    onRefresh: () => _fetchTasks(context, selectedOption),
                     child: Consumer<TaskProvider>(
                       builder: (context, tasks, ch) => Scrollbar(
                         controller: _controller,
@@ -166,29 +176,6 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
                     ),
                   ),
       ),
-    );
-  }
-
-  Row changeFocusMode(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          'Focus Mode',
-          style: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-        Switch.adaptive(
-          activeColor: Theme.of(context).colorScheme.secondary,
-          value: _focusMode,
-          onChanged: (bool value) {
-            setState(() {
-              _focusMode = value;
-            });
-          },
-        ),
-      ],
     );
   }
 }

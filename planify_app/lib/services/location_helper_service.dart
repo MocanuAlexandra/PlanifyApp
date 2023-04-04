@@ -6,25 +6,24 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/task.dart';
 import '../helpers/utility.dart';
-
-const GOOGLE_API_KEY = 'AIzaSyBCtWNcI4lD7pMey-ZghzlfRvFjQ2FfLhM';
+import '../helpers/app_config.dart' as config;
 
 class LocationHelper {
   // function that generates a preview image of a certain location
   static String generateLocPreviewImg({double? latitude, double? longitude}) {
-    return 'https://maps.googleapis.com/maps/api/staticmap?center=&$latitude,$longitude&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Alabel:A%7C$latitude,$longitude&key=$GOOGLE_API_KEY';
+    return 'https://maps.googleapis.com/maps/api/staticmap?center=&$latitude,$longitude&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Alabel:A%7C$latitude,$longitude&key=${config.GOOGLE_API_KEY}';
   }
 
   // function that gets the address of a certain location based on lat and long
   static Future<String> getPlaceAddress(double lat, double lng) async {
     final url =
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$GOOGLE_API_KEY';
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=${config.GOOGLE_API_KEY}';
     final response = await http.get(Uri.parse(url));
     return json.decode(response.body)['results'][0]['formatted_address'];
   }
 
   static getApiKey() {
-    return GOOGLE_API_KEY;
+    return config.GOOGLE_API_KEY;
   }
 
   static getCurrentLocation() {
@@ -36,7 +35,7 @@ class LocationHelper {
       {double? latitude, double? longitude}) async {
     //TODO Modify the radious in production, but keep it for demo purposes
     final url =
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=1500&key=$GOOGLE_API_KEY';
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=1500&key=${config.GOOGLE_API_KEY}';
     final response = await http.get(Uri.parse(url));
     return json.decode(response.body)['results'];
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:planify_app/helpers/utility.dart';
 
 import '../models/task.dart';
+import '../helpers/app_config.dart' as config;
 
 class TextProcessingService {
   // This method processes the text that is passed to it and returns a Task object
@@ -12,13 +13,13 @@ class TextProcessingService {
     // define the regex pattern
     // this contain the action that the user wants to perform and the task details
     final regex = RegExp(
-        r'^(add|insert|put|go to|go for|go|remind me to|remind me|buy|set a reminder to|set a reminder for)\s((?:\w+\s*)+(?:(?:1[0-2]|[1-9])(?::(?:[0-5][0-9]))?\s?(?:A\.M\.|P\.M\.|a\.m\.|p\.m\.|AM|PM|am|pm)?)?)$');
+        '(${config.ACTION_PATTERN})\\s((?:\\w+\\s*)+${config.TIME_PATTERN})\$');
 
     // find the match
     final match = regex.firstMatch(inputText);
 
     if (match != null) {
-      final taskDetails = match.group(2)!.split(RegExp(r'\bon\b|\bat\b'));
+      final taskDetails = match.group(2)!.split(RegExp(config.SPLIT_PATTERN));
 
       //get the task title
       final taskTitle = taskDetails[0].trim();

@@ -169,6 +169,7 @@ class LocationBasedNotificationService {
       //         location.longitude!.toStringAsFixed(4)) {
       //   return;
       // }
+
       //update the current location
       _currentLocation = location;
 

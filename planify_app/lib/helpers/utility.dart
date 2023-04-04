@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/task.dart';
 import '../services/database_helper_service.dart';
+import '../helpers/app_config.dart' as config;
 
 // Utility class used to store static methods that are used in multiple classes
 class Utility {
@@ -621,15 +622,13 @@ class Utility {
   }
 
   static bool isStringDate(String date) {
-    final regexPattern = RegExp(
-        r'((?:January|February|March|April|May|June|July|August|September|October|November|December|january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?(?: \d{4})?)$');
+    final regexPattern = RegExp('(${config.DATE_PATTERN})');
 
     return regexPattern.hasMatch(date);
   }
 
   static bool isStringTime(String time) {
-    final regexPattern = RegExp(
-        r'((?:(?:1[0-2]|[1-9])(?::(?:[0-5][0-9]))?\s?(?:A\.M\.|P\.M\.|a\.m\.|p\.m\.|AM|PM|am|pm)?)?)$');
+    final regexPattern = RegExp('(${config.TIME_PATTERN})');
 
     return regexPattern.hasMatch(time);
   }

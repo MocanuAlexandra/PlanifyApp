@@ -116,6 +116,8 @@ class _VoiceControlCardState extends State<VoiceControlCard> {
     //process text and return Task object
     final taskToBeAdded = TextProcessingService.processText(text);
 
+    // if taskToBeAdded is not null, it means that the text was processed successfully
+    // and the Task object was created, so we can add it to the DB
     if (taskToBeAdded != null) {
       //add Task object to DB
       final taskId = await DBHelper.addTask(taskToBeAdded);
