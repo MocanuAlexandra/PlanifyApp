@@ -36,6 +36,7 @@ class DBHelper {
       return {
         'id': category.id,
         'name': category['name'],
+        'iconCode': category['iconCode'],
       };
     }).toList();
 
@@ -219,6 +220,25 @@ class DBHelper {
       ));
     }
     return tasks;
+  }
+
+  static Future<int> getCategoryIcon(String categoryName) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the categories from the connected user
+    final categories = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .get();
+
+    //get the category that matches the category name
+    final category = categories.docs
+        .where((element) => element['name'] == categoryName)
+        .toList();
+
+    //return the icon number
+    return category.first['iconCode'];
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -485,7 +505,8 @@ class DBHelper {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('categories')
         .doc(id)
-        .update({'name': editedCategory.name});
+        .update(
+            {'name': editedCategory.name, 'iconCode': editedCategory.iconCode});
   }
 
   // function for adding a task category
@@ -501,6 +522,7 @@ class DBHelper {
         .collection('categories')
         .add({
       'name': editedCategory.name,
+      'iconCode': editedCategory.iconCode,
     });
   }
 
@@ -945,5 +967,6 @@ class DBHelper {
       }
     }
   }
+
   ///////////////////////////////////////////////////////////////////////////
 }

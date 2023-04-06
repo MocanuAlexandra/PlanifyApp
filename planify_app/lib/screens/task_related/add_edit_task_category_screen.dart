@@ -22,6 +22,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
   var _editedCategory = TaskCategory(
     id: null,
     name: '',
+    iconCode: 57672, // Icons.category is default
   );
 
   var _initValues = {
@@ -29,6 +30,38 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
   };
 
   var _isInit = true;
+
+  Widget _buildIconGrid() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      shrinkWrap: true,
+      itemCount: Utility.iconList.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+      ),
+      itemBuilder: (ctx, index) {
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _editedCategory.iconCode = Utility.iconList[index].codePoint;
+            });
+          },
+          child: CircleAvatar(
+            backgroundColor:
+                _editedCategory.iconCode == Utility.iconList[index].codePoint
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
+            child: _editedCategory.iconCode == Utility.iconList[index].codePoint
+                ? Icon(Utility.iconList[index],
+                    color: Theme.of(context).colorScheme.onPrimary)
+                : Icon(Utility.iconList[index], color: Colors.black),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,33 +114,30 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
           Form(
             key: _formKey,
             child: Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextFormField(
-                        initialValue: _initValues['name'],
-                        decoration:
-                            const InputDecoration(labelText: 'Category name'),
-                        textInputAction: TextInputAction.next,
-                        onFieldSubmitted: (_) {
-                          _addEditCategory();
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Required field';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _editedCategory.name = value;
-                        },
-                      ),
-                    ],
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      initialValue: _initValues['name'],
+                      decoration:
+                          const InputDecoration(labelText: 'Category name'),
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) {
+                        _addEditCategory();
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Required field';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _editedCategory.name = value;
+                      },
+                    ),
+                    Expanded(child: _buildIconGrid()),
+                  ],
                 ),
               ),
             ),

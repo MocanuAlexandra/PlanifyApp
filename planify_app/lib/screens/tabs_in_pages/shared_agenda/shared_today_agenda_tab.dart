@@ -109,6 +109,7 @@ class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
                                 tasks.tasksList[index].locationCategory,
                             owner: tasks.tasksList[index].owner,
                             imageUrl: tasks.tasksList[index].imageUrl,
+                            category: tasks.tasksList[index].category,
                           ),
                         ),
                       ),

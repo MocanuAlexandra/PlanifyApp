@@ -634,4 +634,39 @@ class Utility {
   }
 
   //////////////////////////////////////////////////////////////
+  //**************** Constants ****************
+  static final List<IconData> iconList = [
+    Icons.category,
+    Icons.home,
+    Icons.settings,
+    Icons.star,
+    Icons.favorite,
+    Icons.shopping_cart,
+    Icons.work,
+    Icons.school,
+    Icons.directions_car,
+    Icons.local_airport,
+    Icons.beach_access,
+    Icons.book,
+    Icons.camera_alt,
+    Icons.fastfood,
+    Icons.local_laundry_service,
+    Icons.local_post_office,
+    Icons.music_note,
+    Icons.movie,
+    Icons.spa,
+    Icons.pets,
+    Icons.snowboarding,
+    Icons.fitness_center,
+    Icons.local_play,
+    Icons.ac_unit,
+    Icons.weekend,
+    Icons.local_mall,
+    Icons.sports_tennis,
+    Icons.theater_comedy,
+    Icons.local_florist,
+    Icons.local_bar,
+  ];
+
+  ////////////////////////////////////////////////////////////////////
 }

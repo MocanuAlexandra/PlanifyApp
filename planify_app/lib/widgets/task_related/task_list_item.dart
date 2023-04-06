@@ -20,21 +20,22 @@ class TaskListItem extends StatefulWidget {
   final String? locationCategory;
   final String? owner;
   final String? imageUrl;
+  final String? category;
 
-  const TaskListItem({
-    super.key,
-    required this.id,
-    this.title,
-    this.dueDate,
-    this.address,
-    this.time,
-    this.priority,
-    this.isDone,
-    this.isDeleted,
-    this.locationCategory,
-    this.owner,
-    this.imageUrl,
-  });
+  const TaskListItem(
+      {super.key,
+      required this.id,
+      this.title,
+      this.dueDate,
+      this.address,
+      this.time,
+      this.priority,
+      this.isDone,
+      this.isDeleted,
+      this.locationCategory,
+      this.owner,
+      this.imageUrl,
+      this.category});
 
   @override
   State<TaskListItem> createState() => _TaskListItemState();
@@ -43,6 +44,7 @@ class TaskListItem extends StatefulWidget {
 class _TaskListItemState extends State<TaskListItem> {
   bool dueDatePassed = false;
   bool dueTimePassed = false;
+  int? categoryIconCode;
 
   Future<void> _deleteTask(
       BuildContext context, String id, String? imageUrl) async {
@@ -263,11 +265,40 @@ class _TaskListItemState extends State<TaskListItem> {
 
   ListTile displayTitleAndDoneDeleteIconButtons(BuildContext context) {
     return ListTile(
-      title: Text(
-        widget.title!,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
+      title: Row(
+        children: [
+          FutureBuilder<void>(
+            future: getCategoryIcon(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  height: 25,
+                  width: 25,
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                for (int index = 0; index < Utility.iconList.length; index++) {
+                  if (categoryIconCode == Utility.iconList[index].codePoint) {
+                    return Icon(
+                      Utility.iconList[index],
+                      color: Theme.of(context).colorScheme.primary,
+                    );
+                  }
+                }
+              }
+              return const SizedBox();
+            },
+          ),
+          const SizedBox(
+            width: 6,
+          ),
+          Text(
+            widget.title!,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
       //address or location category
       subtitle: widget.address!.address! == 'No address chosen'
@@ -460,5 +491,10 @@ class _TaskListItemState extends State<TaskListItem> {
             : priority == "Casual"
                 ? Colors.green
                 : Colors.black;
+  }
+
+  Future<void> getCategoryIcon() async {
+    await DBHelper.getCategoryIcon(widget.category!)
+        .then((value) => categoryIconCode = value);
   }
 }

@@ -18,6 +18,7 @@ class TaskCategoryProvider with ChangeNotifier {
         return TaskCategory(
           id: category['id'],
           name: category['name'],
+          iconCode: category['iconCode'],
         );
       },
     ).toList();
@@ -25,5 +26,10 @@ class TaskCategoryProvider with ChangeNotifier {
 
   TaskCategory findByName(String categoryName) {
     return _categories.firstWhere((category) => category.name == categoryName);
+  }
+
+  int getCategoryIcon(String categoryName) {
+    TaskCategory category = findByName(categoryName);
+    return category.iconCode!;
   }
 }

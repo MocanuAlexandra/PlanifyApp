@@ -127,6 +127,7 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
                       locationCategory: tasks.tasksList[index].locationCategory,
                       owner: tasks.tasksList[index].owner,
                       imageUrl: tasks.tasksList[index].imageUrl,
+                      category: tasks.tasksList[index].category,
                     ),
                   ),
                 ),

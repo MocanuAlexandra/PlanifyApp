@@ -86,6 +86,7 @@ class _OverallAgendaTabState extends State<OverallAgendaTab> {
                                 tasks.tasksList[index].locationCategory,
                             owner: tasks.tasksList[index].owner,
                             imageUrl: tasks.tasksList[index].imageUrl,
+                            category: tasks.tasksList[index].category,
                           ),
                         ),
                       ),

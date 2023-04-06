@@ -24,11 +24,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   bool dueDatePassed = false;
   bool dueTimePassed = false;
   bool _isMapLoading = true;
+  int? categoryIconCode;
+  Task loadedTask = Task();
 
   @override
   Widget build(BuildContext context) {
     final taskId = ModalRoute.of(context)!.settings.arguments as String;
-    final loadedTask =
+    loadedTask =
         Provider.of<TaskProvider>(context, listen: false).findById(taskId);
 
     return FutureBuilder<String>(
@@ -199,7 +201,28 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   Row displayCategory(Task loadedTask) {
     return Row(
       children: [
-        const Icon(Icons.category),
+        FutureBuilder<void>(
+          future: getCategoryIcon(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                height: 25,
+                width: 25,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            } else {
+              for (int index = 0; index < Utility.iconList.length; index++) {
+                if (categoryIconCode == Utility.iconList[index].codePoint) {
+                  return Icon(
+                    Utility.iconList[index],
+                    color: Theme.of(context).colorScheme.primary,
+                  );
+                }
+              }
+            }
+            return const SizedBox();
+          },
+        ),
         const SizedBox(width: 10),
         Text(loadedTask.category!, style: const TextStyle(fontSize: 16)),
       ],
@@ -476,5 +499,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             : Utility.priorityEnumToString(priority) == "Casual"
                 ? Icons.low_priority_sharp
                 : Icons.question_mark;
+  }
+
+  Future<void> getCategoryIcon() async {
+    await DBHelper.getCategoryIcon(loadedTask.category!)
+        .then((value) => categoryIconCode = value);
   }
 }

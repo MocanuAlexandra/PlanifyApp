@@ -43,10 +43,6 @@ dependencies:
   flutter_form_builder: ^7.8.0 # For form creation
   form_builder_validators: ^8.5.0 # For form validation
 
-  # UI dependencies
-  intl: ^0.17.0 # For date formatting (don't use 0.18.0, it has a bug)
-  provider: ^6.0.5 # For state management
-
   # Image dependencies
   photo_view: ^0.14.0 # For photo viewer
   image_picker: ^0.8.7+1 # For image picker
@@ -58,6 +54,8 @@ dependencies:
   google_maps_webservice_ex: ^0.0.1+2 # For Google Maps API
 
   # Other dependencies
+  intl: ^0.17.0 # For date formatting (don't use 0.18.0, it has a bug)
+  provider: ^6.0.5 # For state management
   flutter_typeahead: ^4.3.7 # For typeahead search
   http: ^0.13.5 # For HTTP requests 
   month_picker_dialog_2: ^0.6.2+1 # For month picker
