@@ -488,18 +488,6 @@ class Utility {
 ////////////////////////////////////////////////////////////////////////////////////
 
   //**************** Auxiliary methods for tasks ****************
-  static Future<void> removeSharingForTask(String taskId) async {
-    //delete the task from the users' shared tasks
-    var sharedWithUsers = await Utility.determineAlreadySharedWithUsers(taskId);
-    if (sharedWithUsers.isNotEmpty) {
-      for (var email in sharedWithUsers) {
-        await DBHelper.deleteSharedTaskFromUser(taskId, email);
-      }
-    }
-
-    //delete the users for the task from the database
-    await DBHelper.deleteSharedWithUsers(taskId);
-  }
 
   static void sortTaskListByDueTime(List<dynamic> taskList) {
     taskList.sort((task1, task2) {
@@ -520,21 +508,6 @@ class Utility {
     int hour = int.parse(parts[0]);
     int minute = int.parse(parts[1]);
     return hour * 60 + minute;
-  }
-
-  //function that checks already selected users emails from database and returns a list of them
-  static Future<List<String>> determineAlreadySharedWithUsers(
-      String? taskId) async {
-    List<String> alreadySelectedUserEmails = [];
-    if (taskId != null) {
-      await DBHelper.getSharedWithUsers(taskId).then((userTasks) => {
-            for (final user in userTasks)
-              {
-                alreadySelectedUserEmails.add(user.email!),
-              }
-          });
-    }
-    return alreadySelectedUserEmails;
   }
 
   ///////////////////////////////////////////////////////////////

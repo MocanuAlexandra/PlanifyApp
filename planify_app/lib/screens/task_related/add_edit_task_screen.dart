@@ -6,6 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../models/task.dart';
+import '../../services/task_manipulation_service.dart';
 import '../../widgets/other/image/user_image_picker.dart';
 import '../../widgets/other/user_list_search.dart';
 import '../../services/database_helper_service.dart';
@@ -17,7 +18,6 @@ import '../../models/task_reminder.dart';
 import '../../providers/task_category_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/task_reminder_provider.dart';
-import '../../services/notification_service.dart';
 import '../../widgets/location/location_input.dart';
 import '../../widgets/other/check_box_list.dart';
 import '../pages/overall_agenda_page.dart';
@@ -413,9 +413,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     }
                   // if task is saved, then we need to check already selected users emails
                   : () async {
-                      _selectedUserEmails =
-                          await Utility.determineAlreadySharedWithUsers(
-                              _editedTask.id);
+                      _selectedUserEmails = await TaskManipulationService
+                          .determineAlreadySharedWithUsers(_editedTask.id);
                       await showDialog(
                         context: context,
                         builder: (context) => UserListSearch(
@@ -453,184 +452,27 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       // if we got an id, it means that we are editing a task
       if (_editedTask.id != null) {
         if (_editedTask.isDone == true) {
-          //show an alert dialog to the user if the task is done
-          //we ask the user if he wants to move the tasks to 'in progress' tasks
-          //and we update the task in the database accordingly
-          _displayDialogForDoneTask();
+          // show an alert dialog to the user if the task is done
+          // we ask the user if he wants to move the tasks to 'in progress' tasks
+          // and we update the task in the database accordingly
+          await editDoneTask();
         } else {
-          //check if the logged in user is the owner of the task in order to update the task accordingly
-          if (_editedTask.owner == DBHelper.currentUserId() ||
-              _editedTask.owner == null) {
-            //update the image in the database storage and get the url
-            //then set the image url in the task
-            _editedTask.imageUrl = await DBHelper.updateImageForTask(
-                _pickedImageFile, _editedTask.imageUrl, isImageDeleted);
-
-            //update the task in the database
-            await DBHelper.updateTask(_editedTask.id!, _editedTask);
-
-            //delete the notifications for the task and then add the new ones
-            await deleteNotificationsForTask(_editedTask.id!)
-                .then((value) async => {
-                      //check if the user selected a due date or time
-                      if (_editedTask.dueDate != null ||
-                          _editedTask.dueTime != null)
-                        {
-                          await addNotificationsForTask(_editedTask.id!),
-                        }
-                    });
-
-            //remove sharing for task, then update it
-            await Utility.removeSharingForTask(_editedTask.id!)
-                .then((value) async => {
-                      await shareTask(_editedTask.id!),
-                    });
-          } else {
-            //update the image in the database storage and get the url
-            //then set the image url in the task
-            _editedTask.imageUrl = await DBHelper.updateImageForSharedTask(
-                _pickedImageFile,
-                _editedTask.owner!,
-                _editedTask.imageUrl,
-                isImageDeleted);
-
-            //update the task in the database
-            await DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
-
-            //delete the notifications for the task and then add the new ones
-            await deleteNotificationsForSharedTask(_editedTask.id!)
-                .then((value) async => {
-                      //check if the user selected a due date or time
-                      if (_editedTask.dueDate != null ||
-                          _editedTask.dueTime != null)
-                        {
-                          await addNotificationsForTask(_editedTask.id!),
-                        }
-                    });
-          }
-
-          // go back to overall agenda screen
-          navigator.popAndPushNamed(OverallAgendaPage.routeName);
+          //if the task is not done, we update the task in the database normally
+          await TaskManipulationService.editTask(_editedTask, _pickedImageFile,
+              isImageDeleted, _selectedUserEmails, _selectedReminders);
         }
       }
+
       // if we didn't get an id, it means that we are adding a new task
       else {
-        //add the image in the database storage and get the url
-        //then set the image url in the task
-        _editedTask.imageUrl = await DBHelper.updateImageForTask(
-            _pickedImageFile, _editedTask.imageUrl, isImageDeleted);
-
-        //add the task in the database
-        String taskId = await DBHelper.addTask(_editedTask);
-
-        //share the task with the selected users
-        await shareTask(taskId);
-
-        //check if the user selected a due date or time
-        if (_editedTask.dueDate != null || _editedTask.dueTime != null) {
-          //add notifications for the task
-          await addNotificationsForTask(taskId);
-        }
-
-        // go back to overall agenda screen
-        navigator.popAndPushNamed(OverallAgendaPage.routeName);
+        //add the task to the database
+        await TaskManipulationService.addTask(_editedTask, _pickedImageFile,
+            isImageDeleted, _selectedUserEmails, _selectedReminders);
       }
     }
-  }
 
-  Future<void> deleteNotificationsForTask(String taskId) async {
-    //delete the notifications for the task from the database
-    await DBHelper.deleteRemindersForTask(taskId);
-
-    //delete the notifications for the task from the notification center
-    NotificationService.deleteNotification(taskId);
-  }
-
-  Future<void> deleteNotificationsForSharedTask(String taskId) async {
-    //delete the notifications for the task from the database
-    await DBHelper.deleteNotificationsForSharedTask(taskId);
-
-    //delete the notifications for the task from the notification center
-    NotificationService.deleteNotification(taskId);
-  }
-
-  Future<void> shareTask(String taskId) async {
-    //add the users to the task
-    if (_selectedUserEmails.isNotEmpty) {
-      for (var email in _selectedUserEmails) {
-        //first we add to task a list containing the id of users to whom we shared the task
-        await DBHelper.addShareWithUser(taskId, email);
-
-        // then we add to each user to whom we shared the task, a collection named 'sharedTask'
-        // in which we add a document containing the owner of task and taskId
-        await DBHelper.addSharedTaskToUser(taskId, email);
-      }
-    } else {
-      //if the _selectedUsersEmails is empty, we add an empty list 'sharedWith' in the task
-      await DBHelper.addShareWithUser(taskId, 'no users');
-    }
-  }
-
-  Future<void> addNotificationsForTask(String taskId) async {
-    //parse the selected reminders and create a notification for each one
-    if (_selectedReminders.isNotEmpty) {
-      for (String reminder in _selectedReminders) {
-        TaskReminder newReminder;
-        //check if the user selected only due date
-        if (_editedTask.dueDate != null && _editedTask.dueTime == null) {
-          newReminder = TaskReminder(
-            contentId: taskId.hashCode +
-                _editedTask.dueDate!.day +
-                _editedTask.dueDate!.month +
-                _editedTask.dueDate!.year +
-                reminder.hashCode,
-            reminder: reminder,
-          );
-          //add the notification to database
-          await DBHelper.addReminderForTask(taskId, newReminder);
-        }
-        //check if the user selected only time
-        else if (_editedTask.dueDate == null && _editedTask.dueTime != null) {
-          newReminder = TaskReminder(
-            contentId: taskId.hashCode +
-                _editedTask.dueTime!.hour +
-                _editedTask.dueTime!.minute +
-                reminder.hashCode,
-            reminder: reminder,
-          );
-          //add the notification to database according to the logged in user
-          if (_editedTask.owner == DBHelper.currentUserId() ||
-              _editedTask.owner == null) {
-            await DBHelper.addReminderForTask(taskId, newReminder);
-          } else {
-            await DBHelper.addReminderForSharedTask(taskId, newReminder);
-          }
-          //else it means that the user selected both due date and time
-        } else {
-          newReminder = TaskReminder(
-            contentId: taskId.hashCode +
-                _editedTask.dueDate!.day +
-                _editedTask.dueDate!.month +
-                _editedTask.dueDate!.year +
-                _editedTask.dueTime!.hour +
-                _editedTask.dueTime!.minute +
-                reminder.hashCode,
-            reminder: reminder,
-          );
-          //add the notification to database according to the logged in user
-          if (_editedTask.owner == DBHelper.currentUserId() ||
-              _editedTask.owner == null) {
-            await DBHelper.addReminderForTask(taskId, newReminder);
-          } else {
-            await DBHelper.addReminderForSharedTask(taskId, newReminder);
-          }
-        }
-
-        //add the notification to notification center
-        NotificationService.createNotificationForTask(
-            _editedTask, reminder, newReminder, taskId);
-      }
-    }
+    // go back to overall agenda screen
+    navigator.popAndPushNamed(OverallAgendaPage.routeName);
   }
 
   @override
@@ -805,63 +647,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     _editedTask.address = null;
   }
 
-  void _displayDialogForDoneTask() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Question"),
-            content: const Text(
-              """This task is done. Do you want to move it to "In progress" tasks?
-You have to set new reminders if you want to be notified about this task.""",
-              softWrap: true,
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("Yes"),
-                onPressed: () {
-                  // change the task to not done
-                  _editedTask.isDone = false;
-
-                  // check if the logged in user is the owner of the task
-                  if (_editedTask.owner == DBHelper.currentUserId() ||
-                      _editedTask.owner == null) {
-                    //update the task in the database
-                    DBHelper.updateTask(_editedTask.id!, _editedTask);
-                  } else {
-                    DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
-                  }
-
-                  // go back to overall agenda screen
-                  Navigator.of(context)
-                      .popAndPushNamed(OverallAgendaPage.routeName);
-                },
-              ),
-              TextButton(
-                child: const Text("No"),
-                onPressed: () {
-                  // change the task to done
-                  _editedTask.isDone = true;
-
-                  // check if the logged in user is the owner of the task
-                  if (_editedTask.owner == DBHelper.currentUserId() ||
-                      _editedTask.owner == null) {
-                    //update the task in the database
-                    DBHelper.updateTask(_editedTask.id!, _editedTask);
-                  } else {
-                    DBHelper.updateSharedTask(_editedTask.id!, _editedTask);
-                  }
-
-                  // go back to overall agenda screen
-                  Navigator.of(context)
-                      .popAndPushNamed(OverallAgendaPage.routeName);
-                },
-              ),
-            ],
-          );
-        });
-  }
-
   String _displayTime(TimeOfDay? selectedTime) {
     if (_editedTask.dueTime == null) {
       return 'No due time chosen';
@@ -888,5 +673,62 @@ You have to set new reminders if you want to be notified about this task.""",
         : '${_editedTask.dueDate!.month}';
     String year = '${_editedTask.dueDate!.year}';
     return 'Due date: $day/$month/$year';
+  }
+
+  Future<void> editDoneTask() async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Question"),
+            content: const Text(
+              """Do you want to move the task back to "In progress"?
+You have to set new reminders after the moving, if you want to be notified about this task.""",
+              softWrap: true,
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("Yes"),
+                onPressed: () {
+                  // change the task to not done
+                  _editedTask.isDone = false;
+
+                  // edit the task
+                  TaskManipulationService.editTask(
+                    _editedTask,
+                    _pickedImageFile,
+                    isImageDeleted,
+                    _selectedUserEmails,
+                    _selectedReminders,
+                  );
+
+                  // go back to overall agenda screen
+                  Navigator.of(context)
+                      .popAndPushNamed(OverallAgendaPage.routeName);
+                },
+              ),
+              TextButton(
+                child: const Text("No"),
+                onPressed: () {
+                  // change the task to done
+                  _editedTask.isDone = true;
+
+                  // edit the task
+                  TaskManipulationService.editTask(
+                    _editedTask,
+                    _pickedImageFile,
+                    isImageDeleted,
+                    _selectedUserEmails,
+                    _selectedReminders,
+                  );
+
+                  // go back to overall agenda screen
+                  Navigator.of(context)
+                      .popAndPushNamed(OverallAgendaPage.routeName);
+                },
+              ),
+            ],
+          );
+        });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planify_app/services/task_manipulation_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/database_helper_service.dart';
@@ -72,7 +73,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.deleteRemindersForTask(id);
 
     // remove sharing for this task
-    Utility.removeSharingForTask(id);
+    TaskManipulationService.removeSharingForTask(id);
 
     // remove task from UI
     Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
