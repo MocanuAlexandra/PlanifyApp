@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../services/database_helper_service.dart';
 import '../models/task_category.dart';
+import '../services/database_helper_service.dart';
 
 class TaskCategoryProvider with ChangeNotifier {
   List<TaskCategory> _categories = [];

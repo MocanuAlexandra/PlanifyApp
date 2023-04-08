@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:planify_app/services/database_helper_service.dart';
+import '../../services/database_helper_service.dart';
 
 import '../../helpers/utility.dart';
 import '../../screens/pages/overall_agenda_page.dart';

@@ -2,15 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../models/task.dart';
 import '../models/task_reminder.dart';
-import '../providers/task_provider.dart';
 import 'database_helper_service.dart';
 import 'notification_service.dart';
 
-class TaskManipulationService {
+class TaskService {
   static Timer? timer;
 
   //********************* TASK MANIPULATION **********************/
@@ -103,25 +101,24 @@ class TaskManipulationService {
       int? intervalOfEmptyingTrash, BuildContext context) {
     timer =
         Timer.periodic(Duration(minutes: intervalOfEmptyingTrash!), (timer) {
-      emptyTrash(context, intervalOfEmptyingTrash);
+      emptyTrash(intervalOfEmptyingTrash);
     });
   }
 
   // turn off the auto emptying trash
   static void turnOffAutoEmptyingTrash() {
-    timer!.cancel();
+    if (timer != null) {
+      timer!.cancel();
+    }
   }
 
   //main function for emptying trash
-  static emptyTrash(BuildContext context, int? intervalOfEmptyingTrash) {
+  static emptyTrash(int? intervalOfEmptyingTrash) {
     //remove the images for the tasks
     DBHelper.deleteAllImages();
 
     //delete tasks from DB
     DBHelper.deleteAllTasks();
-
-    // remove task from UI
-    Provider.of<TaskProvider>(context, listen: false).deleteAllTasks();
   }
   //////////////////////////////////////////////////////////////////////
 

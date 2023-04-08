@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/services/task_manipulation_service.dart';
+import '../../services/task_service.dart';
 import 'package:provider/provider.dart';
 
 import 'overall_agenda_page.dart';
@@ -51,46 +51,46 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
   FutureBuilder<dynamic> clearTrash(BuildContext context) {
     return FutureBuilder(
       future: _existDeletedTasks(),
-      builder: (context, snapshot) => snapshot.connectionState ==
-              ConnectionState.waiting
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : snapshot.data == true
-              ? IconButton(
-                  icon: const Icon(Icons.delete_forever_outlined),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Question'),
-                        content: const Text(
-                            'Are you sure you want to permanently delete all tasks?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              // empty trash
-                              TaskManipulationService.emptyTrash(context, null);
-
-                              //close dialog
-                              Navigator.of(context).pushReplacementNamed(
-                                OverallAgendaPage.routeName,
-                              );
-                            },
-                            child: const Text('Yes'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('No'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+      builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.waiting
+              ? const Center(
+                  child: CircularProgressIndicator(),
                 )
-              : const SizedBox(),
+              : snapshot.data == true
+                  ? IconButton(
+                      icon: const Icon(Icons.delete_forever_outlined),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Question'),
+                            content: const Text(
+                                'Are you sure you want to permanently delete all tasks?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  // empty trash
+                                  TaskService.emptyTrash(null);
+
+                                  //close dialog
+                                  Navigator.of(context).pushReplacementNamed(
+                                    OverallAgendaPage.routeName,
+                                  );
+                                },
+                                child: const Text('Yes'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('No'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
+                  : const SizedBox(),
     );
   }
 

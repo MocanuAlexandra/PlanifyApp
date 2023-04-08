@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../../../../screens/task_related/add_edit_task_category_screen.dart';
 import '../../../../screens/task_related/add_edit_task_screen.dart';

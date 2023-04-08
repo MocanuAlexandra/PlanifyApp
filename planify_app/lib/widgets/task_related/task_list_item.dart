@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/services/task_manipulation_service.dart';
+import '../../services/task_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/database_helper_service.dart';
@@ -59,7 +59,7 @@ class _TaskListItemState extends State<TaskListItem> {
     }
 
     // remove task from UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).removeTaskFromScreen(id);
   }
 
   void _markAsDeleted(BuildContext context, String id) {
@@ -73,10 +73,10 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.deleteRemindersForTask(id);
 
     // remove sharing for this task
-    TaskManipulationService.removeSharingForTask(id);
+    TaskService.removeSharingForTask(id);
 
     // remove task from UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).removeTaskFromScreen(id);
   }
 
   void _markAsUndeleted(BuildContext context, String id) {
@@ -84,7 +84,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.markTaskAsUndeleted(id);
 
     // remove task from UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).removeTaskFromScreen(id);
   }
 
   void _markTaskAsDone(BuildContext context, String id) {
@@ -98,7 +98,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.deleteRemindersForTask(id);
 
     // mark task as done in UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).removeTaskFromScreen(id);
   }
 
   void _markSharedTaskAsDone(BuildContext context, String id, String owner) {
@@ -112,7 +112,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.deleteNotificationsForSharedTask(id);
 
     // mark task as done in UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(id);
+    Provider.of<TaskProvider>(context, listen: false).removeTaskFromScreen(id);
   }
 
   Row displayPriority() {
@@ -295,9 +295,15 @@ class _TaskListItemState extends State<TaskListItem> {
           ),
           Text(
             widget.title!,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
+            style: widget.isDone!
+                ? const TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                    decorationThickness: 2,
+                    fontWeight: FontWeight.bold,
+                  )
+                : const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
           ),
         ],
       ),
@@ -445,11 +451,13 @@ class _TaskListItemState extends State<TaskListItem> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          color: widget.isDeleted!
-              ? const Color.fromARGB(255, 255, 219, 219)
-              : widget.isDone!
-                  ? const Color.fromARGB(255, 231, 254, 225)
-                  : const Color.fromARGB(255, 255, 252, 219),
+          color: widget.priority == 'Important'
+              ? const Color.fromARGB(255, 255, 230, 230)
+              : widget.priority == 'Casual'
+                  ? const Color.fromARGB(255, 236, 255, 232)
+                  : widget.priority == 'Necessary'
+                      ? const Color.fromARGB(255, 254, 237, 221)
+                      : const Color.fromARGB(255, 255, 253, 230),
           elevation: 4,
           margin: const EdgeInsets.all(10),
           child: Column(

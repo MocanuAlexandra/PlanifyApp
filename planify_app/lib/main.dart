@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:planify_app/services/task_manipulation_service.dart';
+import 'services/task_service.dart';
 
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -173,11 +173,11 @@ class _MyAppState extends State<MyApp> {
           if (_filters['selfEmptyingTrash'] != false &&
               _filters['intervalOfSelfEmptyingTrash'] != null)
             {
-              TaskManipulationService.turnOnAutoEmptyingTrash(
+              TaskService.turnOnAutoEmptyingTrash(
                   _filters['intervalOfSelfEmptyingTrash'], context_)
             }
           else
-            {TaskManipulationService.turnOffAutoEmptyingTrash()}
+            {TaskService.turnOffAutoEmptyingTrash()}
         });
   }
 }

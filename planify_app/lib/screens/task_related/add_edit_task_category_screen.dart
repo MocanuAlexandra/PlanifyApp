@@ -97,7 +97,7 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
                                 'Do you want to permanently delete this category?')
                             .then((value) {
                           if (value!) {
-                            _deleteCategory(context, _editedCategory.id!);
+                            DBHelper.deleteTaskCategory(_editedCategory.id!);
                             Navigator.of(context).pushReplacementNamed(
                                 OverallAgendaPage.routeName);
                           }
@@ -208,10 +208,5 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
         Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
       }
     }
-  }
-
-  void _deleteCategory(BuildContext context, String categoryId) {
-    DBHelper.deleteTaskCategory(categoryId);
-    Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
   }
 }

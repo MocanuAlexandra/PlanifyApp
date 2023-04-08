@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:planify_app/services/task_manipulation_service.dart';
+import '../../services/task_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/database_helper_service.dart';
@@ -461,7 +461,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     }
 
     // remove task from UI
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(loaded.id!);
+    Provider.of<TaskProvider>(context, listen: false)
+        .removeTaskFromScreen(loaded.id!);
   }
 
   void _markAsDeleted(BuildContext context, Task task) {
@@ -475,11 +476,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     DBHelper.deleteRemindersForTask(task.id!);
 
     // remove sharing for this task
-    TaskManipulationService.removeSharingForTask(task.id!);
+    TaskService.removeSharingForTask(task.id!);
 
     // go to overall page and remove task from UI
     Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
-    Provider.of<TaskProvider>(context, listen: false).deleteTask(task.id!);
+    Provider.of<TaskProvider>(context, listen: false)
+        .removeTaskFromScreen(task.id!);
   }
 
   Color _priorityColor(Priority? priority) {

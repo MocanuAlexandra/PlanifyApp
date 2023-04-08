@@ -46,6 +46,12 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
         actions: [
           IconButton(
               onPressed: () async {
+                //check if there is at least one task
+                if (tasks.isEmpty) {
+                  Utility.displayInformationalDialog(
+                      context, 'There is no tasks for today');
+                  return;
+                }
                 //check if at least one task has location chosen
                 if (tasks
                     .where(

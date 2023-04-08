@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/task.dart';
-import '../services/database_helper_service.dart';
 import '../helpers/app_config.dart' as config;
 
 // Utility class used to store static methods that are used in multiple classes

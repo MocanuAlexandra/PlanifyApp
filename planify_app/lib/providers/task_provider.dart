@@ -197,12 +197,12 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteTask(String id) {
+  void removeTaskFromScreen(String id) {
     _tasks.removeWhere((task) => task.id == id);
     notifyListeners();
   }
 
-  void deleteAllTasks() {
+  void removeAllTasksFromScreen() {
     _tasks.clear();
     notifyListeners();
   }

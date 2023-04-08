@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:planify_app/helpers/utility.dart';
+import '../helpers/utility.dart';
 
 import '../models/task.dart';
 import '../helpers/app_config.dart' as config;

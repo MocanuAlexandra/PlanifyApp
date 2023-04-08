@@ -6,7 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../models/task.dart';
-import '../../services/task_manipulation_service.dart';
+import '../../services/task_service.dart';
 import '../../widgets/other/image/user_image_picker.dart';
 import '../../widgets/other/user_list_search.dart';
 import '../../services/database_helper_service.dart';
@@ -413,8 +413,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     }
                   // if task is saved, then we need to check already selected users emails
                   : () async {
-                      _selectedUserEmails = await TaskManipulationService
-                          .determineAlreadySharedWithUsers(_editedTask.id);
+                      _selectedUserEmails =
+                          await TaskService.determineAlreadySharedWithUsers(
+                              _editedTask.id);
                       await showDialog(
                         context: context,
                         builder: (context) => UserListSearch(
@@ -458,7 +459,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           await editDoneTask();
         } else {
           //if the task is not done, we update the task in the database normally
-          await TaskManipulationService.editTask(_editedTask, _pickedImageFile,
+          await TaskService.editTask(_editedTask, _pickedImageFile,
               isImageDeleted, _selectedUserEmails, _selectedReminders);
         }
       }
@@ -466,8 +467,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       // if we didn't get an id, it means that we are adding a new task
       else {
         //add the task to the database
-        await TaskManipulationService.addTask(_editedTask, _pickedImageFile,
-            isImageDeleted, _selectedUserEmails, _selectedReminders);
+        await TaskService.addTask(_editedTask, _pickedImageFile, isImageDeleted,
+            _selectedUserEmails, _selectedReminders);
       }
     }
 
@@ -694,7 +695,7 @@ You have to set new reminders after the moving, if you want to be notified about
                   _editedTask.isDone = false;
 
                   // edit the task
-                  TaskManipulationService.editTask(
+                  TaskService.editTask(
                     _editedTask,
                     _pickedImageFile,
                     isImageDeleted,
@@ -714,7 +715,7 @@ You have to set new reminders after the moving, if you want to be notified about
                   _editedTask.isDone = true;
 
                   // edit the task
-                  TaskManipulationService.editTask(
+                  TaskService.editTask(
                     _editedTask,
                     _pickedImageFile,
                     isImageDeleted,
