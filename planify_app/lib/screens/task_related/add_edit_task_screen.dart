@@ -443,10 +443,6 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     NavigatorState navigator = Navigator.of(context);
 
     if (isValid) {
-      setState(() {
-        _isLoading = true;
-      });
-
       // save the form
       _formKey.currentState!.save();
 
@@ -458,22 +454,62 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           // and we update the task in the database accordingly
           await editDoneTask();
         } else {
+          setState(() {
+            _isLoading = true;
+          });
           //if the task is not done, we update the task in the database normally
           await TaskService.editTask(_editedTask, _pickedImageFile,
               isImageDeleted, _selectedUserEmails, _selectedReminders);
+
+          // go back to overall agenda screen
+          navigator.popAndPushNamed(OverallAgendaPage.routeName);
         }
       }
 
       // if we didn't get an id, it means that we are adding a new task
       else {
-        //add the task to the database
-        await TaskService.addTask(_editedTask, _pickedImageFile, isImageDeleted,
-            _selectedUserEmails, _selectedReminders);
+        // we first verify if the task is labeled as "appointment" and doesn't have
+        // a due date and due time
+        if (TaskService.isAppointment(_editedTask)) {
+          Utility.displayInformationalDialog(context,
+              'This is an appointment! Please select due date and due time!');
+        }
+
+        //check if the task is labeled as "exam" and doesn't have
+        // a due date and due time
+        else if (TaskService.isExam(_editedTask)) {
+          Utility.displayInformationalDialog(context,
+              'This is an important test! Please select due date and due time!');
+        }
+
+        //check if the task is labeled as "meeting" and doesn't have
+        // a due date and due time
+        else if (TaskService.isMeeting(_editedTask)) {
+          Utility.displayInformationalDialog(context,
+              'This is a meeting! Please select due date and due time!');
+        }
+
+        //check if the task is labeled as "interview" and doesn't have
+        // a due date and due time
+        else if (TaskService.isInterview(_editedTask)) {
+          Utility.displayInformationalDialog(context,
+              'This is an interview! Please select due date and due time!');
+        }
+
+        // if there is no case, add the task normally
+        else {
+          setState(() {
+            _isLoading = true;
+          });
+          //add the task to the database
+          await TaskService.addTask(_editedTask, _pickedImageFile,
+              isImageDeleted, _selectedUserEmails, _selectedReminders);
+
+          // go back to overall agenda screen
+          navigator.popAndPushNamed(OverallAgendaPage.routeName);
+        }
       }
     }
-
-    // go back to overall agenda screen
-    navigator.popAndPushNamed(OverallAgendaPage.routeName);
   }
 
   @override

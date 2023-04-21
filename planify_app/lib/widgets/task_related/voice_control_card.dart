@@ -4,6 +4,7 @@ import '../../services/database_helper_service.dart';
 
 import '../../helpers/utility.dart';
 import '../../screens/pages/overall_agenda_page.dart';
+import '../../services/task_service.dart';
 import '../../services/text_processing_service.dart';
 import '../../services/voice_control_service.dart';
 
@@ -119,14 +120,45 @@ class _VoiceControlCardState extends State<VoiceControlCard> {
     // if taskToBeAdded is not null, it means that the text was processed successfully
     // and the Task object was created, so we can add it to the DB
     if (taskToBeAdded != null) {
-      //add Task object to DB
-      final taskId = await DBHelper.addTask(taskToBeAdded);
+      //first check if task is from a special category
+      // we first verify if the task is labeled as "appointment" and doesn't have
+      // a due date and due time
+      if (TaskService.isAppointment(taskToBeAdded)) {
+        Utility.displayInformationalDialog(context,
+            'This is an appointment! Try saying again and add due date and due time as well!');
+      }
+      //check if the task is labeled as "exam" and doesn't have
+      // a due date and due time
+      else if (TaskService.isExam(taskToBeAdded)) {
+        Utility.displayInformationalDialog(context,
+            'This is an important test! Try saying again and add due date and due time as well!');
+      }
 
-      //add an empty sharedWith list to DB
-      await DBHelper.addShareWithUser(taskId, 'no users');
+      //check if the task is labeled as "meeting" and doesn't have
+      // a due date and due time
+      else if (TaskService.isMeeting(taskToBeAdded)) {
+        Utility.displayInformationalDialog(context,
+            'This is a meeting! Try saying again and add due date and due time as well!');
+      }
 
-      //reload the screen
-      navigator.popAndPushNamed(OverallAgendaPage.routeName);
+      //check if the task is labeled as "interview" and doesn't have
+      // a due date and due time
+      else if (TaskService.isInterview(taskToBeAdded)) {
+        Utility.displayInformationalDialog(context,
+            'This is an interview! Try saying again and add due date and due time as well!');
+      }
+
+      // if there is no case, add the task normally
+      else {
+        //add Task object to DB
+        final taskId = await DBHelper.addTask(taskToBeAdded);
+
+        //add an empty sharedWith list to DB
+        await DBHelper.addShareWithUser(taskId, 'no users');
+
+        //reload the screen
+        navigator.popAndPushNamed(OverallAgendaPage.routeName);
+      }
     } else {
       Utility.displayInformationalDialog(
           context, '''The service could not understand you :(

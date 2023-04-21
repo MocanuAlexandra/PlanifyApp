@@ -253,5 +253,60 @@ class TaskService {
     //delete the users for the task from the database
     await DBHelper.deleteSharedWithUsers(taskId);
   }
+
+  //function that check if the task that we are trying to add is an appointment
+  // so has "appointment" word in title
+  static bool isAppointment(Task task) {
+    if ((task.title!.toLowerCase().contains('appointment') ||
+            task.title!.toLowerCase().contains('doctor') ||
+            task.title!.toLowerCase().contains('dentist')) &&
+        (((task.dueDate == null && task.dueTime == null)) ||
+            (task.dueDate != null && task.dueTime == null) ||
+            (task.dueDate == null && task.dueTime != null))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //same for test/exam
+  static bool isExam(Task task) {
+    if ((task.title!.toLowerCase().contains('exam') ||
+            task.title!.toLowerCase().contains('examen') ||
+            task.title!.toLowerCase().contains('test')) &&
+        (((task.dueDate == null && task.dueTime == null)) ||
+            (task.dueDate != null && task.dueTime == null) ||
+            (task.dueDate == null && task.dueTime != null))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //same for meeting
+  static bool isMeeting(Task task) {
+    if ((task.title!.toLowerCase().contains('meeting') ||
+            task.title!.toLowerCase().contains('reunion') ||
+            task.title!.toLowerCase().contains('meet')) &&
+        (((task.dueDate == null && task.dueTime == null)) ||
+            (task.dueDate != null && task.dueTime == null) ||
+            (task.dueDate == null && task.dueTime != null))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  //same for interview
+  static bool isInterview(Task task) {
+    if ((task.title!.toLowerCase().contains('interview')) &&
+        (((task.dueDate == null && task.dueTime == null)) ||
+            (task.dueDate != null && task.dueTime == null) ||
+            (task.dueDate == null && task.dueTime != null))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   ////////////////////////////////////////////////////////////////////
 }
