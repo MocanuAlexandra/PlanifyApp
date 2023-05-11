@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/task.dart';
 import '../helpers/app_config.dart' as config;
+import '../services/database_helper_service.dart';
 
 // Utility class used to store static methods that are used in multiple classes
 class Utility {
@@ -507,6 +508,19 @@ class Utility {
     int hour = int.parse(parts[0]);
     int minute = int.parse(parts[1]);
     return hour * 60 + minute;
+  }
+
+  static Future<bool> existsTaskWithLocationCategpoySelected() async {
+    bool existTasksWithLocationCategprySelected = false;
+    final tasks = await DBHelper.fetchListOfTasks();
+
+    for (final task in tasks) {
+      if (task.locationCategory != 'No location category chosen') {
+        existTasksWithLocationCategprySelected = true;
+        break;
+      }
+    }
+    return existTasksWithLocationCategprySelected;
   }
 
   ///////////////////////////////////////////////////////////////

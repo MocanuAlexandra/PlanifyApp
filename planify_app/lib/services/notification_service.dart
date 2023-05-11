@@ -85,12 +85,7 @@ class NotificationService {
         },
       ),
       schedule: NotificationCalendar(
-        hour: notificationTime.hour,
-        minute: notificationTime.minute,
-        second: notificationTime.second + 2,
-        repeats: true,
-        preciseAlarm: true,
-      ),
+          hour: notificationTime.hour, minute: notificationTime.minute),
       actionButtons: [
         NotificationActionButton(
           key: 'done',

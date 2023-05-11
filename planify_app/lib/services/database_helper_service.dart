@@ -82,6 +82,43 @@ class DBHelper {
     return tasksList;
   }
 
+  //function for fetching the task as list
+  static Future<List<task_model.Task>> fetchListOfTasks() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the shared tasks
+    final tasksData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .get();
+
+    List<task_model.Task> tasks = [];
+
+    //loop through the tasks
+    for (var task in tasksData.docs) {
+      tasks.add(task_model.Task(
+        id: task.id,
+        title: task['title'],
+        dueDate: Utility.stringToDateTime(task['dueDate']),
+        address: TaskAddress(
+          latitude: task['latitude'],
+          longitude: task['longitude'],
+          address: task['address'],
+        ),
+        dueTime: Utility.stringToTimeOfDay(task['time']),
+        priority: Utility.stringToPriorityEnum(task['priority']),
+        isDone: task['isDone'],
+        isDeleted: task['isDeleted'],
+        category: task['category'],
+        locationCategory: task['locationCategory'],
+        owner: task['owner'],
+        imageUrl: task['imageUrl'],
+      ));
+    }
+    return tasks;
+  }
+
   // function for fetching the reminders if logged user is the owner of the task
   static Future<List<Map<String, dynamic>>> fetchReminders(
       String taskId) async {

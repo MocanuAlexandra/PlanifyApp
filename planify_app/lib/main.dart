@@ -160,13 +160,13 @@ class _MyAppState extends State<MyApp> {
           if (_filters['locationBasedNotification'] != false &&
               _filters['intervalOfNotification'] != null)
             {
-              await LocationBasedNotificationService.turnOff(),
-              await LocationBasedNotificationService.turnOn(
+              LocationBasedNotificationService.turnOff(),
+              LocationBasedNotificationService.turnOn(
                   context_, _filters['intervalOfNotification']),
             }
           else
             {
-              await LocationBasedNotificationService.turnOff(),
+              LocationBasedNotificationService.turnOff(),
             },
 
           //check if self emptying trash is enabled

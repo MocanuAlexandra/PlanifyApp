@@ -33,35 +33,35 @@ dependencies:
     sdk: flutter
 
   # Firebase dependencies
-  firebase_core: ^2.10.0 # For Firebase Core
-  cloud_firestore: ^4.5.2 # For database
-  firebase_auth: ^4.4.2 # For authentication
+  firebase_core: ^2.11.0 # For Firebase Core
+  cloud_firestore: ^4.6.0 # For database
+  firebase_auth: ^4.5.0 # For authentication
   google_sign_in: ^6.1.0 # For Google Sign In
-  firebase_storage: ^11.1.1 # For Firebase Storage
+  firebase_storage: ^11.1.2 # For Firebase Storage
 
   # Validation dependencies
   flutter_form_builder: ^8.0.0 # For form creation
-  form_builder_validators: ^8.5.0 # For form validation
+  form_builder_validators: ^8.6.1 # For form validation
 
   # Image dependencies
   photo_view: ^0.14.0 # For photo viewer
-  image_picker: ^0.8.7+1 # For image picker
+  image_picker: ^0.8.7+4 # For image picker
 
   # Maps dependencies
   location: ^4.4.0 # For location services
-  google_maps_flutter: ^2.2.5 # For Google Maps
-  google_maps_flutter_web: ^0.4.0+7 # For Google Maps Web
+  google_maps_flutter: ^2.2.6 # For Google Maps
+  google_maps_flutter_web: ^0.4.0+8 # For Google Maps Web
   google_maps_webservice_ex: ^0.0.1+2 # For Google Maps API
 
   # Other dependencies
   intl: ^0.17.0 # For date formatting (don't use 0.18.0, it has a bug)
   provider: ^6.0.5 # For state management
-  flutter_typeahead: ^4.3.7 # For typeahead search
-  http: ^0.13.5 # For HTTP requests 
+  flutter_typeahead: ^4.3.8 # For typeahead search
+  http: ^0.13.6 # For HTTP requests 
   month_picker_dialog_2: ^0.6.2+1 # For month picker
   awesome_notifications: ^0.7.4+1 # For notifications
-  shared_preferences: ^2.1.0 # For local storage
-  url_launcher: ^6.1.10 # For opening URLs
+  shared_preferences: ^2.1.1 # For local storage
+  url_launcher: ^6.1.11 # For opening URLs
   uuid: ^3.0.7 # For generating UUIDs
   speech_to_text: ^6.1.1 # For speech to text
   avatar_glow: ^2.0.2 # For avatar glow

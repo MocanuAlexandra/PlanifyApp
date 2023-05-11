@@ -2,138 +2,96 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:provider/provider.dart';
+import 'package:planify_app/services/database_helper_service.dart';
 
+import '../helpers/utility.dart';
 import 'location_helper_service.dart';
-import '../providers/task_provider.dart';
 import 'notification_service.dart';
 
 class LocationBasedNotificationService {
   static LocationData? _currentLocation;
   static List<dynamic>? _nearbyPlaces;
   static StreamSubscription<LocationData>? _locationSubscription;
-  static BuildContext? _context;
-  static BuildContext? _contextt;
-  static Timer? timer;
+  static Timer? _timer;
+  static bool existTasksWithLocationCategprySelected = false;
+  static final Set<String> _processedTaskIds = {};
 
   static Future<List<dynamic>> getListOfNearbyPlaces() async {
     await LocationHelper.getNearbyPlaces(
-            latitude: _currentLocation!.latitude!,
-            longitude: _currentLocation!.longitude!)
-        .then((value) => _nearbyPlaces = value);
+      latitude: _currentLocation!.latitude!,
+      longitude: _currentLocation!.longitude!,
+    ).then((value) => _nearbyPlaces = value);
     return _nearbyPlaces!;
   }
 
-  static void checkForLocations(BuildContext context, int interval) async {
-    _context = context;
-    print("is here");
-    var tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList;
+  static Future<void> checkForLocations(int interval) async {
+    // reset the set of processed task IDs
+    _processedTaskIds.clear();
 
-    timer = Timer.periodic(Duration(minutes: interval), (timer) async {
-      //iterate through the tasks that are not deleted and not done
-      //and have a location category
-      for (var task in tasks) {
-        if (task.locationCategory != "No location category chosen" &&
-            task.isDeleted == false &&
-            task.isDone == false) {
-          //check if the due time and due date have passed
-          //meaning dueDate/time is not null and dueDate/time is before now
-          if (task.dueDate != null &&
-              task.dueTime != null &&
-              task.dueDate!.isBefore(DateTime.now()) &&
+    //get the task from DB
+    final tasks = await DBHelper.fetchListOfTasks();
+
+    for (final task in tasks) {
+      //add task IDs into set, in order to be ckecked only once
+      if (_processedTaskIds.contains(task.id!)) {
+        continue;
+      }
+
+      //if task is done, deleted or doesn't have a location category, get over it
+      if (task.isDeleted ||
+          task.isDone ||
+          task.locationCategory == 'No location category chosen') {
+        continue;
+      }
+
+      final dueDate = task.dueDate;
+      final dueTime = task.dueTime;
+
+      if ((dueDate != null &&
+              dueTime != null &&
+              dueDate.isBefore(DateTime.now()) &&
               DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day,
-                      task.dueTime!.hour,
-                      task.dueTime!.minute)
-                  .isAfter(DateTime.now())) {
-            //get the nearby places
-            await getListOfNearbyPlaces().then((nearbyPlaces) => {
-                  for (var place in nearbyPlaces)
-                    {
-                      for (var type in place['types'])
-                        {
-                          if (type == task.locationCategory)
-                            {
-                              //notify the user
-                              NotificationService
-                                  .createLocationBasedNotification(
-                                      task.id!,
-                                      task.title!,
-                                      place['name'],
-                                      type,
-                                      DateTime.now()),
-                            }
-                        }
-                    }
-                });
-            //check if the due date have passed
-            //meaning dueDate is not null and dueTime it is
-          } else if (task.dueDate != null &&
-              task.dueTime == null &&
-              task.dueDate!.day != DateTime.now().day &&
-              task.dueDate!.month != DateTime.now().month &&
-              task.dueDate!.year != DateTime.now().year) {
-            //get the nearby places
-            await getListOfNearbyPlaces().then((nearbyPlaces) => {
-                  for (var place in nearbyPlaces)
-                    {
-                      for (var type in place['types'])
-                        {
-                          if (type == task.locationCategory)
-                            {
-                              //notify the user
-                              NotificationService
-                                  .createLocationBasedNotification(
-                                      task.id!,
-                                      task.title!,
-                                      place['name'],
-                                      type,
-                                      DateTime.now()),
-                            }
-                        }
-                    }
-                });
-            //last case is when the due date/time are both null
-          } else if (task.dueDate == null && task.dueTime == null) {
-            //get the nearby places
-            await getListOfNearbyPlaces().then((nearbyPlaces) => {
-                  for (var place in nearbyPlaces)
-                    {
-                      for (var type in place['types'])
-                        {
-                          if (type == task.locationCategory)
-                            {
-                              //notify the user
-                              NotificationService
-                                  .createLocationBasedNotification(
-                                      task.id!,
-                                      task.title!,
-                                      place['name'],
-                                      type,
-                                      DateTime.now()),
-                            }
-                        }
-                    }
-                });
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+                dueTime.hour,
+                dueTime.minute,
+              ).isAfter(DateTime.now())) ||
+          (dueDate != null &&
+              dueTime == null &&
+              dueDate.isBefore(DateTime.now()) &&
+              dueDate.day != DateTime.now().day &&
+              dueDate.month != DateTime.now().month &&
+              dueDate.year != DateTime.now().year) ||
+          (dueDate == null && dueTime == null)) {
+        //check if any nearby location has type the same as location category from task
+        for (final place in _nearbyPlaces!) {
+          for (final type in place['types']) {
+            if (type == task.locationCategory) {
+              NotificationService.createLocationBasedNotification(
+                task.id!,
+                task.title!,
+                place['name'],
+                type,
+                DateTime.now(),
+              );
+              _processedTaskIds.add(task.id!);
+              break;
+            }
           }
         }
       }
-    });
+    }
   }
 
   static Future<bool> checkLocationPermission(BuildContext context) async {
-    _context = context;
     bool isPermissionGranted = false;
     final locPermission = await Location().hasPermission();
 
-    // if the user has already granted the location permission
     if (locPermission == PermissionStatus.granted ||
         locPermission == PermissionStatus.grantedLimited) {
       isPermissionGranted = true;
     } else {
-      // if not, ask for it
       final locPermission = await Location().requestPermission();
 
       if (locPermission == PermissionStatus.granted ||
@@ -147,39 +105,38 @@ class LocationBasedNotificationService {
     return isPermissionGranted;
   }
 
-  // turn on the location service
   static Future<void> turnOn(BuildContext context, int interval) async {
-    _contextt = context;
-
-    _locationSubscription = Location().onLocationChanged.listen((location) {
-      //at first, the current location is null so we need to initialize it
-      //and we will check for the first time for nearby places
+    _locationSubscription ??=
+        Location().onLocationChanged.listen((location) async {
       if (_currentLocation == null) {
+        //set the new current location
         _currentLocation = location;
-        checkForLocations(_contextt!, interval);
+      } else if (_currentLocation!.latitude != location.latitude ||
+          _currentLocation!.longitude != location.longitude) {
+        //set the new current location
+        _currentLocation = location;
       }
 
-      //TODO uncomment this in production because it is for testing purposes
-      // //then check if the current location is different from the new location
-      // //so that the user doesn't get notified for the same location
-      // if (_currentLocation!.latitude!.toStringAsFixed(4) ==
-      //         location.latitude!.toStringAsFixed(4) &&
-      //     _currentLocation!.longitude!.toStringAsFixed(4) ==
-      //         location.longitude!.toStringAsFixed(4)) {
-      //   return;
-      // }
+      if (_timer == null || !_timer!.isActive) {
+        _timer = Timer.periodic(Duration(minutes: interval), (timer) async {
+          //check if exists at least one lasts with location category selected
+          if (await Utility.existsTaskWithLocationCategpoySelected()) {
+            //set the nearby locations
+            _nearbyPlaces = await getListOfNearbyPlaces();
 
-      //update the current location
-      _currentLocation = location;
-
-      // check for nearby places
-      print("turn on");
-      checkForLocations(_contextt!, interval);
+            //check those nearby locations according to tasks
+            await checkForLocations(interval);
+          }
+        });
+      }
     });
   }
 
-  // turn off the location service
-  static Future<void> turnOff() async {
-    await _locationSubscription?.cancel();
+  static void turnOff() {
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
+    _timer?.cancel();
+    _timer = null;
+    _processedTaskIds.clear();
   }
 }
