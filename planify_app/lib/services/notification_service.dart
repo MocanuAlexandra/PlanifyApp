@@ -68,7 +68,7 @@ class NotificationService {
     }
   }
 
-  static void createLocationBasedNotification(String taskId,
+  static void createLocationBasedNotification(String taskId, String taskTitle,
       String locationName, String type, DateTime notificationTime) {
     //create the notification
     AwesomeNotifications().createNotification(
@@ -76,7 +76,7 @@ class NotificationService {
         id: type.hashCode + notificationTime.hashCode,
         channelKey: 'basic_channel',
         title: "You are near $locationName ",
-        body: "You have a task you can do here",
+        body: "You have a task you can do here: $taskTitle",
         displayOnBackground: true,
         displayOnForeground: true,
         groupKey: taskId,

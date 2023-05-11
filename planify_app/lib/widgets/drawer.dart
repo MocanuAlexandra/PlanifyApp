@@ -59,10 +59,8 @@ class _MainDrawerState extends State<MainDrawer> {
             color: Colors.black,
           )),
       onTap: () {
-        FirebaseAuth.instance.signOut();
         GoogleSignIn().signOut();
-        SchedulerBinding.instance.addPostFrameCallback((_) {});
-        Navigator.of(context).pushReplacementNamed('/auth');
+        FirebaseAuth.instance.signOut();
       },
     );
   }

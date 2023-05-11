@@ -31,7 +31,7 @@ class LocationHelper {
   }
 
   // function that gets the nearby places of a certain location based on lat and long
-  static Future<List<dynamic>> getNearbyPlacesWithType(
+  static Future<List<dynamic>> getNearbyPlaces(
       {double? latitude, double? longitude}) async {
     //TODO Modify the radious in production, but keep it for demo purposes
     final url =

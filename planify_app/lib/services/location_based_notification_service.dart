@@ -17,7 +17,7 @@ class LocationBasedNotificationService {
   static Timer? timer;
 
   static Future<List<dynamic>> getListOfNearbyPlaces() async {
-    await LocationHelper.getNearbyPlacesWithType(
+    await LocationHelper.getNearbyPlaces(
             latitude: _currentLocation!.latitude!,
             longitude: _currentLocation!.longitude!)
         .then((value) => _nearbyPlaces = value);
@@ -26,6 +26,7 @@ class LocationBasedNotificationService {
 
   static void checkForLocations(BuildContext context, int interval) async {
     _context = context;
+    print("is here");
     var tasks = Provider.of<TaskProvider>(_context!, listen: false).tasksList;
 
     timer = Timer.periodic(Duration(minutes: interval), (timer) async {
@@ -57,8 +58,12 @@ class LocationBasedNotificationService {
                             {
                               //notify the user
                               NotificationService
-                                  .createLocationBasedNotification(task.id!,
-                                      place['name'], type, DateTime.now()),
+                                  .createLocationBasedNotification(
+                                      task.id!,
+                                      task.title!,
+                                      place['name'],
+                                      type,
+                                      DateTime.now()),
                             }
                         }
                     }
@@ -80,8 +85,12 @@ class LocationBasedNotificationService {
                             {
                               //notify the user
                               NotificationService
-                                  .createLocationBasedNotification(task.id!,
-                                      place['name'], type, DateTime.now()),
+                                  .createLocationBasedNotification(
+                                      task.id!,
+                                      task.title!,
+                                      place['name'],
+                                      type,
+                                      DateTime.now()),
                             }
                         }
                     }
@@ -98,8 +107,12 @@ class LocationBasedNotificationService {
                             {
                               //notify the user
                               NotificationService
-                                  .createLocationBasedNotification(task.id!,
-                                      place['name'], type, DateTime.now()),
+                                  .createLocationBasedNotification(
+                                      task.id!,
+                                      task.title!,
+                                      place['name'],
+                                      type,
+                                      DateTime.now()),
                             }
                         }
                     }
@@ -160,6 +173,7 @@ class LocationBasedNotificationService {
       _currentLocation = location;
 
       // check for nearby places
+      print("turn on");
       checkForLocations(_contextt!, interval);
     });
   }

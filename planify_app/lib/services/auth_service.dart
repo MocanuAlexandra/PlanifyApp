@@ -27,7 +27,8 @@ class AuthService {
         .collection('categories')
         .get();
 
-    //check if the user has categories
+    //check if the user hasn't any categories, means that ot is a new accoun
+    // so we have to add default category
     if (categories.docs.isEmpty) {
       await FirebaseFirestore.instance
           .collection('users')
@@ -35,14 +36,10 @@ class AuthService {
           .collection('categories')
           .add({'name': 'Uncategorized', 'iconCode': 57672});
     } else {
-      //add default category if it doesn't exist
-      for (var element in categories.docs) {
-        if (element.data()['name'] != 'Uncategorized') {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userCredentials.user!.uid)
-              .collection('categories')
-              .add({'name': 'Uncategorized', 'iconCode': 57672});
+      //check for default category
+      for (var category in categories.docs) {
+        if (category['name'] == 'Uncategorized') {
+          return;
         }
       }
     }

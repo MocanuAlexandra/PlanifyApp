@@ -419,11 +419,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       children: [
         const Icon(Icons.person),
         const SizedBox(width: 10),
-        Text(
-          'Shared by: $ownerEmail',
-          style: const TextStyle(fontSize: 16),
-          softWrap: true,
-          maxLines: 3,
+        SizedBox(
+          width: 300,
+          child: Text(
+            'Shared by: $ownerEmail',
+            style: const TextStyle(fontSize: 16),
+            softWrap: true,
+            maxLines: 3,
+          ),
         ),
       ],
     );

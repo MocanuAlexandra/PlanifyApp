@@ -102,7 +102,7 @@ class _AuthScreenState extends State<AuthScreen> {
     });
   }
 
-  void submitAuthForm(
+  Future<void> submitAuthForm(
       String email, String password, bool isLogin, BuildContext ctx) async {
     UserCredential userCredential;
 
@@ -111,6 +111,7 @@ class _AuthScreenState extends State<AuthScreen> {
       setState(() {
         _isLoading = true;
       });
+
       if (isLogin) {
         userCredential = await _auth.signInWithEmailAndPassword(
             email: email, password: password);
@@ -135,7 +136,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  void submitGoogleSignIn(BuildContext ctx) async {
+  Future<void> submitGoogleSignIn(BuildContext ctx) async {
     try {
       setState(() {
         _isLoading = true;
