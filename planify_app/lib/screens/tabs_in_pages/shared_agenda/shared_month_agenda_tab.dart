@@ -29,6 +29,19 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
 
   void _presentMonthPicker() async {
     final DateTime? picked = await showMonthPicker(
+      headerColor: Theme.of(context).colorScheme.primary,
+      confirmText: Text(
+        'OK',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+      cancelText: Text(
+        'CANCEL',
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2023),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:planify_app/services/database_helper_service.dart';
+import 'database_helper_service.dart';
 
 import '../helpers/utility.dart';
 import 'location_helper_service.dart';
@@ -105,7 +105,7 @@ class LocationBasedNotificationService {
     return isPermissionGranted;
   }
 
-  static Future<void> turnOn(BuildContext context, int interval) async {
+  static Future<void> turnOn(int interval) async {
     _locationSubscription ??=
         Location().onLocationChanged.listen((location) async {
       if (_currentLocation == null) {

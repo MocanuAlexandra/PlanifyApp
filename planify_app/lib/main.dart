@@ -162,7 +162,7 @@ class _MyAppState extends State<MyApp> {
             {
               LocationBasedNotificationService.turnOff(),
               LocationBasedNotificationService.turnOn(
-                  context_, _filters['intervalOfNotification']),
+                  _filters['intervalOfNotification']),
             }
           else
             {

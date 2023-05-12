@@ -51,6 +51,46 @@ class TaskProvider with ChangeNotifier {
       },
     ).toList();
 
+    //sort the task by due date and the ones from same date to due time
+    _tasks.sort((a, b) {
+      if (a.dueDate == null && b.dueDate == null) {
+        return 0;
+      } else if (a.dueDate == null) {
+        return 1;
+      } else if (b.dueDate == null) {
+        return -1;
+      } else {
+        final dateComparison = a.dueDate!.compareTo(b.dueDate!);
+        if (dateComparison != 0) {
+          return dateComparison;
+        } else {
+          if (a.dueTime == null && b.dueTime == null) {
+            return 0;
+          } else if (a.dueTime == null) {
+            return 1;
+          } else if (b.dueTime == null) {
+            return -1;
+          } else {
+            return DateTime(
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
+              a.dueTime!.hour,
+              a.dueTime!.minute,
+            ).compareTo(
+              DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+                b.dueTime!.hour,
+                b.dueTime!.minute,
+              ),
+            );
+          }
+        }
+      }
+    });
+
     //check if the user wants to fetch today agenda
     if (today != null) {
       _tasks = _tasks
@@ -128,6 +168,46 @@ class TaskProvider with ChangeNotifier {
     final tasksData = await DBHelper.fetchSharedTasks();
 
     _tasks = tasksData;
+
+    //sort the task by due date and the ones from same date to due time
+    _tasks.sort((a, b) {
+      if (a.dueDate == null && b.dueDate == null) {
+        return 0;
+      } else if (a.dueDate == null) {
+        return 1;
+      } else if (b.dueDate == null) {
+        return -1;
+      } else {
+        final dateComparison = a.dueDate!.compareTo(b.dueDate!);
+        if (dateComparison != 0) {
+          return dateComparison;
+        } else {
+          if (a.dueTime == null && b.dueTime == null) {
+            return 0;
+          } else if (a.dueTime == null) {
+            return 1;
+          } else if (b.dueTime == null) {
+            return -1;
+          } else {
+            return DateTime(
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
+              a.dueTime!.hour,
+              a.dueTime!.minute,
+            ).compareTo(
+              DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+                b.dueTime!.hour,
+                b.dueTime!.minute,
+              ),
+            );
+          }
+        }
+      }
+    });
 
     //check if the user wants to fetch today agenda
     if (today != null) {
