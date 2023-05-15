@@ -31,6 +31,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final taskId = ModalRoute.of(context)!.settings.arguments as String;
+    //can't use function from DBHelper cause build shouldn't be async
     loadedTask =
         Provider.of<TaskProvider>(context, listen: false).findById(taskId);
 

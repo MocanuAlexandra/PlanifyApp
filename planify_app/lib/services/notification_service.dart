@@ -55,7 +55,7 @@ class NotificationService {
       var taskId = receivedAction.payload!['groupKey'];
 
       //get the task
-      var task = await DBHelper.getTask(taskId!);
+      var task = await DBHelper.getTaskById(taskId!);
 
       //create a new notification with a delay of 5 minutes
       _createLocalNotification(taskId, task);

@@ -109,7 +109,7 @@ class _TaskListItemState extends State<TaskListItem> {
     NotificationService.deleteNotification(id);
 
     //delete all notifications for this task form the database
-    DBHelper.deleteNotificationsForSharedTask(id);
+    DBHelper.deleteReminderssForSharedTask(id);
 
     // mark task as done in UI
     Provider.of<TaskProvider>(context, listen: false).removeTaskFromScreen(id);

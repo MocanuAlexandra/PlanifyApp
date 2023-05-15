@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
+import '../../helpers/utility.dart';
+
 class LocationCategory extends StatefulWidget {
   final Function onSelectLocationCategory;
   final String? previousLocationCategory;
@@ -28,68 +30,7 @@ class _LocationCategoryState extends State<LocationCategory> {
 
   String? _searchType;
   final _searchController = TextEditingController();
-  final List<String> _locationCategories = [
-    "accounting",
-    "airport",
-    "amusement_park",
-    "aquarium",
-    "art_gallery",
-    "atm",
-    "bakery",
-    "bank",
-    "bar",
-    "beauty_salon",
-    "book_store",
-    "cafe",
-    "car_repair",
-    "car_wash",
-    "church",
-    "city_hall",
-    "clothing_store",
-    "dentist",
-    "doctor",
-    "electrician",
-    "electronics_store",
-    "fire_station",
-    "florist",
-    "food",
-    "furniture_store",
-    "gas_station",
-    "gym",
-    "hair_care",
-    "hardware_store",
-    "hospital",
-    "jewelry_store",
-    "laundry",
-    "library",
-    "liquor_store",
-    "meal_delivery",
-    "meal_takeaway",
-    "movie_theater",
-    "museum",
-    "park",
-    "parking",
-    "pet_store",
-    "pharmacy",
-    "physiotherapist",
-    "plumber",
-    "police",
-    "post_office",
-    "restaurant",
-    "school",
-    "shoe_store",
-    "shopping_mall",
-    "spa",
-    "store",
-    "subway_station",
-    "supermarket",
-    "taxi_stand",
-    "train_station",
-    "travel_agency",
-    "university",
-    "veterinary_care",
-    "zoo"
-  ];
+  final List<String> _locationCategories = Utility.locationCategories;
   String _selectedLocationCategory = '';
 
   @override

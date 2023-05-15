@@ -82,8 +82,40 @@ class DBHelper {
     return tasksList;
   }
 
+  // function that return a task after getting its id
+  static Future<task_model.Task> getTaskById(String taskId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the task from the connected user
+    final task = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+
+    return task_model.Task(
+      id: task.id,
+      title: task['title'],
+      dueDate: Utility.stringToDateTime(task['dueDate']),
+      address: TaskAddress(
+        latitude: task['latitude'],
+        longitude: task['longitude'],
+        address: task['address'],
+      ),
+      dueTime: Utility.stringToTimeOfDay(task['time']),
+      priority: Utility.stringToPriorityEnum(task['priority']),
+      isDone: task['isDone'],
+      isDeleted: task['isDeleted'],
+      category: task['category'],
+      locationCategory: task['locationCategory'],
+      owner: task['owner'],
+      imageUrl: task['imageUrl'],
+    );
+  }
+
   //function for fetching the task as list
-  static Future<List<task_model.Task>> fetchListOfTasks() async {
+  static Future<List<task_model.Task>> getListOfTasks() async {
     final user = FirebaseAuth.instance.currentUser;
 
     //get the shared tasks
@@ -757,7 +789,7 @@ class DBHelper {
   }
 
   // function that deletes the reminders for a task from a sharer
-  static Future<void> deleteNotificationsForSharedTask(String taskId) async {
+  static Future<void> deleteReminderssForSharedTask(String taskId) async {
     final user = FirebaseAuth.instance.currentUser;
 
     //get shared tasks and check if the taskId is equal to the one passed as argument
@@ -836,23 +868,6 @@ class DBHelper {
     } else {
       return false;
     }
-  }
-
-  // function that return a task after getting its id
-  static Future<task_model.Task> getTask(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    final task = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .get();
-    return task_model.Task(
-      id: task.id,
-      title: task['title'],
-      dueDate: Utility.stringToDateTime(task['dueDate']),
-      dueTime: Utility.stringToTimeOfDay(task['time']),
-    );
   }
 
   // get the logged in userId

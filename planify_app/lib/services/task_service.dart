@@ -35,7 +35,7 @@ class TaskService {
             //check if the user selected a due date or time
             if (editedTask.dueDate != null || editedTask.dueTime != null)
               {
-                await addNotificationsForTask(
+                await addRemindersForTask(
                     editedTask.id!, selectedReminders, editedTask),
               }
           });
@@ -62,7 +62,7 @@ class TaskService {
                 //check if the user selected a due date or time
                 if (editedTask.dueDate != null || editedTask.dueTime != null)
                   {
-                    await addNotificationsForTask(
+                    await addRemindersForTask(
                         editedTask.id!, selectedReminders, editedTask),
                   }
               });
@@ -90,7 +90,7 @@ class TaskService {
     //check if the user selected a due date or time
     if (editedTask.dueDate != null || editedTask.dueTime != null) {
       //add notifications for the task
-      await addNotificationsForTask(taskId, selectedReminders, editedTask);
+      await addRemindersForTask(taskId, selectedReminders, editedTask);
     }
   }
   //////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ class TaskService {
   //delete the notifications for the shared task
   static Future<void> deleteNotificationsForSharedTask(String taskId) async {
     //delete the notifications for the task from the database
-    await DBHelper.deleteNotificationsForSharedTask(taskId);
+    await DBHelper.deleteReminderssForSharedTask(taskId);
 
     //delete the notifications for the task from the notification center
     NotificationService.deleteNotification(taskId);
@@ -162,7 +162,7 @@ class TaskService {
   }
 
   //add the notifications for the task
-  static Future<void> addNotificationsForTask(
+  static Future<void> addRemindersForTask(
       String taskId, List<String> selectedReminders, Task editedTask) async {
     //parse the selected reminders and create a notification for each one
     if (selectedReminders.isNotEmpty) {
@@ -254,6 +254,9 @@ class TaskService {
     await DBHelper.deleteSharedWithUsers(taskId);
   }
 
+////////////////////////////////////////////////////////////////////////////////////
+
+//********************* Determine nature of task ************************************//
   //function that check if the task that we are trying to add is an appointment
   // so has "appointment" word in title
   static bool isAppointment(Task task) {

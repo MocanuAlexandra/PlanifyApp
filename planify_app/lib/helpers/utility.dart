@@ -7,6 +7,7 @@ import '../services/database_helper_service.dart';
 
 // Utility class used to store static methods that are used in multiple classes
 class Utility {
+  
   //***************** String manipulation ********************
   static String priorityEnumToString(Priority? priority) {
     String priorityString = '';
@@ -512,7 +513,7 @@ class Utility {
 
   static Future<bool> existsTaskWithLocationCategpoySelected() async {
     bool existTasksWithLocationCategprySelected = false;
-    final tasks = await DBHelper.fetchListOfTasks();
+    final tasks = await DBHelper.getListOfTasks();
 
     for (final task in tasks) {
       if (task.locationCategory != 'No location category chosen') {
@@ -652,6 +653,69 @@ class Utility {
     Icons.theater_comedy,
     Icons.local_florist,
     Icons.local_bar,
+  ];
+
+  static final List<String> locationCategories = [
+    "accounting",
+    "airport",
+    "amusement_park",
+    "aquarium",
+    "art_gallery",
+    "atm",
+    "bakery",
+    "bank",
+    "bar",
+    "beauty_salon",
+    "book_store",
+    "cafe",
+    "car_repair",
+    "car_wash",
+    "church",
+    "city_hall",
+    "clothing_store",
+    "dentist",
+    "doctor",
+    "electrician",
+    "electronics_store",
+    "fire_station",
+    "florist",
+    "food",
+    "furniture_store",
+    "gas_station",
+    "gym",
+    "hair_care",
+    "hardware_store",
+    "hospital",
+    "jewelry_store",
+    "laundry",
+    "library",
+    "liquor_store",
+    "meal_delivery",
+    "meal_takeaway",
+    "movie_theater",
+    "museum",
+    "park",
+    "parking",
+    "pet_store",
+    "pharmacy",
+    "physiotherapist",
+    "plumber",
+    "police",
+    "post_office",
+    "restaurant",
+    "school",
+    "shoe_store",
+    "shopping_mall",
+    "spa",
+    "store",
+    "subway_station",
+    "supermarket",
+    "taxi_stand",
+    "train_station",
+    "travel_agency",
+    "university",
+    "veterinary_care",
+    "zoo"
   ];
 
   ////////////////////////////////////////////////////////////////////

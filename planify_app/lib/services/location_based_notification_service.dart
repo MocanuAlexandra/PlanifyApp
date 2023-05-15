@@ -29,7 +29,7 @@ class LocationBasedNotificationService {
     _processedTaskIds.clear();
 
     //get the task from DB
-    final tasks = await DBHelper.fetchListOfTasks();
+    final tasks = await DBHelper.getListOfTasks();
 
     for (final task in tasks) {
       //add task IDs into set, in order to be ckecked only once
