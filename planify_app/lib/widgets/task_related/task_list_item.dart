@@ -199,9 +199,11 @@ class _TaskListItemState extends State<TaskListItem> {
       //if the time is null
     } else {
       return Row(children: [
-        const Icon(
+        Icon(
           Icons.access_time,
-          color: Colors.black,
+          color: widget.isDone!
+              ? const Color.fromARGB(255, 146, 145, 145)
+              : Colors.black,
         ),
         const SizedBox(
           width: 6,
@@ -275,9 +277,11 @@ class _TaskListItemState extends State<TaskListItem> {
     }
 
     return Row(children: [
-      const Icon(
+      Icon(
         Icons.calendar_month,
-        color: Colors.black,
+        color: widget.isDone!
+            ? const Color.fromARGB(255, 146, 145, 145)
+            : Colors.black,
       ),
       const SizedBox(
         width: 6,
