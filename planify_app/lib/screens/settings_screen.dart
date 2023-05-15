@@ -177,13 +177,6 @@ Make sure the app is running in the background.""",
                     value: _intervalOfSelfEmptyingTrash,
                     items: const [
                       DropdownMenuItem(
-                        value: 1,
-                        child: Text(
-                          'Every 1 minute',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      DropdownMenuItem(
                         value: 5,
                         child: Text(
                           'Every 5 minute',

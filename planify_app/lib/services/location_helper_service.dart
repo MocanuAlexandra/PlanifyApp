@@ -33,7 +33,6 @@ class LocationHelper {
   // function that gets the nearby places of a certain location based on lat and long
   static Future<List<dynamic>> getNearbyPlaces(
       {double? latitude, double? longitude}) async {
-    //TODO Modify the radious in production, but keep it for demo purposes
     final url =
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=1500&key=${config.GOOGLE_API_KEY}';
     final response = await http.get(Uri.parse(url));
