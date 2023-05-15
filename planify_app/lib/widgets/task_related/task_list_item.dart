@@ -122,7 +122,13 @@ class _TaskListItemState extends State<TaskListItem> {
       const SizedBox(
         width: 6,
       ),
-      Text(widget.priority!)
+      Text(widget.priority!,
+          style: widget.isDone!
+              ? const TextStyle(
+                  color: Color.fromARGB(255, 146, 145, 145),
+                  fontWeight: FontWeight.bold,
+                )
+              : null)
     ]);
   }
 
@@ -143,15 +149,19 @@ class _TaskListItemState extends State<TaskListItem> {
         return Row(children: [
           Icon(Icons.access_time,
               color: dueTimePassed
-                  ? const Color.fromARGB(255, 217, 61, 50)
+                  ? widget.isDone!
+                      ? const Color.fromARGB(255, 146, 145, 145)
+                      : const Color.fromARGB(255, 217, 61, 50)
                   : Colors.black),
           const SizedBox(
             width: 6,
           ),
           Text(widget.time!,
               style: dueTimePassed
-                  ? const TextStyle(
-                      color: Color.fromARGB(255, 217, 61, 50),
+                  ? TextStyle(
+                      color: widget.isDone!
+                          ? const Color.fromARGB(255, 146, 145, 145)
+                          : const Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                     )
                   : null)
@@ -167,15 +177,19 @@ class _TaskListItemState extends State<TaskListItem> {
         return Row(children: [
           Icon(Icons.access_time,
               color: dueTimePassed
-                  ? const Color.fromARGB(255, 217, 61, 50)
+                  ? widget.isDone!
+                      ? const Color.fromARGB(255, 146, 145, 145)
+                      : const Color.fromARGB(255, 217, 61, 50)
                   : Colors.black),
           const SizedBox(
             width: 6,
           ),
           Text(widget.time!,
               style: dueTimePassed
-                  ? const TextStyle(
-                      color: Color.fromARGB(255, 217, 61, 50),
+                  ? TextStyle(
+                      color: widget.isDone!
+                          ? const Color.fromARGB(255, 146, 145, 145)
+                          : const Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                     )
                   : null)
@@ -214,15 +228,19 @@ class _TaskListItemState extends State<TaskListItem> {
         return Row(children: [
           Icon(Icons.calendar_month,
               color: dueDatePassed
-                  ? const Color.fromARGB(255, 217, 61, 50)
+                  ? widget.isDone!
+                      ? const Color.fromARGB(255, 146, 145, 145)
+                      : const Color.fromARGB(255, 217, 61, 50)
                   : Colors.black),
           const SizedBox(
             width: 6,
           ),
           Text(widget.dueDate!,
               style: dueDatePassed
-                  ? const TextStyle(
-                      color: Color.fromARGB(255, 217, 61, 50),
+                  ? TextStyle(
+                      color: widget.isDone!
+                          ? const Color.fromARGB(255, 146, 145, 145)
+                          : const Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                     )
                   : null)
@@ -236,15 +254,19 @@ class _TaskListItemState extends State<TaskListItem> {
         return Row(children: [
           Icon(Icons.calendar_month,
               color: dueDatePassed
-                  ? const Color.fromARGB(255, 217, 61, 50)
+                  ? widget.isDone!
+                      ? const Color.fromARGB(255, 146, 145, 145)
+                      : const Color.fromARGB(255, 217, 61, 50)
                   : Colors.black),
           const SizedBox(
             width: 6,
           ),
           Text(widget.dueDate!,
               style: dueDatePassed
-                  ? const TextStyle(
-                      color: Color.fromARGB(255, 217, 61, 50),
+                  ? TextStyle(
+                      color: widget.isDone!
+                          ? const Color.fromARGB(255, 146, 145, 145)
+                          : const Color.fromARGB(255, 217, 61, 50),
                       fontWeight: FontWeight.bold,
                     )
                   : null)
@@ -282,7 +304,9 @@ class _TaskListItemState extends State<TaskListItem> {
                   if (categoryIconCode == Utility.iconList[index].codePoint) {
                     return Icon(
                       Utility.iconList[index],
-                      color: Theme.of(context).colorScheme.primary,
+                      color: widget.isDone!
+                          ? Colors.grey
+                          : Theme.of(context).colorScheme.primary,
                     );
                   }
                 }
@@ -295,15 +319,12 @@ class _TaskListItemState extends State<TaskListItem> {
           ),
           Text(
             widget.title!,
-            style: widget.isDone!
-                ? const TextStyle(
-                    decoration: TextDecoration.lineThrough,
-                    decorationThickness: 2,
-                    fontWeight: FontWeight.bold,
-                  )
-                : const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: widget.isDone!
+                  ? const Color.fromARGB(255, 130, 129, 129)
+                  : Colors.black,
+            ),
           ),
         ],
       ),
@@ -382,8 +403,10 @@ class _TaskListItemState extends State<TaskListItem> {
           if (widget.owner == DBHelper.currentUserId())
             !widget.isDeleted! // if isDeleted is false, show the delete button
                 ? IconButton(
-                    icon: const Icon(Icons.delete,
-                        color: Color.fromARGB(255, 217, 61, 50)),
+                    icon: Icon(Icons.delete,
+                        color: widget.isDone!
+                            ? const Color.fromARGB(255, 202, 185, 185)
+                            : const Color.fromARGB(255, 217, 61, 50)),
                     onPressed: () {
                       // display alert dialog
                       Utility.displayQuestionDialog(
@@ -396,8 +419,10 @@ class _TaskListItemState extends State<TaskListItem> {
                     },
                   )
                 : IconButton(
-                    icon: const Icon(Icons.delete_forever,
-                        color: Color.fromARGB(255, 217, 61, 50)),
+                    icon: Icon(Icons.delete_forever,
+                        color: widget.isDone!
+                            ? const Color.fromARGB(255, 202, 185, 185)
+                            : const Color.fromARGB(255, 217, 61, 50)),
                     onPressed: () {
                       // display alert dialog
                       Utility.displayQuestionDialog(context,
@@ -451,13 +476,15 @@ class _TaskListItemState extends State<TaskListItem> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          color: widget.priority == 'Important'
+          color: widget.priority == 'Important' && widget.isDone == false
               ? const Color.fromARGB(255, 255, 230, 230)
-              : widget.priority == 'Casual'
+              : widget.priority == 'Casual' && widget.isDone == false
                   ? const Color.fromARGB(255, 236, 255, 232)
-                  : widget.priority == 'Necessary'
+                  : widget.priority == 'Necessary' && widget.isDone == false
                       ? const Color.fromARGB(255, 254, 237, 221)
-                      : const Color.fromARGB(255, 255, 253, 230),
+                      : widget.isDone == false
+                          ? const Color.fromARGB(255, 255, 253, 230)
+                          : const Color.fromARGB(255, 244, 243, 243),
           elevation: 4,
           margin: const EdgeInsets.all(10),
           child: Column(
@@ -493,13 +520,17 @@ class _TaskListItemState extends State<TaskListItem> {
   }
 
   Color? _priorityIconColor(String priority) {
-    return priority == "Important"
+    return priority == "Important" && !widget.isDone!
         ? const Color.fromARGB(255, 217, 61, 50)
-        : priority == "Necessary"
+        : priority == "Necessary" && !widget.isDone!
             ? Colors.orange
-            : priority == "Casual"
+            : priority == "Casual" && !widget.isDone!
                 ? Colors.green
-                : Colors.black;
+                :
+                // if the task is done, the priority icon color is grey
+                widget.isDone!
+                    ? const Color.fromARGB(255, 146, 145, 145)
+                    : Colors.black;
   }
 
   Future<void> getCategoryIcon() async {
