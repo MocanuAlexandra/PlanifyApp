@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:planify_app/screens/statistics_screen.dart';
+
 import 'services/task_service.dart';
 
 import 'firebase_options.dart';
@@ -146,6 +148,7 @@ class _MyAppState extends State<MyApp> {
                   saveFilters: _setFilters,
                   currentFilters: _filters,
                 ),
+            StatisticsScreen.routeName: (context) => const StatisticsScreen()
           },
         ));
   }

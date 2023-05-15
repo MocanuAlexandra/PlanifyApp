@@ -11,6 +11,7 @@ import '../providers/task_category_provider.dart';
 import '../screens/pages/category_agenda_page.dart';
 import '../screens/settings_screen.dart';
 import '../screens/pages/overall_agenda_page.dart';
+import '../screens/statistics_screen.dart';
 
 class MainDrawer extends StatefulWidget {
   const MainDrawer({super.key});
@@ -98,6 +99,13 @@ class _MainDrawerState extends State<MainDrawer> {
         }),
         const Divider(),
         buildCategoriesTile(context),
+        const Divider(),
+        buildListTile('Statistics', Icons.query_stats, () {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context)
+                .pushReplacementNamed(StatisticsScreen.routeName);
+          });
+        }),
         const Divider(),
         buildListTile('Trash', Icons.delete, () {
           SchedulerBinding.instance.addPostFrameCallback((_) {
