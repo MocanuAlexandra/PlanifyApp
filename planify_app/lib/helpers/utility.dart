@@ -7,7 +7,6 @@ import '../services/database_helper_service.dart';
 
 // Utility class used to store static methods that are used in multiple classes
 class Utility {
-  
   //***************** String manipulation ********************
   static String priorityEnumToString(Priority? priority) {
     String priorityString = '';
