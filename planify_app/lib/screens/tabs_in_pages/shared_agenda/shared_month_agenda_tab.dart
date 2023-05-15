@@ -95,52 +95,88 @@ class _SharedMonthAgendaTabState extends State<SharedMonthAgendaTab> {
         PopupMenuItem(
           value: FilterOptions.all,
           child: Row(
-            children: const [
+            children: [
               Icon(
                 Icons.all_inbox,
-                color: Colors.black,
+                color: selectedOption == FilterOptions.all
+                    ? Colors.green
+                    : Colors.black,
               ),
-              SizedBox(width: 8),
-              Text('All'),
+              const SizedBox(width: 8),
+              Text(
+                'All',
+                style: TextStyle(
+                  color: selectedOption == FilterOptions.all
+                      ? Colors.green
+                      : Colors.black,
+                ),
+              ),
             ],
           ),
         ),
         PopupMenuItem(
           value: FilterOptions.inProgress,
           child: Row(
-            children: const [
+            children: [
               Icon(
                 Icons.work,
-                color: Colors.black,
+                color: selectedOption == FilterOptions.inProgress
+                    ? Colors.green
+                    : Colors.black,
               ),
-              SizedBox(width: 8),
-              Text('In progress'),
+              const SizedBox(width: 8),
+              Text(
+                'In progress',
+                style: TextStyle(
+                  color: selectedOption == FilterOptions.inProgress
+                      ? Colors.green
+                      : Colors.black,
+                ),
+              ),
             ],
           ),
         ),
         PopupMenuItem(
           value: FilterOptions.done,
           child: Row(
-            children: const [
+            children: [
               Icon(
                 Icons.done,
-                color: Colors.black,
+                color: selectedOption == FilterOptions.done
+                    ? Colors.green
+                    : Colors.black,
               ),
-              SizedBox(width: 8),
-              Text('Done'),
+              const SizedBox(width: 8),
+              Text(
+                'Done',
+                style: TextStyle(
+                  color: selectedOption == FilterOptions.done
+                      ? Colors.green
+                      : Colors.black,
+                ),
+              )
             ],
           ),
         ),
         PopupMenuItem(
           value: FilterOptions.focusMode,
           child: Row(
-            children: const [
+            children: [
               Icon(
                 Icons.notification_important_rounded,
-                color: Colors.black,
+                color: selectedOption == FilterOptions.focusMode
+                    ? Colors.green
+                    : Colors.black,
               ),
-              SizedBox(width: 8),
-              Text('Focus Mode'),
+              const SizedBox(width: 8),
+              Text(
+                'Focus Mode',
+                style: TextStyle(
+                  color: selectedOption == FilterOptions.focusMode
+                      ? Colors.green
+                      : Colors.black,
+                ),
+              ),
             ],
           ),
         ),
