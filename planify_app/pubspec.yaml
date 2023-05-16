@@ -65,6 +65,8 @@ dependencies:
   uuid: ^3.0.7 # For generating UUIDs
   speech_to_text: ^6.1.1 # For speech to text
   avatar_glow: ^2.0.2 # For avatar glow
+  syncfusion_flutter_charts: ^21.2.4  #For charts in statistics screen
+  syncfusion_flutter_gauges: ^21.2.4 
 
 
 dev_dependencies:

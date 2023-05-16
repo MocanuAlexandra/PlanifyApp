@@ -310,6 +310,55 @@ class DBHelper {
     return category.first['iconCode'];
   }
 
+  //get done tasks from month
+  static Future<List<task_model.Task>> getDoneTasksForMonth(
+      DateTime selectedMonth) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the tasks from the connected user
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .where('isDone', isEqualTo: true)
+        .get()
+        .then((snapshot) {
+      List<task_model.Task> tasks = [];
+      for (DocumentSnapshot ds in snapshot.docs) {
+        final task = task_model.Task(
+          id: ds.id,
+          title: ds['title'],
+          dueDate: Utility.stringToDateTime(ds['dueDate']),
+          address: TaskAddress(
+            latitude: ds['latitude'],
+            longitude: ds['longitude'],
+            address: ds['address'],
+          ),
+          dueTime: Utility.stringToTimeOfDay(ds['time']),
+          priority: Utility.stringToPriorityEnum(ds['priority']),
+          isDone: ds['isDone'],
+          isDeleted: ds['isDeleted'],
+          category: ds['category'],
+          locationCategory: ds['locationCategory'],
+          owner: ds['owner'],
+          imageUrl: ds['imageUrl'],
+        );
+
+        //check only tasks that have a dueDate
+        if (task.dueDate != null) {
+          //check if the task is done and if the month of the task is equal to the selected month
+          if (task.isDone &&
+              task.dueDate!.month == selectedMonth.month &&
+              task.dueDate!.year == selectedMonth.year) {
+            tasks.add(task);
+          }
+        }
+      }
+
+      return tasks;
+    });
+  }
+
   ///////////////////////////////////////////////////////////////////////////////
   // ********** TASK CRUD FUNCTIONS **********
   // function for adding tasks to the database
