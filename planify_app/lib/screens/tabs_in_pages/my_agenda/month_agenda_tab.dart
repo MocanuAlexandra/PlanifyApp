@@ -20,7 +20,7 @@ class MonthAgendaTab extends StatefulWidget {
 class _MonthAgendaTabState extends State<MonthAgendaTab> {
   final ScrollController _controller = ScrollController();
   FilterOptions selectedOption = FilterOptions.inProgress;
-  DateTime? _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
 
   Future<void> _fetchTasks(
       BuildContext context, FilterOptions? selectedOption) async {
@@ -44,7 +44,7 @@ class _MonthAgendaTabState extends State<MonthAgendaTab> {
         ),
       ),
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate,
       firstDate: DateTime(2023),
       lastDate: DateTime(2100),
     );
