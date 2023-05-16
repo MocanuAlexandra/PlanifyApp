@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+import 'package:planify_app/helpers/utility.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:planify_app/services/database_helper_service.dart';
@@ -20,6 +21,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   final ScrollController _controller = ScrollController();
   FilterOptions selectedOption = FilterOptions.inProgress;
   DateTime _selectedDate = DateTime.now();
+  late TooltipBehavior _tooltipPriorities;
+  late TooltipBehavior _toolTipCategories;
 
   void _presentMonthPicker() async {
     final DateTime? picked = await showMonthPicker(
@@ -50,6 +53,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   void initState() {
+    _tooltipPriorities = TooltipBehavior(
+      enable: true,
+      format: 'point.x : point.y%',
+    );
+    _toolTipCategories = TooltipBehavior(
+      enable: true,
+      format: 'point.x : point.y%',
+    );
     super.initState();
   }
 
@@ -147,8 +158,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   width: 10,
                 ),
                 const Divider(),
-///////////////////////////////////////////////////////////////////////
-//*************************** Categories pie ************************************ */
+                ///////////////////////////////////////////////////////////////////////
+                //*************************** Categories pie ************************************ */
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0),
                   child: Center(
@@ -193,6 +204,47 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 ),
                 const Divider(),
                 ///////////////////////////////////////////////////////////////////////
+                //*************************** Priorities donut ************************************ */
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Center(
+                    child: Text(
+                      'Priorities overview',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                FutureBuilder<List<PriorityData>>(
+                  future: _getPrioritiesData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      final priorityDataList = snapshot.data ?? [];
+
+                      return priorityDataList.isEmpty
+                          ? const SizedBox(
+                              height: 100,
+                              child: Center(
+                                child: Text(
+                                  'No data available for this month',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            )
+                          : SizedBox(
+                              height: 300,
+                              child:
+                                  _buildPriorityDoughnutChart(priorityDataList),
+                            );
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -201,6 +253,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
+  //Functions that build different charts
   SfCircularChart _buildCategoryPieChart(List<CategoryData> categoryDataList) {
     return SfCircularChart(
       title: ChartTitle(
@@ -209,6 +262,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       ),
       legend: Legend(isVisible: true),
       series: _getCategoryPieSeries(categoryDataList),
+      tooltipBehavior: _toolTipCategories,
     );
   }
 
@@ -223,7 +277,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         xValueMapper: (CategoryData data, _) => data.category,
         yValueMapper: (CategoryData data, _) => data.percentage,
         dataLabelMapper: (CategoryData data, _) =>
-            '${(data.percentage * 100).toStringAsFixed(2)}%',
+            '${(data.percentage).toStringAsFixed(2)}%',
         startAngle: 90,
         endAngle: 90,
         dataLabelSettings: const DataLabelSettings(isVisible: true),
@@ -231,6 +285,37 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     ];
   }
 
+  SfCircularChart _buildPriorityDoughnutChart(
+      List<PriorityData> priorityDataList) {
+    return SfCircularChart(
+      title: ChartTitle(text: ''),
+      legend:
+          Legend(isVisible: true, overflowMode: LegendItemOverflowMode.wrap),
+      series: _getPriorityDoughnutSeries(priorityDataList),
+      tooltipBehavior: _tooltipPriorities,
+    );
+  }
+
+  /// Returns the doughnut series which need to be render.
+  List<DoughnutSeries<PriorityData, String>> _getPriorityDoughnutSeries(
+      List<PriorityData> priorityDataList) {
+    return <DoughnutSeries<PriorityData, String>>[
+      DoughnutSeries<PriorityData, String>(
+        radius: '80%',
+        explode: true,
+        explodeIndex: 0,
+        explodeOffset: '10%',
+        dataSource: priorityDataList,
+        xValueMapper: (PriorityData data, _) => data.priority,
+        yValueMapper: (PriorityData data, _) => data.percentage,
+        dataLabelMapper: (PriorityData data, _) =>
+            '${(data.percentage).toStringAsFixed(2)}%',
+        dataLabelSettings: const DataLabelSettings(isVisible: true),
+      ),
+    ];
+  }
+
+  //Functions that cacluates different percentages
   Future<double?> _calculateProgressPercentage() async {
     final completedTasks = await DBHelper.getDoneTasksForMonth(_selectedDate);
     final totalTasks = await DBHelper.getTasksForMonth(_selectedDate);
@@ -253,15 +338,41 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     for (final category in categoryCountMap.keys) {
       final count = categoryCountMap[category]!;
       final percentage = count > 0 ? count / totalTasks.length : 0;
-      categoryDataList.add(CategoryData(category, percentage.toDouble()));
+      categoryDataList.add(CategoryData(category, percentage.toDouble() * 100));
     }
     return categoryDataList;
   }
+
+  Future<List<PriorityData>> _getPrioritiesData() async {
+    final totalTasks = await DBHelper.getTasksForMonth(_selectedDate);
+
+    final priorityCountMap = <String, int>{};
+    for (final task in totalTasks) {
+      priorityCountMap[Utility.priorityEnumToString(task.priority!)] =
+          (priorityCountMap[task.priority] ?? 0) + 1;
+    }
+
+    final priorityDataList = <PriorityData>[];
+    for (final priority in priorityCountMap.keys) {
+      final count = priorityCountMap[priority]!;
+      final percentage = count > 0 ? count / totalTasks.length : 0;
+      priorityDataList.add(PriorityData(priority, percentage.toDouble() * 100));
+    }
+    return priorityDataList;
+  }
 }
 
+//Classes used in getting data
 class CategoryData {
   final String category;
   final double percentage;
 
   CategoryData(this.category, this.percentage);
+}
+
+class PriorityData {
+  final String priority;
+  final double percentage;
+
+  PriorityData(this.priority, this.percentage);
 }

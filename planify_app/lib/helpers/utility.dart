@@ -64,8 +64,11 @@ class Utility {
       case 'Important':
         priorityEnum = Priority.important;
         break;
+      case 'Unknown':
+        priorityEnum = Priority.unknown;
+        break;
       case null:
-        priorityEnum = null;
+        priorityEnum = Priority.unknown;
     }
     return priorityEnum;
   }
