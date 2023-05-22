@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>145527527415-s67fht4t9pg5cs2iuoq836pgkil8ofm4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.145527527415-s67fht4t9pg5cs2iuoq836pgkil8ofm4</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>145527527415-bf9pe99ep90vg118s3ipois81gqppjic.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAbmRAUH8GmiNbZD4yu6WnYbG0O2_qm8e8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>145527527415</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.planify-app</string>
+	<key>PROJECT_ID</key>
+	<string>planifyapp-cb2cf</string>
+	<key>STORAGE_BUCKET</key>
+	<string>planifyapp-cb2cf.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:145527527415:ios:fbc64467c32b056c6f40f2</string>
+	<key>DATABASE_URL</key>
+	<string>https://planifyapp-cb2cf-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "145527527415",
+    "firebase_url": "https://planifyapp-cb2cf-default-rtdb.firebaseio.com",
     "project_id": "planifyapp-cb2cf",
     "storage_bucket": "planifyapp-cb2cf.appspot.com"
   },
@@ -14,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "145527527415-1ermr4h48fbi04ef9nqps4p8b05hn3uu.apps.googleusercontent.com",
+          "client_id": "145527527415-bf9pe99ep90vg118s3ipois81gqppjic.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.planify_app",
+            "certificate_hash": "986224c32f787274ed48a2c99011163b2369bf34"
+          }
+        },
+        {
+          "client_id": "145527527415-dsgei4vg6f27rghakgobspdope6ip59m.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
