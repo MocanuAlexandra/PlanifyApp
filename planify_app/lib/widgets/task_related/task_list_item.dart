@@ -7,7 +7,7 @@ import '../../helpers/utility.dart';
 import '../../models/task_address.dart';
 import '../../providers/task_provider.dart';
 import '../../screens/task_related/task_details_screen.dart';
-import '../../services/notification_service.dart';
+import '../../services/local_notification_service.dart';
 
 class TaskListItem extends StatefulWidget {
   final String? id;
@@ -67,7 +67,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.markTaskAsDeleted(id);
 
     //delete all notifications for this task from notification center
-    NotificationService.deleteNotification(id);
+    LocalNotificationService.deleteNotification(id);
 
     // delete all notifications for this task form the database
     DBHelper.deleteRemindersForTask(id);
@@ -92,7 +92,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.markTaskAsDone(id);
 
     //delete all notifications for this task from notification center
-    NotificationService.deleteNotification(id);
+    LocalNotificationService.deleteNotification(id);
 
     // delete all notifications for this task form the database
     DBHelper.deleteRemindersForTask(id);
@@ -106,7 +106,7 @@ class _TaskListItemState extends State<TaskListItem> {
     DBHelper.markSharedTaskAsDone(id, owner);
 
     //delete all notifications for this task from notification center
-    NotificationService.deleteNotification(id);
+    LocalNotificationService.deleteNotification(id);
 
     //delete all notifications for this task form the database
     DBHelper.deleteReminderssForSharedTask(id);
@@ -462,7 +462,9 @@ class _TaskListItemState extends State<TaskListItem> {
       ),
       direction: widget.isDeleted!
           ? DismissDirection.none
-          : DismissDirection.endToStart,
+          : widget.owner == DBHelper.currentUserId()
+              ? DismissDirection.endToStart
+              : DismissDirection.none,
       confirmDismiss: (direction) {
         return Utility.displayQuestionDialog(
             context, 'Do you want to move the task in Trash?');

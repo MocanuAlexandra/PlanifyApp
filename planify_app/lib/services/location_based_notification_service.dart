@@ -6,7 +6,7 @@ import 'database_helper_service.dart';
 
 import '../helpers/utility.dart';
 import 'location_helper_service.dart';
-import 'notification_service.dart';
+import 'local_notification_service.dart';
 
 class LocationBasedNotificationService {
   static LocationData? _currentLocation;
@@ -68,7 +68,7 @@ class LocationBasedNotificationService {
         for (final place in _nearbyPlaces!) {
           for (final type in place['types']) {
             if (type == task.locationCategory) {
-              NotificationService.createLocationBasedNotification(
+              LocalNotificationService.createLocationBasedNotification(
                 task.id!,
                 task.title!,
                 place['name'],

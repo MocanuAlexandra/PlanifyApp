@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../models/task_reminder.dart';
 import 'database_helper_service.dart';
-import 'notification_service.dart';
+import 'local_notification_service.dart';
 
 class TaskService {
   static Timer? timer;
@@ -130,7 +130,7 @@ class TaskService {
     await DBHelper.deleteRemindersForTask(taskId);
 
     //delete the notifications for the task from the notification center
-    NotificationService.deleteNotification(taskId);
+    LocalNotificationService.deleteNotification(taskId);
   }
 
   //delete the notifications for the shared task
@@ -139,7 +139,7 @@ class TaskService {
     await DBHelper.deleteReminderssForSharedTask(taskId);
 
     //delete the notifications for the task from the notification center
-    NotificationService.deleteNotification(taskId);
+    LocalNotificationService.deleteNotification(taskId);
   }
 
   //add the users to whom we shared the task
@@ -219,7 +219,7 @@ class TaskService {
         }
 
         //add the notification to notification center
-        NotificationService.createNotificationForTask(
+        LocalNotificationService.createNotificationForTask(
             editedTask, reminder, newReminder, taskId);
       }
     }

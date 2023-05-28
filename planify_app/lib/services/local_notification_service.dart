@@ -8,7 +8,7 @@ import '../helpers/utility.dart';
 import '../models/task.dart';
 import '../models/task_reminder.dart';
 
-class NotificationService {
+class LocalNotificationService {
   static void initialize() {
     AwesomeNotifications().initialize(
         // set the icon to null if you want to use the default app icon
@@ -27,9 +27,9 @@ class NotificationService {
 
   static void setListeners(BuildContext context) {
     AwesomeNotifications().setListeners(
-        onActionReceivedMethod: NotificationService.onActionReceivedMethod,
+        onActionReceivedMethod: LocalNotificationService.onActionReceivedMethod,
         onDismissActionReceivedMethod:
-            NotificationService.onDismissActionReceivedMethod);
+            LocalNotificationService.onDismissActionReceivedMethod);
 
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {

@@ -7,7 +7,7 @@ import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
-import '../../services/notification_service.dart';
+import '../../services/local_notification_service.dart';
 import '../../widgets/other/image/image_preview.dart';
 import '../pages/overall_agenda_page.dart';
 import 'add_edit_task_screen.dart';
@@ -474,7 +474,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     DBHelper.markTaskAsDeleted(task.id!);
 
     //delete all notifications for this task
-    NotificationService.deleteNotification(task.id!);
+    LocalNotificationService.deleteNotification(task.id!);
 
     // delete all notifications for this task form the database
     DBHelper.deleteRemindersForTask(task.id!);

@@ -19,7 +19,7 @@ import 'screens/task_related/add_edit_task_category_screen.dart';
 import 'screens/task_related/add_edit_task_screen.dart';
 import 'screens/task_related/task_details_screen.dart';
 import '../../services/location_based_notification_service.dart';
-import '../../services/notification_service.dart';
+import 'services/local_notification_service.dart';
 import 'providers/task_category_provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/pages/category_agenda_page.dart';
@@ -37,7 +37,7 @@ import 'screens/tabs_in_pages/shared_agenda/shared_today_agenda_tab.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  NotificationService.initialize();
+  LocalNotificationService.initialize();
 
   runApp(const MyApp());
 }
@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     initFilters();
-    NotificationService.setListeners(context);
+    LocalNotificationService.setListeners(context);
     super.initState();
   }
 

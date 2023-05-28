@@ -83,45 +83,61 @@ class _SharedTodayAgendaTabState extends State<SharedTodayAgendaTab> {
   Expanded displayTasks(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: _fetchTasks(context, selectedOption),
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () => _fetchTasks(context, selectedOption),
-                    child: Consumer<TaskProvider>(
-                      builder: (context, tasks, ch) => Scrollbar(
-                        controller: _controller,
-                        thumbVisibility: true,
-                        thickness: 5,
-                        child: ListView.builder(
-                          controller: _controller,
-                          itemCount: tasks.tasksList.length,
-                          itemBuilder: (context, index) => TaskListItem(
-                            id: tasks.tasksList[index].id,
-                            title: tasks.tasksList[index].title,
-                            dueDate: Utility.dateTimeToString(
-                                tasks.tasksList[index].dueDate),
-                            address: tasks.tasksList[index].address,
-                            time: Utility.timeOfDayToString(
-                                tasks.tasksList[index].dueTime),
-                            priority: Utility.priorityEnumToString(
-                                tasks.tasksList[index].priority),
-                            isDone: tasks.tasksList[index].isDone,
-                            isDeleted: tasks.tasksList[index].isDeleted,
-                            locationCategory:
-                                tasks.tasksList[index].locationCategory,
-                            owner: tasks.tasksList[index].owner,
-                            imageUrl: tasks.tasksList[index].imageUrl,
-                            category: tasks.tasksList[index].category,
-                          ),
-                        ),
+          future: _fetchTasks(context, selectedOption),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return const Center(
+                child: Text('Error occurred while fetching shared tasks'),
+              );
+            } else {
+              var taskProvider = Provider.of<TaskProvider>(context);
+              var tasks = taskProvider.tasksList;
+
+              if (tasks.isEmpty) {
+                return const Center(
+                  child: Text('There are no shared tasks for today',
+                      style: TextStyle(fontSize: 16)),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () => _fetchTasks(context, selectedOption),
+                child: Consumer<TaskProvider>(
+                  builder: (context, tasks, ch) => Scrollbar(
+                    controller: _controller,
+                    thumbVisibility: true,
+                    thickness: 5,
+                    child: ListView.builder(
+                      controller: _controller,
+                      itemCount: tasks.tasksList.length,
+                      itemBuilder: (context, index) => TaskListItem(
+                        id: tasks.tasksList[index].id,
+                        title: tasks.tasksList[index].title,
+                        dueDate: Utility.dateTimeToString(
+                            tasks.tasksList[index].dueDate),
+                        address: tasks.tasksList[index].address,
+                        time: Utility.timeOfDayToString(
+                            tasks.tasksList[index].dueTime),
+                        priority: Utility.priorityEnumToString(
+                            tasks.tasksList[index].priority),
+                        isDone: tasks.tasksList[index].isDone,
+                        isDeleted: tasks.tasksList[index].isDeleted,
+                        locationCategory:
+                            tasks.tasksList[index].locationCategory,
+                        owner: tasks.tasksList[index].owner,
+                        imageUrl: tasks.tasksList[index].imageUrl,
+                        category: tasks.tasksList[index].category,
                       ),
                     ),
                   ),
-      ),
+                ),
+              );
+            }
+          }),
     );
   }
 
