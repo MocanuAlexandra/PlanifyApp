@@ -178,13 +178,10 @@ class _MainDrawerState extends State<MainDrawer> {
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 onTap: () {
-                                  SchedulerBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    Navigator.of(context).pushReplacementNamed(
-                                        CategoryAgendaPage.routeName,
-                                        arguments: categories
-                                            .categoriesList[index].name!);
-                                  });
+                                  Navigator.of(context).popAndPushNamed(
+                                      CategoryAgendaPage.routeName,
+                                      arguments: categories
+                                          .categoriesList[index].name!);
                                 },
                               ),
                             ),
