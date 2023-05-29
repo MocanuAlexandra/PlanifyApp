@@ -67,6 +67,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   List<String> _selectedReminders = [];
   bool _dueTimeDueDateChanged = false;
   List<String> _selectedUserEmails = [];
+  bool _sharedUsersChanged = false;
   File? _pickedImageFile;
   bool isImageDeleted = false;
 
@@ -410,6 +411,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                           checkedItems: _selectedUserEmails,
                         ),
                       );
+                      _sharedUsersChanged = true;
                     }
                   // if task is saved, then we need to check already selected users emails
                   : () async {
@@ -422,6 +424,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                           checkedItems: _selectedUserEmails,
                         ),
                       );
+                      _sharedUsersChanged = true;
                     },
               icon: const Icon(Icons.share),
               label: const Text(
@@ -457,6 +460,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           setState(() {
             _isLoading = true;
           });
+          //check if user choose others to shared with, if not, add the same list of shared users
+          if (!_sharedUsersChanged) {
+            _selectedUserEmails =
+                await TaskService.determineAlreadySharedWithUsers(
+                    _editedTask.id);
+          }
+
           //if the task is not done, we update the task in the database normally
           await TaskService.editTask(_editedTask, _pickedImageFile,
               isImageDeleted, _selectedUserEmails, _selectedReminders);
@@ -501,6 +511,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           setState(() {
             _isLoading = true;
           });
+          //check if user choose others to shared with, if not, add the same list of shared users
+          if (!_sharedUsersChanged) {
+            _selectedUserEmails =
+                await TaskService.determineAlreadySharedWithUsers(
+                    _editedTask.id);
+          }
+
           //add the task to the database
           await TaskService.addTask(_editedTask, _pickedImageFile,
               isImageDeleted, _selectedUserEmails, _selectedReminders);
@@ -549,13 +566,21 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                           imagePickFn: _pickedImage,
                           previousImageUrl: _editedTask.imageUrl,
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 10),
                         locationField(),
                         const SizedBox(height: 10),
-                        priorityField(),
-                        const SizedBox(height: 10),
-                        categoryField(context),
-                        const SizedBox(height: 10),
+                        _editedTask.owner == DBHelper.currentUserId()
+                            ? priorityField()
+                            : const SizedBox(height: 1),
+                        _editedTask.owner == DBHelper.currentUserId()
+                            ? const SizedBox(height: 10)
+                            : const SizedBox(height: 1),
+                        _editedTask.owner == DBHelper.currentUserId()
+                            ? categoryField(context)
+                            : const SizedBox(height: 1),
+                        _editedTask.owner == DBHelper.currentUserId()
+                            ? const SizedBox(height: 10)
+                            : const SizedBox(height: 1),
                         reminderAndShareWithField(),
                         const SizedBox(height: 5),
                       ],
@@ -720,15 +745,19 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
             title: const Text("Question"),
             content: const Text(
               """Do you want to move the task back to "In progress"?
-You have to set new reminders after the moving, if you want to be notified about this task.""",
+You have to set new reminders.""",
               softWrap: true,
             ),
             actions: <Widget>[
               TextButton(
                 child: const Text("Yes"),
-                onPressed: () {
+                onPressed: () async {
                   // change the task to not done
                   _editedTask.isDone = false;
+
+                  _selectedUserEmails =
+                      await TaskService.determineAlreadySharedWithUsers(
+                          _editedTask.id);
 
                   // edit the task
                   TaskService.editTask(
@@ -746,9 +775,13 @@ You have to set new reminders after the moving, if you want to be notified about
               ),
               TextButton(
                 child: const Text("No"),
-                onPressed: () {
+                onPressed: () async {
                   // change the task to done
                   _editedTask.isDone = true;
+
+                  _selectedUserEmails =
+                      await TaskService.determineAlreadySharedWithUsers(
+                          _editedTask.id);
 
                   // edit the task
                   TaskService.editTask(

@@ -294,30 +294,35 @@ class _TaskListItemState extends State<TaskListItem> {
     return ListTile(
       title: Row(
         children: [
-          FutureBuilder<void>(
-            future: getCategoryIcon(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox(
-                  height: 25,
-                  width: 25,
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                for (int index = 0; index < Utility.iconList.length; index++) {
-                  if (categoryIconCode == Utility.iconList[index].codePoint) {
-                    return Icon(
-                      Utility.iconList[index],
-                      color: widget.isDone!
-                          ? Colors.grey
-                          : Theme.of(context).colorScheme.primary,
-                    );
-                  }
-                }
-              }
-              return const SizedBox();
-            },
-          ),
+          widget.owner == DBHelper.currentUserId()
+              ? FutureBuilder<void>(
+                  future: getCategoryIcon(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox(
+                        height: 25,
+                        width: 25,
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      for (int index = 0;
+                          index < Utility.iconList.length;
+                          index++) {
+                        if (categoryIconCode ==
+                            Utility.iconList[index].codePoint) {
+                          return Icon(
+                            Utility.iconList[index],
+                            color: widget.isDone!
+                                ? Colors.grey
+                                : Theme.of(context).colorScheme.primary,
+                          );
+                        }
+                      }
+                    }
+                    return const SizedBox();
+                  },
+                )
+              : const SizedBox(),
           const SizedBox(
             width: 6,
           ),

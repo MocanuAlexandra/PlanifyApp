@@ -282,7 +282,7 @@ class DBHelper {
         priority: Utility.stringToPriorityEnum(task['priority']),
         isDone: task['isDone'],
         isDeleted: task['isDeleted'],
-        category: task['category'],
+        category: 'Uncategorized',
         locationCategory: task['locationCategory'],
         owner: task['owner'],
         imageUrl: task['imageUrl'],

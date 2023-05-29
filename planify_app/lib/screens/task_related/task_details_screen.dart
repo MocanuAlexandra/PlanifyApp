@@ -102,14 +102,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                               displayPriority(loadedTask),
                             ],
                           ),
-                          const SizedBox(height: 150),
                           Container(
                             child: displayImage(loadedTask),
                           ),
                         ],
                       ),
-                      displayCategory(loadedTask),
-                      const SizedBox(height: 10),
+                      if (loadedTask.owner == DBHelper.currentUserId())
+                        displayCategory(loadedTask),
                       //check if the owner is the current user, so that the owner is not displayed
                       if (loadedTask.owner != DBHelper.currentUserId())
                         //owner
