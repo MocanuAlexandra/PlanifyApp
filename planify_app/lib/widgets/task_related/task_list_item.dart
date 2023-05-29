@@ -322,7 +322,9 @@ class _TaskListItemState extends State<TaskListItem> {
                     return const SizedBox();
                   },
                 )
-              : const SizedBox(),
+              : const SizedBox(
+                  width: 25,
+                ),
           const SizedBox(
             width: 6,
           ),
