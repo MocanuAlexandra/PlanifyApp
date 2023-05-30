@@ -322,8 +322,14 @@ class _TaskListItemState extends State<TaskListItem> {
                     return const SizedBox();
                   },
                 )
-              : const SizedBox(
+              : SizedBox(
                   width: 25,
+                  child: Icon(
+                    Icons.people,
+                    color: widget.isDone!
+                        ? Colors.grey
+                        : Theme.of(context).colorScheme.primary,
+                  ),
                 ),
           const SizedBox(
             width: 6,

@@ -20,7 +20,7 @@ class CategoryAgendaPage extends StatefulWidget {
 class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   final ScrollController _controller = ScrollController();
   FilterOptions selectedOption = FilterOptions.inProgress;
-  var _category = "Uncategorized";
+  var _category;
   var _isInit = true;
 
   @override

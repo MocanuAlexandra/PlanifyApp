@@ -60,8 +60,8 @@ class _MainDrawerState extends State<MainDrawer> {
             color: Colors.black,
           )),
       onTap: () {
-        GoogleSignIn().signOut();
         FirebaseAuth.instance.signOut();
+        GoogleSignIn().signOut();
       },
     );
   }

@@ -68,7 +68,8 @@ class _SharedOverallAgendaTabState extends State<SharedOverallAgendaTab> {
 
             if (tasks.isEmpty) {
               return const Center(
-                child: Text('There are no shared tasks'),
+                child: Text('There are no shared tasks',
+                    style: TextStyle(fontSize: 16)),
               );
             }
 

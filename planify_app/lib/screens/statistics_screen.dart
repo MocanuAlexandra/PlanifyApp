@@ -187,7 +187,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                               height: 100,
                               child: Center(
                                 child: Text(
-                                  'No data available for this month',
+                                  'No data available for this period',
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),
@@ -232,7 +232,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                               height: 100,
                               child: Center(
                                 child: Text(
-                                  'No data available for this month',
+                                  'No data available for this period',
                                   style: TextStyle(fontSize: 14),
                                 ),
                               ),

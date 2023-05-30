@@ -56,7 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _locationBasedNotification,
                   subtitle: const Text(
                     """Turn on to receive notifications based on your location.
-Make sure the app is running in the background.""",
+""",
                     softWrap: true,
                   ),
                   onChanged: (newValue) async {
