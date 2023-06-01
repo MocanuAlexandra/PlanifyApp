@@ -49,7 +49,7 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
                 //check if there is at least one task
                 if (tasks.isEmpty) {
                   Utility.displayInformationalDialog(
-                      context, 'There is no tasks for today');
+                      context, 'There are no tasks for today');
                   return;
                 }
                 //check if at least one task has location chosen
@@ -59,7 +59,7 @@ class _TodayAgendaTabState extends State<TodayAgendaTab> {
                     .toList()
                     .isEmpty) {
                   Utility.displayInformationalDialog(
-                      context, 'There is no task with location chosen');
+                      context, 'There are no task with location chosen');
                 } else {
                   //get current location of user
                   var locData = await LocationHelper.getCurrentLocation();
