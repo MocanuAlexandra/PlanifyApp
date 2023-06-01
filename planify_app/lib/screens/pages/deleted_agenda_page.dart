@@ -73,7 +73,7 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
                                   TaskService.emptyTrash(null);
 
                                   //close dialog
-                                  Navigator.of(context).pop(
+                                  Navigator.of(context).popAndPushNamed(
                                     OverallAgendaPage.routeName,
                                   );
                                 },

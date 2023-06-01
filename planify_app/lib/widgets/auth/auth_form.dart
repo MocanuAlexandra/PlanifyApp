@@ -214,9 +214,9 @@ least 8 characters and no space.'''),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeIn,
-        height: _authMode == AuthMode.signUp ? 430 : 360,
+        height: _authMode == AuthMode.signUp ? 440 : 370,
         constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.signUp ? 430 : 360),
+            BoxConstraints(minHeight: _authMode == AuthMode.signUp ? 440 : 370),
         width: deviceSize.width * 0.75,
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -249,7 +249,7 @@ least 8 characters and no space.'''),
                         horizontal: 30.0, vertical: 8.0),
                   ),
                   child: Text(
-                    _authMode == AuthMode.login ? 'Login' : 'Signup',
+                    _authMode == AuthMode.login ? 'Login' : 'Sign Up',
                   ),
                 ),
               //change the form to be for sign up/login

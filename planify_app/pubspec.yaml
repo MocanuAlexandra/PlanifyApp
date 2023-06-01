@@ -69,6 +69,13 @@ dependencies:
   syncfusion_flutter_charts: ^21.2.4  #For charts in statistics screen
   syncfusion_flutter_gauges: ^21.2.4 
 
+  flutter_launcher_icons: ^0.13.1 # For set up the icon image of app
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"
+
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +103,7 @@ flutter:
   assets:
     - assets/images/google.jpg
     - assets/images/noimage.jpg
+    - assets/images/icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -46,15 +46,15 @@ class _AuthScreenState extends State<AuthScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    // title of the login/sign up page
-                    child: Text(
-                      'Planify App',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        fontSize: 40,
-                        fontFamily: 'Anton',
-                        fontWeight: FontWeight.normal,
+                  //logo image
+                  Container(
+                    margin: const EdgeInsets.only(top: 30.0),
+                    child: const SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Image(
+                        image: AssetImage('assets/images/icon.png'),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),

@@ -14,9 +14,9 @@
         </intent>
     </queries>
     <application
-        android:label="planify_app"
+        android:label="Planify"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBCtWNcI4lD7pMey-ZghzlfRvFjQ2FfLhM" />
         <activity

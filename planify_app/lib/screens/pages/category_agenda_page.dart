@@ -11,7 +11,7 @@ import '../task_related/add_edit_task_category_screen.dart';
 class CategoryAgendaPage extends StatefulWidget {
   static const routeName = '/category-agenda-tab';
 
-  const CategoryAgendaPage({super.key});
+  const CategoryAgendaPage({Key? key}) : super(key: key);
 
   @override
   State<CategoryAgendaPage> createState() => _CategoryAgendaPageState();
@@ -20,28 +20,29 @@ class CategoryAgendaPage extends StatefulWidget {
 class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   final ScrollController _controller = ScrollController();
   FilterOptions selectedOption = FilterOptions.inProgress;
-  var _category;
+  var _category = '';
   var _isInit = true;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     if (_isInit) {
       final categoryName =
           ModalRoute.of(context)!.settings.arguments as String?;
-      if (categoryName != null) _category = categoryName;
+      if (categoryName != null) {
+        setState(() {
+          _category = categoryName;
+        });
+      }
     }
-
     _isInit = false;
-    super.didChangeDependencies();
   }
 
   Future<void> _fetchTasks(BuildContext context, FilterOptions? selectedOption,
       String? category) async {
+    // Update the category variable before fetching tasks
+    _category = category!;
+
     await Provider.of<TaskProvider>(context, listen: false)
         .fetchTasks(null, null, null, selectedOption, _category);
   }
@@ -49,16 +50,21 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_category), actions: [
-        IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            Navigator.of(context).pushNamed(AddEditTaskCategoryScreen.routeName,
-                arguments: _category);
-          },
-        ),
-        displayFilters(context)
-      ]),
+      appBar: AppBar(
+        title: Text(_category),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                AddEditTaskCategoryScreen.routeName,
+                arguments: _category,
+              );
+            },
+          ),
+          displayFilters(context),
+        ],
+      ),
       drawer: const MainDrawer(),
       body: Column(
         children: [
@@ -88,8 +94,10 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
 
             if (tasks.isEmpty) {
               return const Center(
-                child: Text('There are no tasks for this category',
-                    style: TextStyle(fontSize: 16)),
+                child: Text(
+                  'There are no tasks for this category',
+                  style: TextStyle(fontSize: 16),
+                ),
               );
             }
 
@@ -107,12 +115,15 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
                       id: tasks.tasksList[index].id,
                       title: tasks.tasksList[index].title,
                       dueDate: Utility.dateTimeToString(
-                          tasks.tasksList[index].dueDate),
+                        tasks.tasksList[index].dueDate,
+                      ),
                       address: tasks.tasksList[index].address,
                       time: Utility.timeOfDayToString(
-                          tasks.tasksList[index].dueTime),
+                        tasks.tasksList[index].dueTime,
+                      ),
                       priority: Utility.priorityEnumToString(
-                          tasks.tasksList[index].priority),
+                        tasks.tasksList[index].priority,
+                      ),
                       isDone: tasks.tasksList[index].isDone,
                       isDeleted: tasks.tasksList[index].isDeleted,
                       locationCategory: tasks.tasksList[index].locationCategory,
@@ -131,7 +142,7 @@ class _CategoryAgendaPageState extends State<CategoryAgendaPage> {
   }
 
   PopupMenuButton<FilterOptions> displayFilters(BuildContext context) {
-    return PopupMenuButton(
+    return PopupMenuButton<FilterOptions>(
       icon: const Icon(Icons.more_vert),
       onSelected: (FilterOptions selectedValue) {
         setState(() {
