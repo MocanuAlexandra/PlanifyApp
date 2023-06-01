@@ -18,7 +18,7 @@ class AuthService {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(userCredentials.user!.uid)
-        .set({'email': userCredentials.user!.email, 'deviceTokens': []});
+        .set({'email': userCredentials.user!.email});
 
     //get the user's categories
     final categories = await FirebaseFirestore.instance
