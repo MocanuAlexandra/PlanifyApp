@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 import 'package:planify_app/helpers/utility.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -23,6 +24,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   DateTime _selectedDate = DateTime.now();
   late TooltipBehavior _tooltipPriorities;
   late TooltipBehavior _toolTipCategories;
+  late TooltipBehavior _tooltipMonthlyDoneTasks;
 
   void _presentMonthPicker() async {
     final DateTime? picked = await showMonthPicker(
@@ -61,6 +63,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       enable: true,
       format: 'point.x : point.y%',
     );
+    _tooltipMonthlyDoneTasks =
+        TooltipBehavior(enable: true, canShowMarker: true);
     super.initState();
   }
 
@@ -245,6 +249,50 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     }
                   },
                 ),
+                //*************************** Monthly done tasks chart ************************************ */
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Center(
+                    child: Text(
+                      'Yearly progress',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                FutureBuilder<List<TasksData>>(
+                  future: _getTasksData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      final tasksData = snapshot.data ?? [];
+
+                      bool hasData =
+                          tasksData.any((data) => data.doneTasks! > 0);
+
+                      return hasData
+                          ? SizedBox(
+                              height: 300,
+                              child: _buildPointColorMapperChartOfDoneTasks(
+                                  tasksData),
+                            )
+                          : const SizedBox(
+                              height: 100,
+                              child: Center(
+                                child: Text(
+                                  'No data available',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            );
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -253,6 +301,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
+//************************ Categories pie **************************** */
   //Functions that build different charts
   SfCircularChart _buildCategoryPieChart(List<CategoryData> categoryDataList) {
     return SfCircularChart(
@@ -271,7 +320,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return <PieSeries<CategoryData, String>>[
       PieSeries<CategoryData, String>(
         explode: true,
-        explodeIndex: 0,
+        explodeIndex: 1,
         explodeOffset: '10%',
         dataSource: categoryDataList,
         xValueMapper: (CategoryData data, _) => data.category,
@@ -285,6 +334,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     ];
   }
 
+//************************ Priority donut **************************** */
   SfCircularChart _buildPriorityDoughnutChart(
       List<PriorityData> priorityDataList) {
     return SfCircularChart(
@@ -315,6 +365,42 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     ];
   }
 
+  //************************* Monthly done tasks ****************************** */
+  SfCartesianChart _buildPointColorMapperChartOfDoneTasks(
+      List<TasksData> tasksData) {
+    return SfCartesianChart(
+      plotAreaBorderWidth: 0,
+      title: ChartTitle(text: ''),
+      primaryXAxis:
+          CategoryAxis(majorGridLines: const MajorGridLines(width: 0)),
+      primaryYAxis: NumericAxis(
+        labelFormat: '{value}',
+        axisLine: const AxisLine(width: 0),
+        majorTickLines: const MajorTickLines(color: Colors.transparent),
+        numberFormat: NumberFormat('#'),
+        interval: 1,
+      ),
+      tooltipBehavior: _tooltipMonthlyDoneTasks,
+      series: _getPointColorMapperSeries(tasksData),
+    );
+  }
+
+  /// The method returns column series to chart.
+  List<CartesianSeries<TasksData, String>> _getPointColorMapperSeries(
+      List<TasksData> tasksData) {
+    return <CartesianSeries<TasksData, String>>[
+      ColumnSeries<TasksData, String>(
+          dataSource: tasksData,
+          xValueMapper: (TasksData data, _) => data.month as String,
+          yValueMapper: (TasksData data, _) => data.doneTasks,
+          dataLabelSettings: const DataLabelSettings(isVisible: true),
+          name: 'Done tasks',
+          pointColorMapper: (TasksData data, _) =>
+              _getPointColor(data.doneTasks))
+    ];
+  }
+
+  //************************* Utility functions ****************************** */
   //Functions that cacluates different percentages
   Future<double?> _calculateProgressPercentage() async {
     final completedTasks = await DBHelper.getDoneTasksForMonth(_selectedDate);
@@ -348,21 +434,62 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
     final priorityCountMap = <String, int>{};
     for (final task in totalTasks) {
-      priorityCountMap[Utility.priorityEnumToString(task.priority!)] =
-          (priorityCountMap[task.priority] ?? 0) + 1;
+      final priority = Utility.priorityEnumToString(task.priority!);
+      priorityCountMap[priority] = (priorityCountMap[priority] ?? 0) + 1;
     }
 
     final priorityDataList = <PriorityData>[];
     for (final priority in priorityCountMap.keys) {
       final count = priorityCountMap[priority]!;
-      final percentage = count > 0 ? count / totalTasks.length : 0;
-      priorityDataList.add(PriorityData(priority, percentage.toDouble() * 100));
+      final percentage = count > 0 ? (count / totalTasks.length) * 100 : 0;
+      priorityDataList.add(PriorityData(priority, percentage.toDouble()));
     }
     return priorityDataList;
   }
+
+  Color? _getPointColor(num? value) {
+    Color? color;
+
+    if (value! < 1) {
+      color = const Color.fromARGB(255, 133, 192, 205);
+    } else if (value >= 1 && value < 3) {
+      color = const Color.fromARGB(255, 133, 205, 185);
+    } else if (value >= 3 && value < 5) {
+      color = const Color.fromARGB(255, 133, 205, 147);
+    } else if (value >= 5 && value < 7) {
+      color = const Color.fromRGBO(115, 189, 115, 1);
+    } else if (value >= 7 && value < 10) {
+      color = const Color.fromRGBO(104, 174, 104, 1);
+    } else if (value >= 10 && value < 17) {
+      color = const Color.fromRGBO(94, 158, 94, 1);
+    } else if (value >= 17 && value < 20) {
+      color = const Color.fromRGBO(85, 143, 85, 1);
+    } else if (value >= 20 && value < 25) {
+      color = const Color.fromRGBO(77, 127, 77, 1);
+    } else if (value >= 25 && value < 30) {
+      color = const Color.fromRGBO(69, 111, 69, 1);
+    } else if (value >= 30) {
+      color = const Color.fromRGBO(61, 95, 61, 1);
+    }
+
+    return color;
+  }
+
+  //get tasks data for monthly chart
+  Future<List<TasksData>> _getTasksData() async {
+    final tasksData = <TasksData>[];
+    for (var i = 1; i <= 12; i++) {
+      final doneTasks = await DBHelper.getDoneTasksForMonth(
+          DateTime(_selectedDate.year, i, 1));
+      tasksData.add(TasksData(
+          month: DateFormat.MMM().format(DateTime(_selectedDate.year, i)),
+          doneTasks: doneTasks.length));
+    }
+    return tasksData;
+  }
 }
 
-//Classes used in getting data
+//********************** Classes used in getting data *****************************
 class CategoryData {
   final String category;
   final double percentage;
@@ -375,4 +502,11 @@ class PriorityData {
   final double percentage;
 
   PriorityData(this.priority, this.percentage);
+}
+
+class TasksData {
+  final String? month;
+  final num? doneTasks;
+
+  TasksData({this.month, this.doneTasks});
 }
