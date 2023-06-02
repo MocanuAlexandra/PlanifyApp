@@ -569,16 +569,20 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                         const SizedBox(height: 10),
                         locationField(),
                         const SizedBox(height: 10),
-                        _editedTask.owner == DBHelper.currentUserId()
+                        _editedTask.owner == DBHelper.currentUserId() ||
+                                _editedTask.owner == null
                             ? priorityField()
                             : const SizedBox(height: 1),
-                        _editedTask.owner == DBHelper.currentUserId()
+                        _editedTask.owner == DBHelper.currentUserId() ||
+                                _editedTask.owner == null
                             ? const SizedBox(height: 10)
                             : const SizedBox(height: 1),
-                        _editedTask.owner == DBHelper.currentUserId()
+                        _editedTask.owner == DBHelper.currentUserId() ||
+                                _editedTask.owner == null
                             ? categoryField(context)
                             : const SizedBox(height: 1),
-                        _editedTask.owner == DBHelper.currentUserId()
+                        _editedTask.owner == DBHelper.currentUserId() ||
+                                _editedTask.owner == null
                             ? const SizedBox(height: 10)
                             : const SizedBox(height: 1),
                         reminderAndShareWithField(),
