@@ -104,6 +104,8 @@ flutter:
     - assets/images/google.jpg
     - assets/images/noimage.jpg
     - assets/images/icon.png
+    - android/app/src/main/res/drawable/res_icon.png
+    
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

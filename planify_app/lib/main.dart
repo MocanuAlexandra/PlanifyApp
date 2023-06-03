@@ -119,6 +119,10 @@ class _MyAppState extends State<MyApp> {
               if (userSnapshot.hasData) {
                 return const OverallAgendaPage();
               }
+              if (!userSnapshot.hasData) {
+                return const AuthScreen();
+              }
+
               return const AuthScreen();
             },
           ),
