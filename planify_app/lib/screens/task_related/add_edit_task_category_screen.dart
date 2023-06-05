@@ -195,12 +195,32 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
 
       //check if we got an id
       if (_editedCategory.id != null) {
+        //check if category already exists
+        if (Provider.of<TaskCategoryProvider>(context, listen: false)
+                .findByName(_editedCategory.name!)
+                .name !=
+            '') {
+          Utility.displayInformationalDialog(
+              context, 'This category already exists.');
+          return;
+        }
+
         //update category
         DBHelper.updateTaskCategory(_editedCategory.id!, _editedCategory);
 
         // go back to overall agenda screen
         Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
       } else {
+        //check if category already exists
+        if (Provider.of<TaskCategoryProvider>(context, listen: false)
+                .findByName(_editedCategory.name!)
+                .name !=
+            '') {
+          Utility.displayInformationalDialog(
+              context, 'This category already exists.');
+          return;
+        }
+
         //add category
         DBHelper.addTaskCategory(_editedCategory);
 

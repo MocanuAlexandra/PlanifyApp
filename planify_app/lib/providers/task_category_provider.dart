@@ -25,7 +25,12 @@ class TaskCategoryProvider with ChangeNotifier {
   }
 
   TaskCategory findByName(String categoryName) {
-    return _categories.firstWhere((category) => category.name == categoryName);
+    return _categories.firstWhere(
+        (category) =>
+            category.name!.toUpperCase() == categoryName.toUpperCase(),
+        orElse: () => TaskCategory(
+              name: '',
+            ));
   }
 
   int getCategoryIcon(String categoryName) {

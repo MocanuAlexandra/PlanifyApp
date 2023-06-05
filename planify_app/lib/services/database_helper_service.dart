@@ -723,6 +723,18 @@ class DBHelper {
     return tasks.docs.isNotEmpty;
   }
 
+  //check if catgeory exists by name
+  static Future<bool> doesCategoryExists(String categoryName) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final categories = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('categories')
+        .where('name', isEqualTo: categoryName)
+        .get();
+    return categories.docs.isNotEmpty;
+  }
+
   /////////////////////////////////////////////////////////////////////
   // ********** SHARED TASKS **********
   // function that adds a user to the sharedWith array of a task
