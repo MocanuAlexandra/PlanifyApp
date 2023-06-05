@@ -2,6 +2,9 @@
 
 const String GOOGLE_API_KEY = 'AIzaSyBCtWNcI4lD7pMey-ZghzlfRvFjQ2FfLhM';
 
+const String FCM_API_KEY =
+    'AAAAIeId1_c:APA91bHy5cfnolxJ86IGMRVJWWtrb1k6ARq156VqYb_BF43xKbGatJG7oR27ayOHLBJjtbUhn27K-ewx1xjs6l8klZc3aUYlw5vLPCu4wBVcmfgT-wX4v65iMpJj7Pe1ex7l6w2NL7WE';
+
 const String ACTION_PATTERN =
     'add|insert|put|go to|go for|go|reminder|remind me to|remind me|buy|set a reminder to|set a reminder for';
 

@@ -7,7 +7,7 @@ import '../../helpers/utility.dart';
 import '../../models/task_address.dart';
 import '../../providers/task_provider.dart';
 import '../../screens/task_related/task_details_screen.dart';
-import '../../services/local_notification_service.dart';
+import '../../services/notifications/local_notification_service.dart';
 
 class TaskListItem extends StatefulWidget {
   final String? id;

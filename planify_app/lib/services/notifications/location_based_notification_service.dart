@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'database_helper_service.dart';
+import '../database_helper_service.dart';
 
-import '../helpers/utility.dart';
-import 'location_helper_service.dart';
+import '../../helpers/utility.dart';
+import '../location_helper_service.dart';
 import 'local_notification_service.dart';
 
 class LocationBasedNotificationService {

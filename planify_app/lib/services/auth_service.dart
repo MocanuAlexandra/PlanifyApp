@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
@@ -14,11 +15,15 @@ class AuthService {
   }
 
   static Future<void> addUserDataInDB(UserCredential userCredentials) async {
+    //get the device token
+    final deviceToken = await FirebaseMessaging.instance.getToken();
+
     //add the username as extra field
     await FirebaseFirestore.instance
         .collection('users')
         .doc(userCredentials.user!.uid)
-        .set({'email': userCredentials.user!.email});
+        .set(
+            {'email': userCredentials.user!.email, 'deviceToken': deviceToken});
 
     //get the user's categories
     final categories = await FirebaseFirestore.instance

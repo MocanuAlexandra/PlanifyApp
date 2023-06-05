@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:planify_app/screens/statistics_screen.dart';
+import 'package:planify_app/services/notifications/remote_notification_service.dart';
 
 import 'services/task_service.dart';
 
@@ -18,8 +19,8 @@ import '../../screens/settings_screen.dart';
 import 'screens/task_related/add_edit_task_category_screen.dart';
 import 'screens/task_related/add_edit_task_screen.dart';
 import 'screens/task_related/task_details_screen.dart';
-import '../../services/location_based_notification_service.dart';
-import 'services/local_notification_service.dart';
+import 'services/notifications/location_based_notification_service.dart';
+import 'services/notifications/local_notification_service.dart';
 import 'providers/task_category_provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/pages/category_agenda_page.dart';
@@ -34,11 +35,11 @@ import 'screens/tabs_in_pages/shared_agenda/shared_month_agenda_tab.dart';
 import 'screens/tabs_in_pages/shared_agenda/shared_overrall_agenda_tab.dart';
 import 'screens/tabs_in_pages/shared_agenda/shared_today_agenda_tab.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   LocalNotificationService.initialize();
-
+  RemoteNotificationService.initialize();
   runApp(const MyApp());
 }
 
@@ -77,6 +78,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     initFilters();
     LocalNotificationService.setListeners(context);
+    RemoteNotificationService.setListeners();
     super.initState();
   }
 

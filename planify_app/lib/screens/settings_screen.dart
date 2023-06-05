@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/utility.dart';
-import '../services/location_based_notification_service.dart';
+import '../services/notifications/location_based_notification_service.dart';
 import '../widgets/drawer.dart';
 
 class SettingsScreen extends StatefulWidget {

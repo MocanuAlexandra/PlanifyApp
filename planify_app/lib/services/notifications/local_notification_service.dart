@@ -1,12 +1,13 @@
 import 'dart:math';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-import 'database_helper_service.dart';
-import '../helpers/utility.dart';
-import '../models/task.dart';
-import '../models/task_reminder.dart';
+import '../database_helper_service.dart';
+import '../../helpers/utility.dart';
+import '../../models/task.dart';
+import '../../models/task_reminder.dart';
 
 class LocalNotificationService {
   static void initialize() {
@@ -19,7 +20,7 @@ class LocalNotificationService {
               channelKey: 'basic_channel',
               channelName: 'Basic notifications',
               channelDescription: 'Notification channel for basic tests',
-              defaultColor: const Color(0xFF9D50DD),
+              defaultColor: const Color.fromARGB(255, 1, 96, 100),
               ledColor: Colors.white)
         ],
         debug: true);
@@ -65,6 +66,9 @@ class LocalNotificationService {
 
       //mark the task as done
       DBHelper.markTaskAsDone(taskId!);
+    } else if (receivedAction.buttonKeyPressed == 'ok') {
+      //close the notification
+      AwesomeNotifications().cancel(receivedAction.id!);
     }
   }
 
@@ -149,6 +153,41 @@ class LocalNotificationService {
         NotificationActionButton(
           key: 'delay',
           label: 'SNOOZE 5 MIN',
+          autoDismissible: true,
+          actionType: ActionType.SilentAction,
+        ),
+      ],
+    );
+  }
+
+  /// Use this method to create a notification
+  static void createNotificationForSharedUser(RemoteNotification message) {
+    //set the date & time of the notification
+    TimeOfDay? notificationTime = TimeOfDay.now();
+    DateTime? notificationDate = DateTime.now();
+
+    //create the notification
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: Random().nextInt(10),
+        channelKey: 'basic_channel',
+        title: message.title,
+        body: message.body,
+        displayOnBackground: true,
+        displayOnForeground: true,
+      ),
+      schedule: NotificationCalendar(
+        day: notificationDate.day,
+        month: notificationDate.month,
+        year: notificationDate.year,
+        hour: notificationTime.hour,
+        minute: notificationTime.minute,
+        repeats: false,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'ok',
+          label: 'OK',
           autoDismissible: true,
           actionType: ActionType.SilentAction,
         ),

@@ -1118,5 +1118,26 @@ class DBHelper {
     }
   }
 
+  //*************Functions used for notifications for shared tasks ********************/
+  //get device tokens from user based on emails parameter
+  static Future<List<String>> getDeviceTokens(List<String> emails) async {
+    List<String> deviceTokens = [];
+
+    for (var email in emails) {
+      final user = await DBHelper.getUserByEmail(email);
+      final deviceToken = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.id)
+          .get();
+      deviceTokens.add(deviceToken['deviceToken']);
+    }
+
+    return deviceTokens;
+  }
+
+  static getCurrentUserEmail() {
+    return FirebaseAuth.instance.currentUser!.email;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
 }

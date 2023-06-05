@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../models/task_reminder.dart';
 import 'database_helper_service.dart';
-import 'local_notification_service.dart';
+import 'notifications/local_notification_service.dart';
+import 'notifications/remote_notification_service.dart';
 
 class TaskService {
   static Timer? timer;
@@ -29,6 +30,13 @@ class TaskService {
 
       //update the task in the database
       await DBHelper.updateTask(editedTask.id!, editedTask);
+
+      //add notifications to the selected users
+      List<String> tokens = await DBHelper.getDeviceTokens(selectedUserEmails);
+      for (String token in tokens) {
+        await RemoteNotificationService.sendNotificationAboutEditTaskToUsers(
+            token, editedTask.title!);
+      }
 
       //delete the notifications for the task and then add the new ones
       await deleteNotificationsForTask(editedTask.id!).then((value) async => {
@@ -87,12 +95,20 @@ class TaskService {
     //share the task with the selected users
     await shareTask(taskId, selectedUserEmails);
 
+    //add notifications to the selected users
+    List<String> tokens = await DBHelper.getDeviceTokens(selectedUserEmails);
+    for (String token in tokens) {
+      await RemoteNotificationService.sendNotificationAboutNewTaskToUsers(
+          token, editedTask.title!);
+    }
+
     //check if the user selected a due date or time
     if (editedTask.dueDate != null || editedTask.dueTime != null) {
       //add notifications for the task
       await addRemindersForTask(taskId, selectedReminders, editedTask);
     }
   }
+
   //////////////////////////////////////////////////////////////////////////
 
   //******************** TRASH MANIPULATION********************/

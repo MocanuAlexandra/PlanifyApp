@@ -7,7 +7,7 @@ import '../../services/database_helper_service.dart';
 import '../../helpers/utility.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
-import '../../services/local_notification_service.dart';
+import '../../services/notifications/local_notification_service.dart';
 import '../../widgets/other/image/image_preview.dart';
 import '../pages/overall_agenda_page.dart';
 import 'add_edit_task_screen.dart';
