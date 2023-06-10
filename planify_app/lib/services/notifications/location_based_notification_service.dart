@@ -17,6 +17,7 @@ class LocationBasedNotificationService {
   static final Set<String> _processedTaskIds = {};
 
   static Future<List<dynamic>> getListOfNearbyPlaces() async {
+    print("get list of neabry places");
     await LocationHelper.getNearbyPlaces(
       latitude: _currentLocation!.latitude!,
       longitude: _currentLocation!.longitude!,
@@ -25,19 +26,21 @@ class LocationBasedNotificationService {
   }
 
   static Future<void> checkForLocations(int interval) async {
-    // reset the set of processed task IDs
+    print("check for locations");
+
+    // Reset the set of processed task IDs
     _processedTaskIds.clear();
 
-    //get the task from DB
+    // Get the tasks from the DB
     final tasks = await DBHelper.getListOfTasks();
 
     for (final task in tasks) {
-      //add task IDs into set, in order to be ckecked only once
+      // Skip tasks that have already been processed
       if (_processedTaskIds.contains(task.id!)) {
         continue;
       }
 
-      //if task is done, deleted or doesn't have a location category, get over it
+      // If the task is done, deleted, or doesn't have a location category, move on to the next task
       if (task.isDeleted ||
           task.isDone ||
           task.locationCategory == 'No location category chosen') {
@@ -49,7 +52,7 @@ class LocationBasedNotificationService {
 
       if ((dueDate != null &&
               dueTime != null &&
-              dueDate.isBefore(DateTime.now()) &&
+              dueDate.isAfter(DateTime.now()) &&
               DateTime(
                 DateTime.now().year,
                 DateTime.now().month,
@@ -59,26 +62,32 @@ class LocationBasedNotificationService {
               ).isAfter(DateTime.now())) ||
           (dueDate != null &&
               dueTime == null &&
-              dueDate.isBefore(DateTime.now()) &&
-              dueDate.day != DateTime.now().day &&
-              dueDate.month != DateTime.now().month &&
-              dueDate.year != DateTime.now().year) ||
+              dueDate.isAfter(DateTime.now())) ||
           (dueDate == null && dueTime == null)) {
-        //check if any nearby location has type the same as location category from task
+        bool notificationSent =
+            false; // Variable to track if a notification has been sent for this task
+
         for (final place in _nearbyPlaces!) {
           for (final type in place['types']) {
             if (type == task.locationCategory) {
-              LocalNotificationService.createLocationBasedNotification(
-                task.id!,
-                task.title!,
-                place['name'],
-                type,
-                DateTime.now(),
-              );
-              _processedTaskIds.add(task.id!);
-              break;
+              if (!notificationSent) {
+                print("incomming notification..");
+                LocalNotificationService.createLocationBasedNotification(
+                  task.id!,
+                  task.title!,
+                  place['name'],
+                  type,
+                  DateTime.now(),
+                );
+                notificationSent =
+                    true; // Set the flag to true to indicate that a notification has been sent for this task
+              }
             }
           }
+        }
+
+        if (notificationSent) {
+          _processedTaskIds.add(task.id!);
         }
       }
     }
@@ -106,25 +115,39 @@ class LocationBasedNotificationService {
   }
 
   static Future<void> turnOn(int interval) async {
+    print("turned on");
+
     _locationSubscription ??=
         Location().onLocationChanged.listen((location) async {
       if (_currentLocation == null) {
-        //set the new current location
+        // Set the new current location
         _currentLocation = location;
+
+        // Check if there is at least one task with a location category selected
+        if (await Utility.existsTaskWithLocationCategpoySelected()) {
+          print("first time check");
+
+          // Set the nearby locations
+          _nearbyPlaces = await getListOfNearbyPlaces();
+
+          // Check those nearby locations according to tasks
+          await checkForLocations(interval);
+        }
       } else if (_currentLocation!.latitude != location.latitude ||
           _currentLocation!.longitude != location.longitude) {
-        //set the new current location
+        // Set the new current location
         _currentLocation = location;
       }
 
       if (_timer == null || !_timer!.isActive) {
         _timer = Timer.periodic(Duration(minutes: interval), (timer) async {
-          //check if exists at least one lasts with location category selected
+          print("interval check");
+          // Check if there is at least one task with a location category selected
           if (await Utility.existsTaskWithLocationCategpoySelected()) {
-            //set the nearby locations
+            // Set the nearby locations
             _nearbyPlaces = await getListOfNearbyPlaces();
 
-            //check those nearby locations according to tasks
+            // Check those nearby locations according to tasks
             await checkForLocations(interval);
           }
         });
@@ -133,6 +156,7 @@ class LocationBasedNotificationService {
   }
 
   static void turnOff() {
+    print("turned off");
     _locationSubscription?.cancel();
     _locationSubscription = null;
     _timer?.cancel();

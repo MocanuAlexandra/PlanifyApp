@@ -34,7 +34,7 @@ class LocationHelper {
   static Future<List<dynamic>> getNearbyPlaces(
       {double? latitude, double? longitude}) async {
     final url =
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=2000&key=${config.GOOGLE_API_KEY}';
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=2500&key=${config.GOOGLE_API_KEY}';
     final response = await http.get(Uri.parse(url));
     return json.decode(response.body)['results'];
   }
