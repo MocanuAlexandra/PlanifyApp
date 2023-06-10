@@ -408,6 +408,26 @@ class DBHelper {
     });
   }
 
+  //check if exists deleted tasks
+  static Future<bool> checkIfDeletedTasksExist() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    //get the tasks from the connected user
+    final tasks = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('tasks')
+        .where('isDeleted', isEqualTo: true)
+        .get();
+
+    //check if there are deleted tasks
+    if (tasks.docs.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////////
   // ********** TASK CRUD FUNCTIONS **********
   // function for adding tasks to the database

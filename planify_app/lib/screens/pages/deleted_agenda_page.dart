@@ -70,7 +70,7 @@ class _DeletedAgendaPageState extends State<DeletedAgendaPage> {
                               TextButton(
                                 onPressed: () {
                                   // empty trash
-                                  TaskService.emptyTrash(null);
+                                  TaskService.emptyTrash();
 
                                   //close dialog
                                   Navigator.of(context).popAndPushNamed(

@@ -169,7 +169,7 @@ class _MyAppState extends State<MyApp> {
               _filters['intervalOfNotification'] != null)
             {
               LocationBasedNotificationService.turnOff(),
-              LocationBasedNotificationService.turnOn(
+              await LocationBasedNotificationService.turnOn(
                   _filters['intervalOfNotification']),
             }
           else
@@ -181,11 +181,13 @@ class _MyAppState extends State<MyApp> {
           if (_filters['selfEmptyingTrash'] != false &&
               _filters['intervalOfSelfEmptyingTrash'] != null)
             {
-              TaskService.turnOnAutoEmptyingTrash(
+              await TaskService.turnOnAutoEmptyingTrash(
                   _filters['intervalOfSelfEmptyingTrash'], context_)
             }
           else
-            {TaskService.turnOffAutoEmptyingTrash()}
+            {
+              TaskService.turnOffAutoEmptyingTrash(),
+            }
         });
   }
 }

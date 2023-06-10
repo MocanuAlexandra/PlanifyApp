@@ -113,23 +113,36 @@ class TaskService {
 
   //******************** TRASH MANIPULATION********************/
   // turn on the auto emptying trash
-  static void turnOnAutoEmptyingTrash(
-      int? intervalOfEmptyingTrash, BuildContext context) {
-    timer =
-        Timer.periodic(Duration(minutes: intervalOfEmptyingTrash!), (timer) {
-      emptyTrash(intervalOfEmptyingTrash);
+  static Future<void> turnOnAutoEmptyingTrash(
+      int? intervalOfEmptyingTrash, BuildContext context) async {
+    print("turned on self emptying trash");
+    // Check if there is any trash at the moment
+    if (await DBHelper.checkIfDeletedTasksExist()) {
+      print("first check for emptying trash");
+      emptyTrash();
+    }
+
+    // Schedule periodic emptying of trash
+    timer = Timer.periodic(Duration(minutes: intervalOfEmptyingTrash!),
+        (timer) async {
+      if (await DBHelper.checkIfDeletedTasksExist()) {
+        print("interval check for emptying trash");
+        emptyTrash();
+      }
     });
   }
 
   // turn off the auto emptying trash
   static void turnOffAutoEmptyingTrash() {
+    print("turned off self emptying trash");
     if (timer != null) {
       timer!.cancel();
     }
   }
 
   //main function for emptying trash
-  static emptyTrash(int? intervalOfEmptyingTrash) {
+  static emptyTrash() {
+    print("emptying trash..");
     //remove the images for the tasks
     DBHelper.deleteAllImages();
 

@@ -71,7 +71,7 @@ class LocationBasedNotificationService {
           for (final type in place['types']) {
             if (type == task.locationCategory) {
               if (!notificationSent) {
-                print("incomming notification..");
+                print("incomming location based notification..");
                 LocalNotificationService.createLocationBasedNotification(
                   task.id!,
                   task.title!,
@@ -115,7 +115,7 @@ class LocationBasedNotificationService {
   }
 
   static Future<void> turnOn(int interval) async {
-    print("turned on");
+    print("turned on location based notification");
 
     _locationSubscription ??=
         Location().onLocationChanged.listen((location) async {
@@ -125,7 +125,7 @@ class LocationBasedNotificationService {
 
         // Check if there is at least one task with a location category selected
         if (await Utility.existsTaskWithLocationCategpoySelected()) {
-          print("first time check");
+          print("first time check for location based notification");
 
           // Set the nearby locations
           _nearbyPlaces = await getListOfNearbyPlaces();
@@ -141,7 +141,7 @@ class LocationBasedNotificationService {
 
       if (_timer == null || !_timer!.isActive) {
         _timer = Timer.periodic(Duration(minutes: interval), (timer) async {
-          print("interval check");
+          print("interval check for location based notification");
           // Check if there is at least one task with a location category selected
           if (await Utility.existsTaskWithLocationCategpoySelected()) {
             // Set the nearby locations
@@ -156,7 +156,7 @@ class LocationBasedNotificationService {
   }
 
   static void turnOff() {
-    print("turned off");
+    print("turned off location based notification");
     _locationSubscription?.cancel();
     _locationSubscription = null;
     _timer?.cancel();
