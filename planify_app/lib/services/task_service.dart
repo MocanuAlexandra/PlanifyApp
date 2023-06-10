@@ -255,11 +255,11 @@ class TaskService {
   }
 
   //function that checks already selected users emails from database and returns a list of them
-  static Future<List<String>> determineAlreadySharedWithUsers(
-      String? taskId) async {
+  static Future<List<String>> determineAlreadySharedWithUsers(String? taskId,
+      [String? ownerId]) async {
     List<String> alreadySelectedUserEmails = [];
     if (taskId != null) {
-      await DBHelper.getSharedWithUsers(taskId).then((userTasks) => {
+      await DBHelper.getSharedWithUsers(taskId, ownerId).then((userTasks) => {
             for (final user in userTasks)
               {
                 alreadySelectedUserEmails.add(user.email!),

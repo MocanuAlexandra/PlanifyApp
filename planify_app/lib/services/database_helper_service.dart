@@ -477,7 +477,7 @@ class DBHelper {
         .doc(user!.uid)
         .collection('tasks')
         .add({
-      'title': newTask.title,
+      'title': newTask.title!.trim(),
       'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(newTask.dueTime),
       'latitude': updatedLocation.latitude,
@@ -566,7 +566,7 @@ class DBHelper {
         .collection('tasks')
         .doc(editedTaskId)
         .update({
-      'title': editedTask.title,
+      'title': editedTask.title!.trim(),
       'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(editedTask.dueTime),
       'latitude': updatedLocation.latitude,
@@ -624,7 +624,7 @@ class DBHelper {
         .collection('tasks')
         .doc(editedTaskId)
         .update({
-      'title': editedTask.title,
+      'title': editedTask.title!.trim(),
       'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(editedTask.dueTime),
       'latitude': updatedLocation.latitude,
@@ -692,8 +692,10 @@ class DBHelper {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('categories')
         .doc(id)
-        .update(
-            {'name': editedCategory.name, 'iconCode': editedCategory.iconCode});
+        .update({
+      'name': editedCategory.name!.trim(),
+      'iconCode': editedCategory.iconCode
+    });
   }
 
   // function for adding a task category
@@ -708,7 +710,7 @@ class DBHelper {
         .doc(user!.uid)
         .collection('categories')
         .add({
-      'name': editedCategory.name,
+      'name': editedCategory.name!.trim(),
       'iconCode': editedCategory.iconCode,
     });
   }
@@ -787,30 +789,57 @@ class DBHelper {
   }
 
   // function that returns the users that a task is shared with
-  static Future<List<AppUser>> getSharedWithUsers(String taskId) async {
-    final user = FirebaseAuth.instance.currentUser;
-    final task = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .collection('tasks')
-        .doc(taskId)
-        .get();
-
-    final sharedWithUsersIds = task['sharedWith'];
-
-    //get the users from the ids
-    List<AppUser> sharedWithUsers = [];
-    for (var userId in sharedWithUsersIds) {
-      final user = await FirebaseFirestore.instance
+  static Future<List<AppUser>> getSharedWithUsers(String taskId,
+      [String? ownerId]) async {
+    //check if owner if was send as parameter, if yes, check replace user.uuid with id
+    if (ownerId != null) {
+      final task = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userId)
+          .doc(ownerId)
+          .collection('tasks')
+          .doc(taskId)
           .get();
-      sharedWithUsers.add(AppUser(
-        id: user.id,
-        email: user['email'],
-      ));
+
+      final sharedWithUsersIds = task['sharedWith'];
+
+      //get the users from the ids
+      List<AppUser> sharedWithUsers = [];
+      for (var userId in sharedWithUsersIds) {
+        final user = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+        sharedWithUsers.add(AppUser(
+          id: user.id,
+          email: user['email'],
+        ));
+      }
+      return sharedWithUsers;
+    } else {
+      final user = FirebaseAuth.instance.currentUser;
+      final task = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('tasks')
+          .doc(taskId)
+          .get();
+
+      final sharedWithUsersIds = task['sharedWith'];
+
+      //get the users from the ids
+      List<AppUser> sharedWithUsers = [];
+      for (var userId in sharedWithUsersIds) {
+        final user = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+        sharedWithUsers.add(AppUser(
+          id: user.id,
+          email: user['email'],
+        ));
+      }
+      return sharedWithUsers;
     }
-    return sharedWithUsers;
   }
 
   // function that deletes a user from the sharedWith array of a task

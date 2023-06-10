@@ -464,7 +464,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
           if (!_sharedUsersChanged) {
             _selectedUserEmails =
                 await TaskService.determineAlreadySharedWithUsers(
-                    _editedTask.id);
+                    _editedTask.id, _editedTask.owner);
           }
 
           //if the task is not done, we update the task in the database normally
