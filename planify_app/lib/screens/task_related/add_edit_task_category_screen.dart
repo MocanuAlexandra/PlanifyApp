@@ -197,9 +197,13 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
       if (_editedCategory.id != null) {
         //check if category already exists
         if (Provider.of<TaskCategoryProvider>(context, listen: false)
-                .findByName(_editedCategory.name!)
-                .name !=
-            '') {
+                    .findByName(_editedCategory.name!)
+                    .name !=
+                '' &&
+            Provider.of<TaskCategoryProvider>(context, listen: false)
+                    .findByName(_editedCategory.name!)
+                    .id !=
+                _editedCategory.id) {
           Utility.displayInformationalDialog(
               context, 'This category already exists.');
           return;
@@ -211,11 +215,15 @@ class _AddEditTaskCategoryScreenState extends State<AddEditTaskCategoryScreen> {
         // go back to overall agenda screen
         Navigator.of(context).pushReplacementNamed(OverallAgendaPage.routeName);
       } else {
-        //check if category already exists
+        //check if category already exists, but dont compare with the current category
         if (Provider.of<TaskCategoryProvider>(context, listen: false)
-                .findByName(_editedCategory.name!)
-                .name !=
-            '') {
+                    .findByName(_editedCategory.name!)
+                    .name !=
+                '' &&
+            Provider.of<TaskCategoryProvider>(context, listen: false)
+                    .findByName(_editedCategory.name!)
+                    .id !=
+                _editedCategory.id) {
           Utility.displayInformationalDialog(
               context, 'This category already exists.');
           return;

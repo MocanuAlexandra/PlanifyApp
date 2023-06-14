@@ -646,34 +646,44 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   }
 
   void _presentDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate:
-          _editedTask.dueDate != null ? _editedTask.dueDate! : DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      initialDatePickerMode: DatePickerMode.day,
-      locale: const Locale('en', 'US'),
-    ).then((pickedDate) async => {
-          if (pickedDate != null)
-            {
-              //check if the user selected a new date and if there are reminders
-              if (pickedDate != _editedTask.dueDate &&
-                  _editedTask.dueDate != null &&
-                  await DBHelper.checkForReminders(_editedTask.id!))
-                {
-                  _dueTimeDueDateChanged = true,
-                  Utility.displayInformationalDialog(context,
-                      'The previous reminders were deleted because the due date was changed.'),
-                  setState(() {
-                    _selectedReminders = [];
-                  })
-                },
-              setState(() {
-                _editedTask.dueDate = pickedDate;
-              }),
-            }
-        });
+    DateTime currentDate = DateTime.now();
+
+    if (_editedTask.dueDate != null &&
+        _editedTask.dueDate!.isBefore(currentDate)) {
+      // Display a message indicating that the previous date is before today
+      Utility.displayInformationalDialog(
+        context,
+        'The previous due date is before today, delete it first, then choose another one.',
+      );
+    } else {
+      showDatePicker(
+        context: context,
+        initialDate: _editedTask.dueDate ?? currentDate,
+        firstDate: currentDate,
+        lastDate: DateTime(2100),
+        initialDatePickerMode: DatePickerMode.day,
+        locale: const Locale('en', 'US'),
+      ).then((pickedDate) async {
+        if (pickedDate != null) {
+          // Check if the user selected a new date and if there are reminders
+          if (pickedDate != _editedTask.dueDate &&
+              _editedTask.dueDate != null &&
+              await DBHelper.checkForReminders(_editedTask.id!)) {
+            _dueTimeDueDateChanged = true;
+            Utility.displayInformationalDialog(
+              context,
+              'The previous reminders were deleted because the due date was changed.',
+            );
+            setState(() {
+              _selectedReminders = [];
+            });
+          }
+          setState(() {
+            _editedTask.dueDate = pickedDate;
+          });
+        }
+      });
+    }
   }
 
   void _presentTimePicker() {

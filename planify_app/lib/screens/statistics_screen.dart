@@ -324,7 +324,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         explodeOffset: '10%',
         dataSource: categoryDataList,
         xValueMapper: (CategoryData data, _) => data.category,
-        yValueMapper: (CategoryData data, _) => data.percentage,
+        yValueMapper: (CategoryData data, _) =>
+            num.parse(data.percentage.toStringAsFixed(2)),
         dataLabelMapper: (CategoryData data, _) =>
             '${(data.percentage).toStringAsFixed(2)}%',
         startAngle: 90,
@@ -357,7 +358,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         explodeOffset: '10%',
         dataSource: priorityDataList,
         xValueMapper: (PriorityData data, _) => data.priority,
-        yValueMapper: (PriorityData data, _) => data.percentage,
+        yValueMapper: (PriorityData data, _) =>
+            num.parse(data.percentage.toStringAsFixed(2)),
         dataLabelMapper: (PriorityData data, _) =>
             '${(data.percentage).toStringAsFixed(2)}%',
         dataLabelSettings: const DataLabelSettings(isVisible: true),
