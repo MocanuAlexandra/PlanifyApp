@@ -163,42 +163,47 @@ class _MainDrawerState extends State<MainDrawer> {
       children: [
         FutureBuilder(
           future: _fetchCategories(context),
-          builder: (context, snapshot) =>
-              snapshot.connectionState == ConnectionState.waiting
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Consumer<TaskCategoryProvider>(
-                      builder: (context, categories, _) => SizedBox(
-                        height: 150,
-                        child: Scrollbar(
+          builder: (context, snapshot) => snapshot.connectionState ==
+                  ConnectionState.waiting
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Consumer<TaskCategoryProvider>(
+                  builder: (context, categories, _) {
+                    var sortedCategories = categories.categoriesList.toList();
+                    sortedCategories.sort((a, b) =>
+                        a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
+
+                    return SizedBox(
+                      height: 150,
+                      child: Scrollbar(
+                        controller: _controller,
+                        thumbVisibility: true,
+                        thickness: 5,
+                        child: ListView.builder(
                           controller: _controller,
-                          thumbVisibility: true,
-                          thickness: 5,
-                          child: ListView.builder(
-                            controller: _controller,
-                            shrinkWrap: true,
-                            itemCount: categories.categoriesList.length,
-                            itemBuilder: (context, index) {
-                              var categoryName =
-                                  categories.categoriesList[index].name!;
-                              return ListTile(
-                                title: Text(
-                                  categoryName,
-                                  style: const TextStyle(fontSize: 18),
-                                ),
-                                onTap: () {
-                                  Navigator.of(context).popAndPushNamed(
-                                    CategoryAgendaPage.routeName,
-                                    arguments: categoryName,
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                          shrinkWrap: true,
+                          itemCount: sortedCategories.length,
+                          itemBuilder: (context, index) {
+                            var categoryName = sortedCategories[index].name!;
+                            return ListTile(
+                              title: Text(
+                                categoryName,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).popAndPushNamed(
+                                  CategoryAgendaPage.routeName,
+                                  arguments: categoryName,
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
-                    ),
+                    );
+                  },
+                ),
         )
       ],
     );

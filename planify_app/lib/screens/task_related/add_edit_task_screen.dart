@@ -653,7 +653,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       // Display a message indicating that the previous date is before today
       Utility.displayInformationalDialog(
         context,
-        'The previous due date is before today, delete it first, then choose another one.',
+        'The previous due date is before today. Delete it first, then choose another one.',
       );
     } else {
       showDatePicker(
