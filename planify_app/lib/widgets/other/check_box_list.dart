@@ -59,7 +59,6 @@ class _CheckboxListState extends State<CheckboxList> {
               child: Scrollbar(
                 controller: _controller,
                 thumbVisibility: true,
-                thickness: 10,
                 child: ListView.builder(
                   controller: _controller,
                   itemCount: widget.items.length,

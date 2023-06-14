@@ -21,6 +21,7 @@ class _UserListSearchState extends State<UserListSearch> {
   List<String> filterItems = [];
   List<String> checkedItems = [];
   final FocusNode _focusNode = FocusNode();
+  final ScrollController _controller = ScrollController();
 
   late final TextEditingController controller = TextEditingController()
     ..addListener(() {
@@ -80,30 +81,38 @@ class _UserListSearchState extends State<UserListSearch> {
                   _focusNode.unfocus();
                 },
               ),
-              SizedBox(
-                height: 100,
-                width: 300,
-                child: ListView.builder(
-                    itemCount: filterItems.length,
-                    itemBuilder: (context, index) {
-                      final bool isChecked =
-                          checkedItems.contains(filterItems[index]);
-                      return CheckboxListTile(
-                        value: isChecked,
-                        title: Text(filterItems[index]),
-                        onChanged: (value) {
-                          if (isChecked) {
-                            setState(() {
-                              checkedItems.remove(filterItems[index]);
-                            });
-                          } else {
-                            setState(() {
-                              checkedItems.add(filterItems[index]);
-                            });
-                          }
-                        },
-                      );
-                    }),
+              Expanded(
+                child: SizedBox(
+                  height: 220,
+                  width: 300,
+                  child: Scrollbar(
+                    controller: _controller,
+                    thumbVisibility: true,
+                    child: ListView.builder(
+                      controller: _controller,
+                      itemCount: filterItems.length,
+                      itemBuilder: (context, index) {
+                        final bool isChecked =
+                            checkedItems.contains(filterItems[index]);
+                        return CheckboxListTile(
+                          value: isChecked,
+                          title: Text(filterItems[index]),
+                          onChanged: (value) {
+                            if (isChecked) {
+                              setState(() {
+                                checkedItems.remove(filterItems[index]);
+                              });
+                            } else {
+                              setState(() {
+                                checkedItems.add(filterItems[index]);
+                              });
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
