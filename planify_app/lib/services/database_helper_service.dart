@@ -477,7 +477,7 @@ class DBHelper {
         .doc(user!.uid)
         .collection('tasks')
         .add({
-      'title': newTask.title!.trim(),
+      'title': newTask.title!.trim().capitalize(),
       'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(newTask.dueTime),
       'latitude': updatedLocation.latitude,
@@ -566,7 +566,7 @@ class DBHelper {
         .collection('tasks')
         .doc(editedTaskId)
         .update({
-      'title': editedTask.title!.trim(),
+      'title': editedTask.title!.trim().capitalize(),
       'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(editedTask.dueTime),
       'latitude': updatedLocation.latitude,
@@ -624,7 +624,7 @@ class DBHelper {
         .collection('tasks')
         .doc(editedTaskId)
         .update({
-      'title': editedTask.title!.trim(),
+      'title': editedTask.title!.trim().capitalize(),
       'dueDate': updatedDueDate,
       'time': Utility.timeOfDayToString(editedTask.dueTime),
       'latitude': updatedLocation.latitude,
@@ -693,7 +693,7 @@ class DBHelper {
         .collection('categories')
         .doc(id)
         .update({
-      'name': editedCategory.name!.trim(),
+      'name': editedCategory.name!.trim().capitalize(),
       'iconCode': editedCategory.iconCode
     });
   }
@@ -710,7 +710,7 @@ class DBHelper {
         .doc(user!.uid)
         .collection('categories')
         .add({
-      'name': editedCategory.name!.trim(),
+      'name': editedCategory.name!.trim().capitalize(),
       'iconCode': editedCategory.iconCode,
     });
   }

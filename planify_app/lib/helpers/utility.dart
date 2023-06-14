@@ -722,3 +722,11 @@ class Utility {
 
   ////////////////////////////////////////////////////////////////////
 }
+
+// This extension is used to capitalize the first letter of a string
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
+  }
+}

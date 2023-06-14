@@ -22,7 +22,7 @@ class TextProcessingService {
       final taskDetails = match.group(2)!.split(RegExp(config.SPLIT_PATTERN));
 
       //get the task title
-      final taskTitle = taskDetails[0].trim();
+      final taskTitle = taskDetails[0].trim().capitalize();
 
       //check if the next string is a date
       if (taskDetails.length > 1) {

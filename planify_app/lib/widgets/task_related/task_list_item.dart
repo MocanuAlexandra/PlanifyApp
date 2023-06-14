@@ -334,17 +334,23 @@ class _TaskListItemState extends State<TaskListItem> {
           const SizedBox(
             width: 6,
           ),
-          Text(
-            widget.title!,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: widget.isDone!
-                  ? const Color.fromARGB(255, 130, 129, 129)
-                  : Colors.black,
+          Expanded(
+            // Use Expanded to allow the text to take available space
+            child: Text(
+              widget.title!,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: widget.isDone!
+                    ? const Color.fromARGB(255, 130, 129, 129)
+                    : Colors.black,
+              ),
             ),
           ),
         ],
       ),
+
       //address or location category
       subtitle: widget.address!.address! == 'No address chosen'
           ? widget.locationCategory == 'No location category chosen'
