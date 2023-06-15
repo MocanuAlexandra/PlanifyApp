@@ -649,7 +649,8 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     DateTime currentDate = DateTime.now();
 
     if (_editedTask.dueDate != null &&
-        _editedTask.dueDate!.isBefore(currentDate)) {
+        _editedTask.dueDate!.isBefore(currentDate) &&
+        _editedTask.dueDate!.day != currentDate.day) {
       // Display a message indicating that the previous date is before today
       Utility.displayInformationalDialog(
         context,

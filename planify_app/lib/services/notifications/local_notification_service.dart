@@ -101,7 +101,7 @@ class LocalNotificationService {
     );
   }
 
-  /// Use this method to create a notification
+  /// Use this method to create a local notification
   static void createNotificationForTask(
       Task newTask, String reminder, TaskReminder newReminder, String taskId) {
     //set the date & time of the notification
@@ -129,20 +129,29 @@ class LocalNotificationService {
           'groupKey': taskId,
         },
       ),
-      schedule: notificationDate != null
+      schedule: (notificationDate != null && notificationTime != null)
           ? NotificationCalendar(
               day: notificationDate.day,
               month: notificationDate.month,
               year: notificationDate.year,
+              hour: notificationTime.hour,
+              minute: notificationTime.minute,
               repeats: false,
             )
-          : notificationTime != null
+          : (notificationDate != null)
               ? NotificationCalendar(
-                  hour: notificationTime.hour,
-                  minute: notificationTime.minute,
+                  day: notificationDate.day,
+                  month: notificationDate.month,
+                  year: notificationDate.year,
                   repeats: false,
                 )
-              : null,
+              : (notificationTime != null)
+                  ? NotificationCalendar(
+                      hour: notificationTime.hour,
+                      minute: notificationTime.minute,
+                      repeats: false,
+                    )
+                  : null,
       actionButtons: [
         NotificationActionButton(
           key: 'done',
@@ -160,7 +169,8 @@ class LocalNotificationService {
     );
   }
 
-  /// Use this method to create a notification
+  /// Use this method to create a notification when user shares a task with other users
+  // so that the other users can be notified
   static void createNotificationForSharedUser(RemoteNotification message) {
     //set the date & time of the notification
     TimeOfDay? notificationTime = TimeOfDay.now();
@@ -200,6 +210,7 @@ class LocalNotificationService {
     AwesomeNotifications().cancelNotificationsByGroupKey(groupKey);
   }
 
+  //Method used when user snoozze his reminder
   @pragma("vm:entry-point")
   static Future<void> _createLocalNotification(String taskId, Task task) async {
     AwesomeNotifications().createNotification(
