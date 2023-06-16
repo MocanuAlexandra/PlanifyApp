@@ -421,6 +421,8 @@ class Utility {
                 dueTime.hour - 2 < 0 ? 24 + dueTime.hour - 2 : dueTime.hour - 2,
             minute: dueTime.minute);
         break;
+      default:
+        time = TimeOfDay(hour: dueTime.hour, minute: dueTime.minute);
     }
     return time;
   }
@@ -455,6 +457,8 @@ class Utility {
       case '1 year before':
         date = dueDate.subtract(const Duration(days: 365));
         break;
+      default:
+        date = dueDate;
     }
     return date;
   }
