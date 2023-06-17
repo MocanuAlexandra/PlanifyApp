@@ -1,4 +1,3 @@
-import 'package:planify_app/helpers/utility.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class VoiceControlService {
@@ -16,7 +15,7 @@ class VoiceControlService {
 
     if (isAvailable) {
       _speech.listen(
-        onResult: (value) => onResult(value.recognizedWords.capitalize()),
+        onResult: (value) => onResult(value.recognizedWords),
       );
     }
 
