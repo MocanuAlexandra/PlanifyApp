@@ -95,7 +95,10 @@ class TaskProvider with ChangeNotifier {
     if (today != null) {
       _tasks = _tasks
           .where((task) =>
-              task.dueDate != null && task.dueDate!.day == DateTime.now().day)
+              task.dueDate != null &&
+              task.dueDate!.day == DateTime.now().day &&
+              task.dueDate!.month == DateTime.now().month &&
+              task.dueDate!.year == DateTime.now().year)
           .toList();
       //check if the user wants to fetch a certain month agenda
     } else if (month != null) {

@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         
-        {
-            "name": "planify_app",
-            "request": "launch",
-            "type": "dart"
-        },
         // {
-        //     "name": "planify_app (release mode)",
+        //     "name": "planify_app",
         //     "request": "launch",
-        //     "type": "dart",
-        //     "flutterMode": "release"
-        // }
+        //     "type": "dart"
+        // },
+        {
+            "name": "planify_app (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
     ]
 }
