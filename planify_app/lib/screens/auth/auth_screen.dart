@@ -115,6 +115,9 @@ class _AuthScreenState extends State<AuthScreen> {
       if (isLogin) {
         userCredential = await _auth.signInWithEmailAndPassword(
             email: email, password: password);
+
+        //add the username as extra field in DB, and add default category if it doesn't exist
+        await AuthService.addUserDataInDB(userCredential);
       } else {
         userCredential = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
