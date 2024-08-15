@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC95oqnmUsZoVjKyRwerZjJsjl53MpZ5ms',
-    appId: '1:145527527415:web:77c17ea8153506876f40f2',
-    messagingSenderId: '145527527415',
-    projectId: 'planifyapp-cb2cf',
-    authDomain: 'planifyapp-cb2cf.firebaseapp.com',
-    storageBucket: 'planifyapp-cb2cf.appspot.com',
-    measurementId: 'G-1X9JMXX1T5',
+    apiKey: 'private',
+    appId: 'private',
+    messagingSenderId: 'private',
+    projectId: 'private',
+    authDomain: 'private',
+    storageBucket: 'private',
+    measurementId: 'private',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDSw2WGOjtd3NhPh7XeumACCd3CtPYRsRU',
-    appId: '1:145527527415:android:e6a58403345d82556f40f2',
-    messagingSenderId: '145527527415',
-    projectId: 'planifyapp-cb2cf',
-    storageBucket: 'planifyapp-cb2cf.appspot.com',
+    apiKey: 'private',
+    appId: 'private',
+    messagingSenderId: 'private',
+    projectId: 'private',
+    storageBucket: 'private',
   );
 }
